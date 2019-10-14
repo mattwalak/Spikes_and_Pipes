@@ -39,3 +39,5 @@ audio.setVolume(0.5, {channel=1})
 
 --Go to the menu screen
 composer.gotoScene("title_screen")
+
+--End of file
