@@ -87,7 +87,10 @@ function scene:create( event )
 
     -- Initialize level data
     local level = composer.getVariable("level")
-    print("Here we are, playing level ".. level)
+    level_data = require ("Levels."..level)
+
+
+    print("Here we are, playing level ".. level_data.name)
     score = 0
 
     -- Initialize ui
