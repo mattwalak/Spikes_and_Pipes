@@ -4,6 +4,7 @@
 
 
 local levels = require("levels")
+local util = require("util")
 local CN = require ("crazy_numbers")
 local composer = require( "composer" )
 local scene = composer.newScene()
@@ -34,6 +35,7 @@ local gameLoopTimer
 
 -- Define important gameplay variables
 local score -- Same as height within the level
+local obstacle_num
 
 -- Define variable for level data
 local level_data
@@ -42,15 +44,42 @@ local level_data
 local scoreText
 
 
+local function updateObstacleElement()
+
+end
+
+local function addObstacle(parentGroup, obstacle)
+    obstacle = display.newGroup()
+end
+
+
 -- Update score element
 local function update_scoreText()
     scoreText.text = score
 end
 
+local function victory()
+    print("VICTORY!!!")
+    timer.pause(gameLoopTimer)
+end
+
 -- Updates obstacles and background (Updates twice a second)
 local function gameLoop_slow()
-    print("loop!")
     score = score + 1
+
+    -- Check for VICTORY
+    if (score == level_data.victory) then
+        victory()
+    end
+
+
+    -- Check if we put on another object (The slot in the array is not null)
+    if level_data.obstacles[score] then
+        print("adding object "..score)
+        util.tprint(level_data.obstacles[score])
+        addObstacle(level_data.obstacles[score])
+    end
+
     update_scoreText()
     --updateObstacles()
     --updateBackground()
@@ -88,6 +117,7 @@ function scene:create( event )
     -- Initialize level data
     local level = composer.getVariable("level")
     level_data = require ("Levels."..level)
+    obstacle_num = 1
 
 
     print("Here we are, playing level ".. level_data.name)
