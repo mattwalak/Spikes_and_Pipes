@@ -16,7 +16,7 @@ MUSIC:
 HARD CORE CODING:
 10/3	9:00pm		2:40				Redesigned control flow. Made new files for each location of control (title_screen.lua, level_select.lua, game.lua). Also reorganized supporting file structure
 10/8	5:30pm		1:00				Began redesigning obstacle representation structure to make crazy recursive things possible.
-10/14	9:00pm		
+10/14	9:00pm		1:00				Began working on game structure. Set up level reading system (Each level stored as .lua file)
 ------------------------------------------------------------------------------------------------------------------------------
 					2:40 TOTAL
 
