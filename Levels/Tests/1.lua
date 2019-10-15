@@ -1,7 +1,7 @@
 local CN = require("crazy_numbers")
 local util = require("util")
-local SCREEN_TOP = display.contentHeight/CN.COL_WIDTH
-print("screen_top = "..SCREEN_TOP)
+local MIDDLE_Y = display.contentHeight/CN.COL_WIDTH/2
+local MIDDLE_X = display.contentWidth/CN.COL_WIDTH/2
 
 
 
@@ -10,9 +10,9 @@ local speed = 4
 
 -- Parent Object format
 local parent = {
-    path = {0,SCREEN_TOP,0,-SCREEN_TOP},
+    path = {MIDDLE_X, 0, MIDDLE_X, 2*MIDDLE_Y},
     animation_options = {
-      time = {400},
+      time = {4000},
       time_interpolation = nil,
       rotation = {0},
       rotation_interpolation = nil,
@@ -35,7 +35,7 @@ local obstacle_1_child = {
     object = "black_square",
     on_complete = "stop"
 }
-obstacle_1.obstacle = obstacle_1_child
+obstacle_1.object = obstacle_1_child
 
 -- Obstacle 2
 local obstacle_2 = util.deepcopy(parent)
@@ -50,7 +50,7 @@ local obstacle_2_child = {
     object = "probably your grandma",
     on_complete = "stop"
 }
-obstacle_2.obstacle = obstacle_2_child
+obstacle_2.object = obstacle_2_child
 --------------------------------------------------------------------------------
 
 

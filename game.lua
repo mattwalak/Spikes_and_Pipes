@@ -43,13 +43,47 @@ local level_data
 -- ui elements
 local scoreText
 
+-- Transitions an obstacle from keyframe to keyframe + 1
+local function keyframeObstacle(obstacleGroup, obstacle_data, keyframe)
+    if #obstacle_data.path < ((keyframe+1)*2) then
+        -- We have reached the end of the animation!
+        print("Animation end")
+    else
+        transition.to(obstacleGroup, {
+          time = obstacle_data.animation_options.time[keyframe],
+          x = obstacle_data.path[(keyframe*2)+1],
+          y = obstacle_data.path[(keyframe*2)+2]
+      })
 
-local function updateObstacleElement()
-
+    end
 end
 
-local function addObstacle(parentGroup, obstacle)
-    obstacle = display.newGroup()
+-- Creates an objects and starts in from keyframe 1 to 2
+local function createObstacle(parentGroup, obstacle_data)
+    -- Will probably need to set anchor point at some point
+    thisObstacleGroup = display.newGroup()
+
+    local object = obstacle_data.object
+    -- Add the obstacles object
+    if not object then
+        -- No object... don't do anything... I think
+        return
+    elseif type(object) == "table" then
+        -- Recursively nestled objects!
+        createObstacle(thisObstacleGroup, obstacle_data.object)
+    elseif type(object) == "string" then
+        if object == "black_square" then
+            print("Adding black square I think")
+            local sprite = display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+        end
+    end
+
+    -- Set initial x and y
+    thisObstacleGroup.x = obstacle_data.path[1]*CN.COL_WIDTH
+    thisObstacleGroup.y = obstacle_data.path[2]*CN.COL_WIDTH
+
+    keyframeObstacle(thisObstacleGroup, obstacle_data, 1)
+
 end
 
 
@@ -76,8 +110,7 @@ local function gameLoop_slow()
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         print("adding object "..score)
-        util.tprint(level_data.obstacles[score])
-        addObstacle(level_data.obstacles[score])
+        createObstacle(obstacleGroup, level_data.obstacles[score])
     end
 
     update_scoreText()
