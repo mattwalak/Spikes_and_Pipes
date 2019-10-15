@@ -1,0 +1,23 @@
+THE OFFICIAL SPIKES AND PIPES LOG
+
+
+DESIGN:
+9/28	1:20pm		1:30 (ART)			Redesigned: Bubble.ai, Scaffold.ai, Spike.ai. Designed preliminary level select screen
+9/28	6:20pm		0:45 (ART)			Redesigned powerups: Plus.ai, Center.ai, Double.ai, Coin.ai
+9/28	8:45pm		1:00 (ANIMATION)	Animated powerups: Plus, Center, Double, Coin (Did not finish)
+------------------------------------------------------------------------------------------------------------------------------
+					3:15 TOTAL
+
+MUSIC:
+------------------------------------------------------------------------------------------------------------------------------
+					0:00 TOTAL
+
+
+HARD CORE CODING:
+10/3	9:00pm		2:40				Redesigned control flow. Made new files for each location of control (title_screen.lua, level_select.lua, game.lua). Also reorganized supporting file structure
+10/8	5:30pm		1:00				Began redesigning obstacle represation structure to make crazy recursive things possible.
+------------------------------------------------------------------------------------------------------------------------------
+					2:40 TOTAL
+
+
+THE GRAND TOTAL:	6:55
