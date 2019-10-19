@@ -44,16 +44,17 @@ function util.newParentObstacle(speed)
     local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
         name = "Parent",
-        path = {MIDDLE_X, 0, MIDDLE_X, 2*MIDDLE_Y},
+        path = {MIDDLE_X, 2*MIDDLE_Y, MIDDLE_X, 0},
+        time = {speed, speed},
         animation_options = {
-          time = {speed},
-          time_interpolation = nil,
-          rotation = {0},
+          position_interpolation = nil,
+          rotation = {0, 0},
           rotation_interpolation = nil,
         },
         on_complete = "destroy",
         object = nil,
-        first_frame = 1
+        first_frame = 1,
+        current_frame = 2
     }
     return parent
 end

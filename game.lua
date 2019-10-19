@@ -43,59 +43,103 @@ local level_data
 -- ui elements
 local scoreText
 
--- Transitions an obstacle from keyframe to keyframe + 1
-local function keyframeObstacle(obstacleGroup, obstacle_data, keyframe)
-    local num_keyframes = (#obstacle_data.path/2)
-    keyframe = keyframe % num_keyframes -- See if we have looped
-
-    -- If we are transitioning back to the first frame, the animation is over
-    if (keyframe + 1) == obstacle_data.first_frame then
-        -- We have reached the end of the animation!
-        print("Animation end for name = ".. obstacle_data.name)
-    else
-        local time = obstacle_data.animation_options.time[keyframe]
-        local x = obstacle_data.path[(keyframe*2)+1] * CN.COL_WIDTH
-        local y = obstacle_data.path[(keyframe*2)+2] * CN.COL_WIDTH
-
-        print("transitioning; name = "..obstacle_data.name.."; x = "..x.."; y = "..y)
-
-        transition.to(obstacleGroup, {
-          time = time,
-          x = x,
-          y = y,
-          onComplete = keyframeObstacle(obstacleGroup, obstacle_data, keyframe + 1)
-      })
+local function transitionComplete(obstacleGroup)
+    if not obstacleGroup then
+        print("nothing in transition complete!")
     end
+
+    local name = obstacleGroup.obstacle_data.name
+    print("Entered transitionComplete with: "..name)
 end
 
--- Creates an objects and starts in from keyframe 1 to 2
+-- Transitions an obstacle from keyframe to keyframe + 1
+local function keyframeObstacle(obstacleGroup)
+    if not obstacleGroup then
+        print("nothing in keyframeObstacle")
+    end
+
+    local obstacle_data = obstacleGroup.obstacle_data
+    local name = obstacleGroup.obstacle_data.name
+    local num_keyframes = (#obstacle_data.path/2)
+    print("Entering keyframeObstacle with: "..name)
+
+    -- Update keyframe for wrap-around
+    local keyframe = ((obstacle_data.current_frame - 1) % num_keyframes) + 1
+    obstacle_data.current_frame = keyframe
+
+    -- Initialize next_keyframe (With wrap-arround value)
+    local next_keyframe = keyframe + 1
+    next_keyframe = ((next_keyframe - 1) % num_keyframes) + 1
+
+    -- Initialize with number of times this animation has looped completely
+    local revolutions = (obstacle_data.current_frame - 1)/num_keyframes
+    revolutions = math.floor(revolutions)
+
+    print("keyframe = "..keyframe.."; next_keyframe = "..next_keyframe.."; revolutions = "..revolutions.."; num_keyframes = ".. num_keyframes)
+
+    if(revolutions > 0) then
+        -- We have completed a full loop
+        if(obstacle_data.on_complete == "destroy") then
+            print("DESTROYING name: "..name)
+            obstacleGroup:removeSelf();
+            return
+        elseif(obstacle_data.on_complete == "stop") then
+            print("STOPPING animation for name: "..name)
+            return
+        elseif(obstacle_data.on_complete == "loop") then
+            -- Do nothing
+        end
+    end
+
+    local transition_time = obstacle_data.time[keyframe]
+    local next_x = obstacle_data.path[(next_keyframe*2)-1] * CN.COL_WIDTH
+    local next_y = obstacle_data.path[next_keyframe*2] * CN.COL_WIDTH
+
+    print("transitioning; name = "..obstacle_data.name.."; x = "..next_x.."; y = "..next_y.."; time = "..transition_time)
+
+    -- Update our frame count
+    obstacleGroup.obstacle_data.current_frame = obstacleGroup.obstacle_data.current_frame + 1
+        
+    transition.to(obstacleGroup, {
+        time = transition_time,
+        x = next_x,
+        y = next_y,
+        onComplete = transitionComplete
+    })
+end
+
+-- Creates an objects and starts transition from current_frame to current_frame+1
 local function createObstacle(parentGroup, obstacle_data)
+    local name = obstacle_data.name
+    print("Entering createObstacle with: "..name)
+
     -- Will probably need to set anchor point at some point
     thisObstacleGroup = display.newGroup()
+    thisObstacleGroup.obstacle_data = obstacle_data
     parentGroup:insert(thisObstacleGroup)
 
-    local object = obstacle_data.object
+    -- Set initial x and y
+    local current_frame = obstacle_data.current_frame
+    thisObstacleGroup.x = obstacle_data.path[(current_frame*2)-1]*CN.COL_WIDTH
+    thisObstacleGroup.y = obstacle_data.path[current_frame*2]*CN.COL_WIDTH
+    print("Setting initial values for name: "..name.."; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
+
     -- Add the obstacles object
+    local object = obstacle_data.object
     if not object then
         -- No object... don't do anything... I think
-        return
+        print("no object for: "..name)
     elseif type(object) == "table" then
         -- Recursively nestled objects!
         createObstacle(thisObstacleGroup, obstacle_data.object)
     elseif type(object) == "string" then
         if object == "black_square" then
-            print("Adding black square I think")
-            local sprite = display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+            display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
         end
     end
 
-    -- Set initial x and y
-    thisObstacleGroup.x = obstacle_data.path[1]*CN.COL_WIDTH
-    thisObstacleGroup.y = obstacle_data.path[2]*CN.COL_WIDTH
-    print("Setting initial values; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
 
-
-    keyframeObstacle(thisObstacleGroup, obstacle_data, obstacle_data.first_frame)
+    keyframeObstacle(thisObstacleGroup)
 
 end
 

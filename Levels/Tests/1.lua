@@ -11,15 +11,16 @@ local obstacle_1 = util.newParentObstacle(speed)
 local obstacle_1_child = {
     name = "Black Square",
     path = {0,0},
+    time = {4000},
     animation_options = {
-      time = {4000},
-      time_interpolation = nil,
+      position_interpolation = nil,
       rotation = {0},
       rotation_interpolation = nil
     },
     object = "black_square",
     on_complete = "stop",
-    first_frame = 1
+    first_frame = 1,
+    current_frame = 1
 }
 obstacle_1.object = obstacle_1_child
 
@@ -28,15 +29,16 @@ local obstacle_2 = util.newParentObstacle(speed)
 local obstacle_2_child = {
     name = "Black Square 2",
     path = {-1,0,1,0},
+    time = {4000, 4000},
     animation_options = {
-      time = {1000},
-      time_interpolation = nil,
-      rotation = {0},
+      position_interpolation = nil,
+      rotation = {0, 0},
       rotation_interpolation = nil
     },
     object = "black_square",
     on_complete = "stop",
-    first_frame = 1
+    first_frame = 1,
+    current_frame = 1
 }
 obstacle_2.object = obstacle_2_child
 --------------------------------------------------------------------------------
