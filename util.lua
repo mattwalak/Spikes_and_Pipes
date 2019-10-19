@@ -1,7 +1,10 @@
--- Table clone method (Put this somewhere else when you are done plz)
--- Credit: http://lua-users.org/wiki/CopyTable
+-- Utilities! (yay?)
+
+local CN = require("crazy_numbers")
 local util = {}
 
+-- Table clone method (Put this somewhere else when you are done plz)
+-- Credit: http://lua-users.org/wiki/CopyTable
 function util.deepcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -36,7 +39,11 @@ end
 -- Returns the default parent object that travels from the top of the
 -- screen to the bottom in a given ammount of time (Stored in speed)
 function util.newParentObstacle(speed)
+    -- NOTE: You will probabily have to handle sizes of obstacles at some point
+    local MIDDLE_Y = (display.contentHeight/CN.COL_WIDTH)/2
+    local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
+        name = "Parent",
         path = {MIDDLE_X, 0, MIDDLE_X, 2*MIDDLE_Y},
         animation_options = {
           time = {speed},

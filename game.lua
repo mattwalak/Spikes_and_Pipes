@@ -45,16 +45,26 @@ local scoreText
 
 -- Transitions an obstacle from keyframe to keyframe + 1
 local function keyframeObstacle(obstacleGroup, obstacle_data, keyframe)
-    if #obstacle_data.path < ((keyframe+1)*2) then
-        -- We have reached the end of the animation!
-        print("Animation end")
-    else
-        transition.to(obstacleGroup, {
-          time = obstacle_data.animation_options.time[keyframe],
-          x = obstacle_data.path[(keyframe*2)+1],
-          y = obstacle_data.path[(keyframe*2)+2]
-      })
+    local num_keyframes = (#obstacle_data.path/2)
+    keyframe = keyframe % num_keyframes -- See if we have looped
 
+    -- If we are transitioning back to the first frame, the animation is over
+    if (keyframe + 1) == obstacle_data.first_frame then
+        -- We have reached the end of the animation!
+        print("Animation end for name = ".. obstacle_data.name)
+    else
+        local time = obstacle_data.animation_options.time[keyframe]
+        local x = obstacle_data.path[(keyframe*2)+1] * CN.COL_WIDTH
+        local y = obstacle_data.path[(keyframe*2)+2] * CN.COL_WIDTH
+
+        print("transitioning; name = "..obstacle_data.name.."; x = "..x.."; y = "..y)
+
+        transition.to(obstacleGroup, {
+          time = time,
+          x = x,
+          y = y,
+          onComplete = keyframeObstacle(obstacleGroup, obstacle_data, keyframe + 1)
+      })
     end
 end
 
@@ -62,6 +72,7 @@ end
 local function createObstacle(parentGroup, obstacle_data)
     -- Will probably need to set anchor point at some point
     thisObstacleGroup = display.newGroup()
+    parentGroup:insert(thisObstacleGroup)
 
     local object = obstacle_data.object
     -- Add the obstacles object
@@ -81,8 +92,10 @@ local function createObstacle(parentGroup, obstacle_data)
     -- Set initial x and y
     thisObstacleGroup.x = obstacle_data.path[1]*CN.COL_WIDTH
     thisObstacleGroup.y = obstacle_data.path[2]*CN.COL_WIDTH
+    print("Setting initial values; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
 
-    keyframeObstacle(thisObstacleGroup, obstacle_data, 1)
+
+    keyframeObstacle(thisObstacleGroup, obstacle_data, obstacle_data.first_frame)
 
 end
 
