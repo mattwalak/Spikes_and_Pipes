@@ -77,8 +77,8 @@ local function keyframeObstacle(obstacleGroup)
 
     print("keyframe = "..keyframe.."; next_keyframe = "..next_keyframe.."; revolutions = "..revolutions.."; num_keyframes = ".. num_keyframes)
 
+    -- Full loop compelte actions
     if(revolutions > 0) then
-        -- We have completed a full loop
         if(obstacle_data.on_complete == "destroy") then
             print("DESTROYING name: "..name)
             obstacleGroup:removeSelf();
@@ -109,17 +109,18 @@ local function keyframeObstacle(obstacleGroup)
 end
 
 -- Creates an objects and starts transition from current_frame to current_frame+1
-local function createObstacle(parentGroup, obstacle_data)
+local function createObstacle(obstacle_data)
     local name = obstacle_data.name
     print("Entering createObstacle with: "..name)
 
     -- Will probably need to set anchor point at some point
-    thisObstacleGroup = display.newGroup()
+    local thisObstacleGroup = display.newGroup()
     thisObstacleGroup.obstacle_data = obstacle_data
-    parentGroup:insert(thisObstacleGroup)
 
-    -- Set initial x and y
-    local current_frame = obstacle_data.current_frame
+    -- Set initial x and y (Accounting for overflow)
+    local num_keyframes = #obstacle_data.path/2
+    local current_frame = ((obstacle_data.current_frame - 1) % num_keyframes) + 1
+
     thisObstacleGroup.x = obstacle_data.path[(current_frame*2)-1]*CN.COL_WIDTH
     thisObstacleGroup.y = obstacle_data.path[current_frame*2]*CN.COL_WIDTH
     print("Setting initial values for name: "..name.."; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
@@ -131,16 +132,16 @@ local function createObstacle(parentGroup, obstacle_data)
         print("no object for: "..name)
     elseif type(object) == "table" then
         -- Recursively nestled objects!
-        createObstacle(thisObstacleGroup, obstacle_data.object)
+        thisObstacleGroup:insert(createObstacle(obstacle_data.object))
     elseif type(object) == "string" then
         if object == "black_square" then
             display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
         end
     end
 
-
     keyframeObstacle(thisObstacleGroup)
-
+    print("ending createObstacle with name:"..thisObstacleGroup.obstacle_data.name)
+    return thisObstacleGroup
 end
 
 
@@ -167,7 +168,7 @@ local function gameLoop_slow()
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         print("adding object "..score)
-        createObstacle(obstacleGroup, level_data.obstacles[score])
+        obstacleGroup:insert(createObstacle(level_data.obstacles[score]))
     end
 
     update_scoreText()
