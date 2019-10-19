@@ -8,22 +8,9 @@ local MIDDLE_X = display.contentWidth/CN.COL_WIDTH/2
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
 local speed = 4
 
--- Parent Object format
-local parent = {
-    path = {MIDDLE_X, 0, MIDDLE_X, 2*MIDDLE_Y},
-    animation_options = {
-      time = {4000},
-      time_interpolation = nil,
-      rotation = {0},
-      rotation_interpolation = nil,
-    },
-    on_complete = "destroy",
-    object = nil
-}
-
 -- Define obstacles ------------------------------------------------------------
 -- Obstacle 1
-local obstacle_1 = util.deepcopy(parent)
+local obstacle_1 = util.newParentObstacle(speed)
 local obstacle_1_child = {
     path = {0,0},
     animation_options = {
@@ -38,7 +25,7 @@ local obstacle_1_child = {
 obstacle_1.object = obstacle_1_child
 
 -- Obstacle 2
-local obstacle_2 = util.deepcopy(parent)
+local obstacle_2 = util.newParentObstacle(speed)
 local obstacle_2_child = {
     path = {0,0},
     animation_options = {

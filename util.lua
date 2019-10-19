@@ -33,4 +33,22 @@ end
 end
 end
 
+-- Returns the default parent object that travels from the top of the
+-- screen to the bottom in a given ammount of time (Stored in speed)
+function util.newParentObstacle(speed)
+    local parent = {
+        path = {MIDDLE_X, 0, MIDDLE_X, 2*MIDDLE_Y},
+        animation_options = {
+          time = {speed},
+          time_interpolation = nil,
+          rotation = {0},
+          rotation_interpolation = nil,
+        },
+        on_complete = "destroy",
+        object = nil,
+        first_frame = 1
+    }
+    return parent
+end
+
 return util

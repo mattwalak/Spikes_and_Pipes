@@ -19,6 +19,7 @@ HARD CORE CODING:
 10/14	9:00pm		1:00				Began working on game structure. Set up level reading system (Each level stored as .lua file)
 10/14	10:40pm		1:10				Began implementing methods to display and animate obstacles
 10/14	12:00pm		0:45				Continued implementing methods to display and animate obstacles (Recursive animation). Obstacles now appear on screen and things!
+10/17	11:10pm				
 ------------------------------------------------------------------------------------------------------------------------------
 					5:35 TOTAL
 
