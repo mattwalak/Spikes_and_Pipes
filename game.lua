@@ -43,19 +43,32 @@ local level_data
 -- ui elements
 local scoreText
 
-local function transitionComplete(obstacleGroup)
-    if not obstacleGroup then
-        print("nothing in transition complete!")
+-- removes an obstacle and all of its nestled objects
+local function destroyObstacle(thisObstacleGroup)
+    print("Destroying this one:")
+    util.tprint(thisObstacleGroup.obstacle_data)
+
+    -- Base case
+    if not thisObstacleGroup then
+        return
     end
 
-    local name = obstacleGroup.obstacle_data.name
-    print("Entered transitionComplete with: "..name)
+
+
+    
+    -- If we have a nestled object
+    if thisObstacleGroup.obstacle_data.object then
+        destroyObstacle(thisObstacleGroup.obstacle_data.object)
+    end
+
+    thisObstacleGroup.obstacle_data = nil
 end
 
 -- Transitions an obstacle from keyframe to keyframe + 1
 local function keyframeObstacle(obstacleGroup)
     if not obstacleGroup then
         print("nothing in keyframeObstacle")
+        return
     end
 
     local obstacle_data = obstacleGroup.obstacle_data
@@ -64,23 +77,23 @@ local function keyframeObstacle(obstacleGroup)
     print("Entering keyframeObstacle with: "..name)
 
     -- Update keyframe for wrap-around
-    local keyframe = ((obstacle_data.current_frame - 1) % num_keyframes) + 1
-    obstacle_data.current_frame = keyframe
+    local keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
 
     -- Initialize next_keyframe (With wrap-arround value)
     local next_keyframe = keyframe + 1
     next_keyframe = ((next_keyframe - 1) % num_keyframes) + 1
 
     -- Initialize with number of times this animation has looped completely
-    local revolutions = (obstacle_data.current_frame - 1)/num_keyframes
+    local revolutions = (obstacle_data.frame_counter - 1)/num_keyframes
     revolutions = math.floor(revolutions)
 
-    print("keyframe = "..keyframe.."; next_keyframe = "..next_keyframe.."; revolutions = "..revolutions.."; num_keyframes = ".. num_keyframes)
+    print("frame_counter = "..obstacleGroup.obstacle_data.frame_counter.."; keyframe = "..keyframe.."; next_keyframe = "..next_keyframe.."; revolutions = "..revolutions.."; num_keyframes = ".. num_keyframes)
 
     -- Full loop compelte actions
     if(revolutions > 0) then
         if(obstacle_data.on_complete == "destroy") then
             print("DESTROYING name: "..name)
+            destroyObstacle(obstacleGroup)
             obstacleGroup:removeSelf();
             return
         elseif(obstacle_data.on_complete == "stop") then
@@ -98,17 +111,17 @@ local function keyframeObstacle(obstacleGroup)
     print("transitioning; name = "..obstacle_data.name.."; x = "..next_x.."; y = "..next_y.."; time = "..transition_time)
 
     -- Update our frame count
-    obstacleGroup.obstacle_data.current_frame = obstacleGroup.obstacle_data.current_frame + 1
+    obstacleGroup.obstacle_data.frame_counter = obstacleGroup.obstacle_data.frame_counter + 1
         
     transition.to(obstacleGroup, {
         time = transition_time,
         x = next_x,
         y = next_y,
-        onComplete = transitionComplete
+        onComplete = keyframeObstacle
     })
 end
 
--- Creates an objects and starts transition from current_frame to current_frame+1
+-- Creates an objects and starts transition from frame_counter to frame_counter+1
 local function createObstacle(obstacle_data)
     local name = obstacle_data.name
     print("Entering createObstacle with: "..name)
@@ -119,10 +132,10 @@ local function createObstacle(obstacle_data)
 
     -- Set initial x and y (Accounting for overflow)
     local num_keyframes = #obstacle_data.path/2
-    local current_frame = ((obstacle_data.current_frame - 1) % num_keyframes) + 1
+    local frame_counter = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
 
-    thisObstacleGroup.x = obstacle_data.path[(current_frame*2)-1]*CN.COL_WIDTH
-    thisObstacleGroup.y = obstacle_data.path[current_frame*2]*CN.COL_WIDTH
+    thisObstacleGroup.x = obstacle_data.path[(frame_counter*2)-1]*CN.COL_WIDTH
+    thisObstacleGroup.y = obstacle_data.path[frame_counter*2]*CN.COL_WIDTH
     print("Setting initial values for name: "..name.."; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
 
     -- Add the obstacles object

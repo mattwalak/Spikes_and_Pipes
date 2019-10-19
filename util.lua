@@ -54,7 +54,7 @@ function util.newParentObstacle(speed)
         on_complete = "destroy",
         object = nil,
         first_frame = 1,
-        current_frame = 2
+        frame_counter = 2
     }
     return parent
 end
