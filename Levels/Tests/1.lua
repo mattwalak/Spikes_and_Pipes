@@ -64,8 +64,9 @@ obstacle_3.object = obstacle_3_child
 
 -- Define pairs
 local obstacles_list = {}
---obstacles_list[2] = obstacle_1
 obstacles_list[2] = obstacle_1
+obstacles_list[4] = obstacle_2
+obstacles_list[6] = obstacle_3
 
 local level_1 =  {
     name = "Test level 1",

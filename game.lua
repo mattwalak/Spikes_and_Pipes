@@ -43,19 +43,11 @@ local level_data
 -- ui elements
 local scoreText
 
--- Destroys nestled obstacle data
-local function destroyObstacleData(thisObstacleData)
-    -- Base case
-    if not thisObstacleData then
-        return
-    end
-
-    -- Recursively destroy
-    if type(thisObstacleData.object) == "table" then
-        destroyObstacleData(thisObstacleData.object)
-    end
-
-    thisObstacleData = nil
+-- Stops all transitions for a given obstacle
+local function stopTransitions(obstacleGroup)
+    if not obstacleGroup then return end
+    stopTransitions(obstacleGroup[1])
+    transition.cancel(obstacleGroup)
 end
 
 -- Transitions an obstacle from keyframe to keyframe + 1
@@ -86,13 +78,10 @@ local function keyframeObstacle(obstacleGroup)
     -- Full loop compelte actions
     if(revolutions > 0) then
         if(obstacle_data.on_complete == "destroy") then
-            print("DESTROYING name: "..name)
-            destroyObstacleData(obstacleGroup.obstacle_data)
-            obstacleGroup.obstacle_data = nil
-            obstacleGroup:removeSelf();
+            stopTransitions(obstacleGroup)
+            obstacleGroup:removeSelf()
             return
         elseif(obstacle_data.on_complete == "stop") then
-            print("STOPPING animation for name: "..name)
             return
         elseif(obstacle_data.on_complete == "loop") then
             -- Do nothing
