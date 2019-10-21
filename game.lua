@@ -137,6 +137,11 @@ end
 
 local function on_victory_tapped(event)
     print("on_victory_tapped")
+
+    -- Remove victory thing
+    event.target.text:removeSelf()
+    event.target:removeSelf()
+
     composer.gotoScene("level_select")
 end
 
@@ -150,10 +155,10 @@ local function victory()
     button:addEventListener("tap", on_victory_tapped)
 
     -- Adds text
-    local text = display.newText(uiGroup, "Back to level select", 
+    button.text = display.newText(uiGroup, "Back to level select", 
         display.contentWidth/2, display.contentHeight/2,
         native.systemFont)
-    text:setFillColor(0,0,0)
+    button.text:setFillColor(0,0,0)
 
 end
 
@@ -213,20 +218,10 @@ function scene:create( event )
     bg:setFillColor(1,1,1)
     backgroundGroup:insert(bg)
 
-    -- Initialize level data
-    local level = composer.getVariable("level")
-    level_data = require ("Levels."..level)
-
-    print("Here we are, playing level ".. level_data.name)
-    score = 0
-
     -- Initialize ui
+    score = 0
     scoreText = display.newText(uiGroup, score, display.contentWidth/2, display.contentHeight/8, native.systemFont, 36)
     scoreText:setFillColor(0,0,0)
-
-    run_intro()
-    timer.performWithDelay(0, start_game)
-
 end
 
 
@@ -237,10 +232,20 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
+        -- Code here runs when the scene is still off screen (but is about to come on screen)
+        
+        -- Initialize level data
+        local level = composer.getVariable("level")
+        level_data = require ("Levels."..level)
+
+        print("Here we are, playing level ".. level_data.name)
+        score = 0
+        update_scoreText()
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-
+        run_intro()
+        timer.performWithDelay(0, start_game)
     end
 end
 
