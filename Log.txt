@@ -22,6 +22,7 @@ HARD CORE CODING:
 10/17	11:10pm		0:50				Continued implementing methods to display and animate obstacles (Yes, still recursive animation)	
 10/19	8:30am		1:35				Finally figured out my numbering system for keyframes. Continued writing keyframeObstacle()	
 10/19	10:20am		1:00				Keyframing system and obstacle presentation works! Working on destroying objects on animation finish
+10/20	8:10pm		0:40				Continued work on destroying objects on animation finish... Decided obstacle data needs to be stored differently for easier acsess (To hard to stop obstacles when they need to be removed from the screen)
 ------------------------------------------------------------------------------------------------------------------------------
 					9:00 TOTAL
 

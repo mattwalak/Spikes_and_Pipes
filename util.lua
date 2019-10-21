@@ -59,4 +59,20 @@ function util.newParentObstacle(speed)
     return parent
 end
 
+-- Prints the name and nestled objects for an obstacle_data data structure
+function util.printObstacleData(data, indent)
+    if not data then return end
+    if not indent then indent = 0 end
+    local formatting = string.rep("\t", indent)    
+
+    if type(data) == "table" then
+        print(formatting..data.name..":")
+    elseif type(data) == "string" then
+        print(formatting..data)
+    end
+
+    util.printObstacleData(data.object, indent+1)
+end
+
+
 return util
