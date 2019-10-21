@@ -236,7 +236,8 @@ function scene:show( event )
         
         -- Initialize level data
         local level = composer.getVariable("level")
-        level_data = require ("Levels."..level)
+        local level_data_original = require ("Levels."..level)
+        level_data = util.deepcopy(level_data_original)
 
         print("Here we are, playing level ".. level_data.name)
         score = 0
