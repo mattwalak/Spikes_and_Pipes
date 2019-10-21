@@ -14,11 +14,6 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
--- Temporary white background (This should be replaced by backgroundGroup later)
-local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
-bg:setFillColor(1,1,1)
-
-
 -- Initialize physics
 local physics = require("physics")
 physics.start()
@@ -35,7 +30,6 @@ local gameLoopTimer
 
 -- Define important gameplay variables
 local score -- Same as height within the level
-local obstacle_num
 
 -- Define variable for level data
 local level_data
@@ -46,21 +40,21 @@ local scoreText
 -- Stops all transitions for a given obstacle
 local function stopTransitions(obstacleGroup)
     if not obstacleGroup then return end
-    stopTransitions(obstacleGroup[1])
+    if obstacleGroup.numChildren then
+        for i = 1, obstacleGroup.numChildren, 1 do
+            stopTransitions(obstacleGroup[i])
+        end
+    end
+
     transition.cancel(obstacleGroup)
 end
 
 -- Transitions an obstacle from keyframe to keyframe + 1
 local function keyframeObstacle(obstacleGroup)
-    if not obstacleGroup then
-        print("nothing in keyframeObstacle")
-        return
-    end
-
     local obstacle_data = obstacleGroup.obstacle_data
     local name = obstacleGroup.obstacle_data.name
     local num_keyframes = (#obstacle_data.path/2)
-    print("Entering keyframeObstacle with: "..name)
+    print("Keyframming name: "..name)
 
     -- Update keyframe for wrap-around
     local keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
@@ -73,13 +67,12 @@ local function keyframeObstacle(obstacleGroup)
     local revolutions = (obstacle_data.frame_counter - 1)/num_keyframes
     revolutions = math.floor(revolutions)
 
-    print("frame_counter = "..obstacleGroup.obstacle_data.frame_counter.."; keyframe = "..keyframe.."; next_keyframe = "..next_keyframe.."; revolutions = "..revolutions.."; num_keyframes = ".. num_keyframes)
-
     -- Full loop compelte actions
     if(revolutions > 0) then
         if(obstacle_data.on_complete == "destroy") then
             stopTransitions(obstacleGroup)
             obstacleGroup:removeSelf()
+            obstacleGroup = nil
             return
         elseif(obstacle_data.on_complete == "stop") then
             return
@@ -88,15 +81,13 @@ local function keyframeObstacle(obstacleGroup)
         end
     end
 
+    -- Update our frame count and perform transition
+    obstacleGroup.obstacle_data.frame_counter = obstacleGroup.obstacle_data.frame_counter + 1
+        
     local transition_time = obstacle_data.time[keyframe]
     local next_x = obstacle_data.path[(next_keyframe*2)-1] * CN.COL_WIDTH
     local next_y = obstacle_data.path[next_keyframe*2] * CN.COL_WIDTH
 
-    print("transitioning; name = "..obstacle_data.name.."; x = "..next_x.."; y = "..next_y.."; time = "..transition_time)
-
-    -- Update our frame count
-    obstacleGroup.obstacle_data.frame_counter = obstacleGroup.obstacle_data.frame_counter + 1
-        
     transition.to(obstacleGroup, {
         time = transition_time,
         x = next_x,
@@ -108,25 +99,22 @@ end
 -- Creates an objects and starts transition from frame_counter to frame_counter+1
 local function createObstacle(obstacle_data)
     local name = obstacle_data.name
-    print("Entering createObstacle with: "..name)
 
+    -- Set up new group for obstacle
     -- Will probably need to set anchor point at some point
     local thisObstacleGroup = display.newGroup()
     thisObstacleGroup.obstacle_data = obstacle_data
 
-    -- Set initial x and y (Accounting for overflow)
+    -- find frame and update position
     local num_keyframes = #obstacle_data.path/2
-    local frame_counter = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
+    local this_keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
+    thisObstacleGroup.x = obstacle_data.path[(this_keyframe*2)-1]*CN.COL_WIDTH
+    thisObstacleGroup.y = obstacle_data.path[this_keyframe*2]*CN.COL_WIDTH
 
-    thisObstacleGroup.x = obstacle_data.path[(frame_counter*2)-1]*CN.COL_WIDTH
-    thisObstacleGroup.y = obstacle_data.path[frame_counter*2]*CN.COL_WIDTH
-    print("Setting initial values for name: "..name.."; x: "..thisObstacleGroup.x..", y: "..thisObstacleGroup.y)
-
-    -- Add the obstacles object
+    -- Recursively add objects to this obstacle
     local object = obstacle_data.object
     if not object then
-        -- No object... don't do anything... I think
-        print("no object for: "..name)
+        -- Do nothing
     elseif type(object) == "table" then
         -- Recursively nestled objects!
         thisObstacleGroup:insert(createObstacle(obstacle_data.object))
@@ -136,8 +124,8 @@ local function createObstacle(obstacle_data)
         end
     end
 
+    -- Begin obstacle animation
     keyframeObstacle(thisObstacleGroup)
-    print("ending createObstacle with name:"..thisObstacleGroup.obstacle_data.name)
     return thisObstacleGroup
 end
 
@@ -147,9 +135,26 @@ local function update_scoreText()
     scoreText.text = score
 end
 
+local function on_victory_tapped(event)
+    print("on_victory_tapped")
+    composer.gotoScene("level_select")
+end
+
 local function victory()
-    print("VICTORY!!!")
     timer.pause(gameLoopTimer)
+
+    -- Creates temporary victory button with event listener
+    local button = display.newRect(uiGroup, display.contentWidth/2, display.contentHeight/2,
+    display.contentWidth/2,display.contentHeight/8)
+    button:setFillColor(0,127,127)
+    button:addEventListener("tap", on_victory_tapped)
+
+    -- Adds text
+    local text = display.newText(uiGroup, "Back to level select", 
+        display.contentWidth/2, display.contentHeight/2,
+        native.systemFont)
+    text:setFillColor(0,0,0)
+
 end
 
 -- Updates obstacles and background (Updates twice a second)
@@ -161,7 +166,6 @@ local function gameLoop_slow()
         victory()
     end
 
-
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         print("adding object "..score)
@@ -169,8 +173,6 @@ local function gameLoop_slow()
     end
 
     update_scoreText()
-    --updateObstacles()
-    --updateBackground()
 end
 
 -- Does all the pagentry showing bubbles escaping the pipe etc...
@@ -201,12 +203,19 @@ function scene:create( event )
     obstacleGroup = display.newGroup()
     backgroundGroup = display.newGroup()
     uiGroup = display.newGroup()
+    sceneGroup:insert(backgroundGroup)
+    sceneGroup:insert(bubbleGroup)
+    sceneGroup:insert(obstacleGroup)
+    sceneGroup:insert(uiGroup)    
+    
+    -- Temporary white background (This should be replaced by backgroundGroup later)
+    local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
+    bg:setFillColor(1,1,1)
+    backgroundGroup:insert(bg)
 
     -- Initialize level data
     local level = composer.getVariable("level")
     level_data = require ("Levels."..level)
-    obstacle_num = 1
-
 
     print("Here we are, playing level ".. level_data.name)
     score = 0
@@ -228,7 +237,6 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
-        -- Code here runs when the scene is still off screen (but is about to come on screen)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -245,6 +253,7 @@ function scene:hide( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
+
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen

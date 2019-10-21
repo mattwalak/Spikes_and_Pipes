@@ -42,8 +42,9 @@ local obstacle_2_child = {
 }
 obstacle_2.object = obstacle_2_child
 
--- Obstacle 2
+-- Obstacle 3
 local obstacle_3 = util.newParentObstacle(speed)
+obstacle_3.time = {400, 400}
 local obstacle_3_child = {
     name = "Black Square still",
     path = {0,0},
