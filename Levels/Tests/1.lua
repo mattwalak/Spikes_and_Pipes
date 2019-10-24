@@ -32,7 +32,7 @@ end
 local function basicSpike()
   local top_spike = {
       name = "top spike",
-      path = {0,0},
+      path = {0,-1},
       time = {1000},
       animation_options = {
         position_interpolation = nil,
@@ -47,7 +47,7 @@ local function basicSpike()
 
   local block = {
       name = "block",
-      path = {0,1},
+      path = {0,0},
       time = {1000},
       animation_options = {
         position_interpolation = nil,
@@ -62,7 +62,7 @@ local function basicSpike()
 
   local bottom_spike = {
       name = "bottom spike",
-      path = {0,2},
+      path = {0,1},
       time = {1000},
       animation_options = {
         position_interpolation = nil,
