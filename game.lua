@@ -37,6 +37,8 @@ local level_data
 -- ui elements
 local scoreText
 
+-- Removes everything from 
+
 -- Stops all transitions for a given obstacle
 local function stopTransitions(obstacleGroup)
     if not obstacleGroup then return end
@@ -142,6 +144,8 @@ local function on_victory_tapped(event)
     event.target.text:removeSelf()
     event.target:removeSelf()
 
+    -- Remove all obstacles still on screen
+
     composer.gotoScene("level_select")
 end
 
@@ -233,7 +237,8 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        
+        util.printMemUsage()
+
         -- Initialize level data
         local level = composer.getVariable("level")
         local level_data_original = require ("Levels."..level)
@@ -273,6 +278,7 @@ function scene:destroy( event )
 
     local sceneGroup = self.view
     -- Code here runs prior to the removal of scene's view
+
 
 end
 
