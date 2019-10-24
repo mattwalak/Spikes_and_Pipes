@@ -37,7 +37,7 @@ local level_data
 -- ui elements
 local scoreText
 
--- Removes everything from 
+-- Removes everything from
 
 -- Stops all transitions for a given obstacle
 local function stopTransitions(obstacleGroup)
@@ -84,7 +84,7 @@ local function keyframeObstacle(obstacleGroup)
 
     -- Update our frame count and perform transition
     obstacleGroup.obstacle_data.frame_counter = obstacleGroup.obstacle_data.frame_counter + 1
-        
+
     local transition_time = obstacle_data.time[keyframe]
     local next_x = obstacle_data.path[(next_keyframe*2)-1] * CN.COL_WIDTH
     local next_y = obstacle_data.path[next_keyframe*2] * CN.COL_WIDTH
@@ -111,6 +111,7 @@ local function createObstacle(obstacle_data)
     local this_keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
     thisObstacleGroup.x = obstacle_data.path[(this_keyframe*2)-1]*CN.COL_WIDTH
     thisObstacleGroup.y = obstacle_data.path[this_keyframe*2]*CN.COL_WIDTH
+    thisObstacleGroup.rotation = obstacle_data.animation_options.rotation[(this_keyframe*2)-1]
 
     -- Recursively add objects to this obstacle
     local num_objects
@@ -129,7 +130,9 @@ local function createObstacle(obstacle_data)
             thisObstacleGroup:insert(createObstacle(obstacle_data.objects[i]))
         elseif type(thisObject) == "string" then
             if thisObject == "black_square" then
-                display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+                local black_square = display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+            elseif thisObject == "spike" then
+                local spike = display.newImageRect(thisObstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
             end
         end
     end
@@ -167,7 +170,7 @@ local function victory()
     button:addEventListener("tap", on_victory_tapped)
 
     -- Adds text
-    button.text = display.newText(uiGroup, "Back to level select", 
+    button.text = display.newText(uiGroup, "Back to level select",
         display.contentWidth/2, display.contentHeight/2,
         native.systemFont)
     button.text:setFillColor(0,0,0)
@@ -223,8 +226,8 @@ function scene:create( event )
     sceneGroup:insert(backgroundGroup)
     sceneGroup:insert(bubbleGroup)
     sceneGroup:insert(obstacleGroup)
-    sceneGroup:insert(uiGroup)    
-    
+    sceneGroup:insert(uiGroup)
+
     -- Temporary white background (This should be replaced by backgroundGroup later)
     local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
     bg:setFillColor(1,1,1)

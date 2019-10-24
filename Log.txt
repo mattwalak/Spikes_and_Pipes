@@ -28,6 +28,7 @@ HARD CORE CODING:
 10/20	9:10pm		0:50				Discovered transition.cancel(), using it to stop animations mid transition.
 10/20	10:20pm		1:00				Began writing composer scene transition/setup code for game.lua
 10/23	9:50pm		1:00				Implemented memory leak checking print statements. Changed obstacle.object to obstacle.objects (Can now have a table)
+10/24	4:00pm		
 											NOTE: For some reason memory is not freed from obstacles between scenes. Should check into that
 											NOTE: Using the transition.to() command on large tables of objects creates unnaceptable differences between object
 													paths when lots of objects/obstacles are loaded. Must find a more precise method
