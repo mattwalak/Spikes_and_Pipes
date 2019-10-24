@@ -13,7 +13,7 @@ local function newBubble(displayGroup)
     displayGroup:insert(thisBubble)
     thisBubble.x = 0
     thisBubble.y = 0
-    physics.addBody(thisBubble, "dynamic", {radius=CN.COL_WIDTH, density=1.0, bounce=0.1})
+    physics.addBody(thisBubble, "dynamic")
     table.insert(bubbles, thisBubble)
     return thisBubble
 end

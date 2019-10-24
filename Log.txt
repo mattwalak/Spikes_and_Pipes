@@ -32,6 +32,7 @@ HARD CORE CODING:
 											NOTE: Using the transition.to() command on large tables of objects creates unnaceptable differences between object
 													paths when lots of objects/obstacles are loaded. Must find a more precise method
 10/24	4:00pm		1:20				Began implementing bubbles! (Also physics)
+10/24	5:30pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					14:50 TOTAL
 
