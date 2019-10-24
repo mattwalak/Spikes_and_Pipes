@@ -56,7 +56,6 @@ local function keyframeObstacle(obstacleGroup)
     local obstacle_data = obstacleGroup.obstacle_data
     local name = obstacleGroup.obstacle_data.name
     local num_keyframes = (#obstacle_data.path/2)
-    print("Keyframming name: "..name)
 
     -- Update keyframe for wrap-around
     local keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
@@ -114,15 +113,24 @@ local function createObstacle(obstacle_data)
     thisObstacleGroup.y = obstacle_data.path[this_keyframe*2]*CN.COL_WIDTH
 
     -- Recursively add objects to this obstacle
-    local object = obstacle_data.object
-    if not object then
-        -- Do nothing
-    elseif type(object) == "table" then
-        -- Recursively nestled objects!
-        thisObstacleGroup:insert(createObstacle(obstacle_data.object))
-    elseif type(object) == "string" then
-        if object == "black_square" then
-            display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+    local num_objects
+    if obstacle_data.objects then
+        num_objects = #obstacle_data.objects
+    else
+        num_objects = 0
+    end
+
+    for i = 1, num_objects, 1 do
+        local thisObject = obstacle_data.objects[i]
+        if not thisObject then
+            -- Do nothing
+        elseif type(thisObject) == "table" then
+            -- Recursively nestled objects!
+            thisObstacleGroup:insert(createObstacle(obstacle_data.objects[i]))
+        elseif type(thisObject) == "string" then
+            if thisObject == "black_square" then
+                display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+            end
         end
     end
 

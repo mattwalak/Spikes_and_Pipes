@@ -52,7 +52,7 @@ function util.newParentObstacle(speed)
           rotation_interpolation = nil,
         },
         on_complete = "destroy",
-        object = nil,
+        objects = nil,
         first_frame = 1,
         frame_counter = 2
     }
@@ -71,7 +71,9 @@ function util.printObstacleData(data, indent)
         print(formatting..data)
     end
 
-    util.printObstacleData(data.object, indent+1)
+    for i = 1, #data.objects, 1 do
+        util.printObstacleData(data.objects[i], indent+1)
+    end
 end
 
 -- Prints memory usage data
