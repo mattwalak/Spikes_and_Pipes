@@ -7,6 +7,7 @@ local levels = require("levels")
 local util = require("util")
 local CN = require ("crazy_numbers")
 local composer = require( "composer" )
+local bubble = require("bubble")
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
@@ -16,8 +17,6 @@ local scene = composer.newScene()
 
 -- Initialize physics
 local physics = require("physics")
-physics.start()
-physics.setGravity(0,0)
 
 -- Define display groups
 local bubbleGroup
@@ -131,8 +130,10 @@ local function createObstacle(obstacle_data)
         elseif type(thisObject) == "string" then
             if thisObject == "black_square" then
                 local black_square = display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+                physics.addBody(black_square, "static", {radius=CN.COL_WIDTH, density=1.0, bounce=0.1})
             elseif thisObject == "spike" then
                 local spike = display.newImageRect(thisObstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
+                physics.addBody(spike, "static", {radius=CN.COL_WIDTH, density=1.0, bounce=0.1})
             end
         end
     end
@@ -199,12 +200,13 @@ end
 -- Removes all intro-related graphics from screen itself
 local function run_intro()
     print("running intro!")
+    bubble.introBubbles(bubbleGroup,display.contentWidth/2,5*display.contentHeight/6,10)
 end
 
 -- Starts the game!
 local function start_game()
     print("starting game")
-    gameLoopTimer = timer.performWithDelay(500, gameLoop_slow, 0)
+    gameLoopTimer = timer.performWithDelay(1000, gameLoop_slow, 0)
 end
 
 
@@ -261,6 +263,13 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+
+        -- Start the physics!
+        physics.start()
+        physics.setGravity(0,0)
+        physics.setDrawMode("normal")
+
+        -- Run the intro, then start the game!
         run_intro()
         timer.performWithDelay(0, start_game)
     end
