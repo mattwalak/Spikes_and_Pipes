@@ -10,7 +10,7 @@ local function squareBounceGenerate(num)
     if (num%2) == 0 then
         path = {-5, -num, 5, -num}
     else
-        path = {5, -num, -5, -num}
+        path = {-5, -num, 5, -num}
     end
     local obstacle = {
         name = "Black Square bounce",
@@ -97,7 +97,7 @@ obstacle_2.objects = basicSpike()
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = obstacle_2
+obstacles_list[1] = obstacle_1
 
 local level_1 =  {
     name = "Test level 1",
