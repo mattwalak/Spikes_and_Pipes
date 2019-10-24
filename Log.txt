@@ -32,9 +32,10 @@ HARD CORE CODING:
 											NOTE: Using the transition.to() command on large tables of objects creates unnaceptable differences between object
 													paths when lots of objects/obstacles are loaded. Must find a more precise method
 10/24	4:00pm		1:20				Began implementing bubbles! (Also physics)
-10/24	5:30pm		
+10/24	5:30pm		1:00				Realized that physics doesn't work with moving display groups... Researched alternatives. Looks like we are heading into the great
+								Obstacle motion rewrite!
 ------------------------------------------------------------------------------------------------------------------------------
-					14:50 TOTAL
+					15:50 TOTAL
 
 
-THE GRAND TOTAL:	18:05
+THE GRAND TOTAL:	19:05
