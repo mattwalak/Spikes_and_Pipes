@@ -46,8 +46,7 @@ function util.newParentObstacle(speed)
         position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
         rotation_path = {0,0},
         transition_time = {speed, speed},
-        position_interpolation = easing.linear,
-        rotation_interpolation = easing.linear,
+        keyframe_interpolation = easing.linear,
         on_complete = "destroy",
         first_frame = 2,
     }

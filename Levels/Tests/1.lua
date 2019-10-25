@@ -13,8 +13,7 @@ local null_1A = {
     position_path = {util.newPoint(-5, 0), util.newPoint(5, 0)},
     rotation_path = {0,0},
     transition_time = {1000, 1000},
-    position_interpolation = easing.linear,
-    rotation_interpolation = easing.linear,
+    keyframe_interpolation = easing.linear,
     on_complete = "loop",
     first_frame = 1,
 }

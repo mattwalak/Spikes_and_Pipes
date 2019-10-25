@@ -40,25 +40,63 @@ local scoreText
 
 -- Removes everything from
 
--- Stops all transitions for a given obstacle
-local function stopTransitions(obstacleGroup)
-    if not obstacleGroup then return end
-    if obstacleGroup.numChildren then
-        for i = 1, obstacleGroup.numChildren, 1 do
-            stopTransitions(obstacleGroup[i])
+-- Stops all null object transitions and sets them to nil
+local function stopNulls()
+    for i = 1, #activeNullObjects, 1 do
+        transition.cancel(activeNullObjects[i])
+        activeNullObjects[i] = nil -- Should probably remove them from the table... maybe?
+    end
+end
+
+-- Transitions a null object from current_frame to current_frame + 1
+local function keyframeNull(thisNull)
+    local num_frames = #thisNull.position_path
+
+    -- Calculate current frame accounting for overflow
+    local current_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
+
+    -- Number of times we have completed the full animation
+    -- (If > 1, we are currently at first frame ie. cycle is already complete)
+    local revolutions = thisNull.frame_counter/num_frames
+    if(revolutions > 0) then
+        if(thisNull.on_complete == "destroy") then
+            transition.cancel(thisNull) -- In case the rotation keyframe hasn't finished
+            thisNull = nil  -- DisplayObjects know if one of their parents is
+            return          -- nil they should delete themselves
+        elseif(thisNull.on_complete == "stop") then
+            return -- Do not start on the next transition
+        elseif(thisNull.on_complete == "loop") then
+            -- Do nothing
         end
     end
 
-    transition.cancel(obstacleGroup)
-end
+    -- Update frame count (Accounting for overflow) and perform transitions
+    local next_frame = (current_frame % num_frames) + 1
+    thisNull.frame_counter = thisNull.frame_counter + 1
+    local transition_time = thisNull.transition_time[next_frame]
+    local next_x = thisNull.position_path[next_frame].x
+    local next_y = thisNull.position_path[next_frame].y
+    local next_rotation = thisNull.rotation_path[next_frame]
 
--- Transitions an obstacle from keyframe to keyframe + 1
-local function keyframeObstacle(thisNull)
-    local num_frames = #thisNull.position_path
-    local this_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
+    -- To ensure transitions start at the same time, only the position transition
+    -- causes the next transition to be called
+    transition.to(obstacleGroup, {
+        time = transition_time,
+        x = next_x,
+        y = next_y,
+        transition = thisNull.position_interpolation,
+        onComplete = keyframeObstacle
+    })
+
+    transition.to(obstacleGroup, {
+        time = transition_time,
+        rotation = next_rotation,
+        transition = thisNull.rotation_interpolation,
+    })
 
 
     --[[
+    -- OLD IMPLEMENTATION
     local obstacle_data = obstacleGroup.obstacle_data
     local name = obstacleGroup.obstacle_data.name
     local num_keyframes = (#obstacle_data.path/2)
@@ -110,7 +148,7 @@ local function createObstacle(obstacle_data)
             local thisNull = obstacle_data.null_objects[i]
             table.insert(activeNullObjects, thisNull)
 
-            -- Set those special state values we were not allowed to touch before
+            -- Set the state values of our null object
             thisNull.frame_counter = 0
             local num_frames = #thisNull.position_path
             local this_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
@@ -118,7 +156,7 @@ local function createObstacle(obstacle_data)
             thisNull.y = thisNull.position_path[this_frame].y
             thisNull.rotation = thisNull.rotation_path[this_frame]
 
-            -- Set the null objects on their way!
+            -- Set the null objects on their way! (Start transitions)
             keyframeNull(thisNull)
     end
 
@@ -127,6 +165,7 @@ local function createObstacle(obstacle_data)
 
 
     --[[
+    -- OLD IMPLEMENTATION
     local name = obstacle_data.name
 
     -- Set up new group for obstacle
