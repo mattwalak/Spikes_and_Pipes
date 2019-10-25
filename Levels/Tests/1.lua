@@ -3,7 +3,7 @@ local util = require("util")
 
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
-local speed = 5000
+local speed = 10000
 
 local function squareBounceGenerate(num)
     local path
@@ -83,8 +83,8 @@ end
 -- Obstacle 1
 local obstacle_1 = util.newParentObstacle(speed)
 obstacle_1.objects = {}
-
-for i = 0, 15, 1 do
+obstacle_1.path[2] = 10*display.contentHeight/CN.COL_WIDTH
+for i = 0, 100, 1 do
     local add = squareBounceGenerate(i)
     table.insert(obstacle_1.objects, add)
 end
