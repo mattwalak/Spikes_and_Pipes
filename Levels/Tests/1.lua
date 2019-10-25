@@ -3,105 +3,42 @@ local util = require("util")
 
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
-local speed = 10000
+local speed = 4000
 
-local function squareBounceGenerate(num)
-    local path
-    if (num%2) == 0 then
-        path = {-5, -num, 5, -num}
-    else
-        path = {-5, -num, 5, -num}
-    end
-    local obstacle = {
-        name = "Black Square bounce",
-        path = path,
-        time = {1000, 1000},
-        animation_options = {
-          position_interpolation = nil,
-          rotation = {0},
-          rotation_interpolation = nil
-        },
-        objects = {"black_square"},
-        on_complete = "loop",
-        first_frame = 1,
-        frame_counter = 1
-    }
-    return obstacle
-end
-
-local function basicSpike()
-  local top_spike = {
-      name = "top spike",
-      path = {0,-1},
-      time = {1000},
-      animation_options = {
-        position_interpolation = nil,
-        rotation = {0},
-        rotation_interpolation = nil
-      },
-      objects = {"spike"},
-      on_complete = "stop",
-      first_frame = 1,
-      frame_counter = 1
-  }
-
-  local block = {
-      name = "block",
-      path = {0,0},
-      time = {1000},
-      animation_options = {
-        position_interpolation = nil,
-        rotation = {0},
-        rotation_interpolation = nil
-      },
-      objects = {"black_square"},
-      on_complete = "stop",
-      first_frame = 1,
-      frame_counter = 1
-  }
-
-  local bottom_spike = {
-      name = "bottom spike",
-      path = {0,1},
-      time = {1000},
-      animation_options = {
-        position_interpolation = nil,
-        rotation = {180},
-        rotation_interpolation = nil
-      },
-      objects = {"spike"},
-      on_complete = "stop",
-      first_frame = 1,
-      frame_counter = 1
-  }
-
-  return {top_spike, block, bottom_spike}
-
-end
 
 -- Define obstacles ------------------------------------------------------------
--- Obstacle 1
-local obstacle_1 = util.newParentObstacle(speed)
-obstacle_1.objects = {}
-obstacle_1.path[2] = 10*display.contentHeight/CN.COL_WIDTH
-for i = 0, 100, 1 do
-    local add = squareBounceGenerate(i)
-    table.insert(obstacle_1.objects, add)
-end
-
-local obstacle_2 = util.newParentObstacle(speed)
-obstacle_2.objects = basicSpike()
+local parent_1 = util.newParentObstacle(speed)
+local null_1A = {
+    name = "Parent",
+    position_path = {util.newPoint(-5, 0), util.newPoint(5, 0)},
+    rotation_path = {0,0},
+    transition_time = {1000, 1000},
+    position_interpolation = easing.linear,
+    rotation_interpolation = easing.linear,
+    on_complete = "loop",
+    first_frame = 1,
+}
+local displayObject_1 = {
+    type = "black_square",
+    x = 0,
+    y = 0,
+    rotation = 0,
+    ancestry = {parent_1, null_1A}
+}
+local obstacle_1 ={
+    null_objects = {parent_1, null_1A},
+    display_objects = {displayObject_1}
+}
 
 --------------------------------------------------------------------------------
 
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = obstacle_1
+obstacle_list[1] = obstacle_1
 
 local level_1 =  {
     name = "Test level 1",
-    speed = 4,
     victory = 10,
     obstacles = obstacles_list,
 }

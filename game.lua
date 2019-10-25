@@ -29,6 +29,8 @@ local gameLoopTimer
 
 -- Define important gameplay variables
 local score -- Same as height within the level
+local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
+local activeNullObjects = {} -- All active Null objects
 
 -- Define variable for level data
 local level_data
@@ -51,7 +53,12 @@ local function stopTransitions(obstacleGroup)
 end
 
 -- Transitions an obstacle from keyframe to keyframe + 1
-local function keyframeObstacle(obstacleGroup)
+local function keyframeObstacle(thisNull)
+    local num_frames = #thisNull.position_path
+    local this_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
+
+
+    --[[
     local obstacle_data = obstacleGroup.obstacle_data
     local name = obstacleGroup.obstacle_data.name
     local num_keyframes = (#obstacle_data.path/2)
@@ -93,11 +100,33 @@ local function keyframeObstacle(obstacleGroup)
         x = next_x,
         y = next_y,
         onComplete = keyframeObstacle
-    })
+    })]]
 end
 
 -- Creates an objects and starts transition from frame_counter to frame_counter+1
 local function createObstacle(obstacle_data)
+    -- Initialize null objects
+    for i = 1, #obstacle_data.null_objects, 1 do -- We know there is at least 1 null (parent)
+            local thisNull = obstacle_data.null_objects[i]
+            table.insert(activeNullObjects, thisNull)
+
+            -- Set those special state values we were not allowed to touch before
+            thisNull.frame_counter = 0
+            local num_frames = #thisNull.position_path
+            local this_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
+            thisNull.x = thisNull.position_path[this_frame].x
+            thisNull.y = thisNull.position_path[this_frame].y
+            thisNull.rotation = thisNull.rotation_path[this_frame]
+
+            -- Set the null objects on their way!
+            keyframeNull(thisNull)
+    end
+
+
+
+
+
+    --[[
     local name = obstacle_data.name
 
     -- Set up new group for obstacle
@@ -140,7 +169,7 @@ local function createObstacle(obstacle_data)
 
     -- Begin obstacle animation
     keyframeObstacle(thisObstacleGroup)
-    return thisObstacleGroup
+    return thisObstacleGroup]]--
 end
 
 
@@ -190,7 +219,7 @@ local function gameLoop_slow()
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         print("adding object "..score)
-        obstacleGroup:insert(createObstacle(level_data.obstacles[score]))
+        createObstacle(level_data.obstacles[score])
     end
 
     update_scoreText()
