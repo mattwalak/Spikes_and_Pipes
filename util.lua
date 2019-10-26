@@ -31,7 +31,11 @@ if type(v) == "table" then
 print(formatting)
 util.tprint(v, indent+1)
 else
-print(formatting .. v)
+    if type(v) == "function" then
+        print(formatting .. "some funciton")
+    else
+        print(formatting .. v)
+    end
 end
 end
 end

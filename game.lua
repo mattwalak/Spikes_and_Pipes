@@ -166,14 +166,33 @@ local function keyframeNull(thisNull)
     })]]
 end
 
+-- Repositions a display object based on its ancestry
+-- Depth indicates how deep we are 
+local function reposition(displayObject)
+	local x_offset = 0
+	local y_offset = 0
+	local rotation_offset = 0
+	local ancestry = displayObject.ancestry
+	for i = 1, #ancestry, 1 do
+		x_offset = x_offset + ancestry[i].x
+		y_offset = y_offset + ancestry[i].y
+		rotation_offset = rotation_offset + ancestry[i].rotation
+	end
+	displayObject.image.x = displayObject.x + x_offset -- displayObject.x is unchanging, displayObject.image.x is the displayObjects position on the screen
+	displayObject.image.y = displayObject.y + y_offset
+	displayObject.image.rotation = displayObject.rotation + rotation_offset
+end
+
 -- Creates a new Corona recognized display object from its data
 local function createDisplayObject(object_data)
-	local newObject
+	local newObject = {}
+	local image
 	if object_data.type == "black_square" then
-		newObject = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+		image = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
 	elseif object_data.type == "spike" then
-		newObject = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
+		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
 	end
+	newObject.image = image
 	newObject.x = object_data.x
 	newObject.y = object_data.y
 	newObject.rotation = object_data.rotation
@@ -208,6 +227,7 @@ local function createObstacle(obstacle_data)
     -- Initialize display objects
     for i = 1, #obstacle_data.display_objects, 1 do
     	local newObject = createDisplayObject(obstacle_data.display_objects[i])
+    	reposition(newObject)
     	table.insert(activeDisplayObjects, newObject)
     end
 
@@ -259,15 +279,12 @@ local function createObstacle(obstacle_data)
     return thisObstacleGroup]]--
 end
 
--- Repositions a display object based on its ancestry
-local function reposition(ancestry, object)
-	
-end
+
 
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
 local function updateDisplayObjects()
 	for i = 1, #activeDisplayObjects, 1 do
-		
+		reposition(activeDisplayObjects[i])
 	end
 end
 
@@ -393,8 +410,7 @@ function scene:show( event )
 
         -- Initialize level data
         local level = composer.getVariable("level")
-        local level_data_original = require ("Levels."..level)
-        level_data = util.deepcopy(level_data_original)
+        level_data = require ("Levels."..level)
 
         print("Here we are, playing level ".. level_data.name)
         score = 0
