@@ -37,9 +37,9 @@ HARD CORE CODING:
 10/24	7:55pm		1:20				Designed new "Null object" structure (Think After Effects) for representing obstacles and for handling display object inheritance
 10/24	9:30pm		1:25				Began implementing "Null object" structure. Rewrote createObstacle() method. Rewrote keyframeObstacle() (now keyframeNull)
 10/25	8:25pm		1:25				Continued implementing "Null object" structure. Debugged createObstacle() and keyframeNull() methods. Began writing DisplayObject manipulation methods
-10/26	10:10am		
+10/26	10:10am		0:50				Continued implementing "Null object" structure. DisplayObject manipulation methods work for position.
 ------------------------------------------------------------------------------------------------------------------------------
-					20:00 TOTAL
+					20:50 TOTAL
 
 
-THE GRAND TOTAL:	23:15
+THE GRAND TOTAL:	24:05

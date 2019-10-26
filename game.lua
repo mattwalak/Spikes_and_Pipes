@@ -68,6 +68,13 @@ local function destroyNull(thisNull)
     	end
     end
 
+    -- Remove self from activeNull table
+    for i = 1, #activeNullObjects, 1 do
+    	if activeNullObjects[i] == thisNull then
+    		table.remove(activeNullObjects, i)
+    	end
+    end
+
     thisNull = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
 end
 
@@ -232,6 +239,10 @@ local function victory()
 end
 
 local function onEnterFrame()
+	--[[print("Active nulls: ")
+	for i = 1, #activeNullObjects, 1 do
+		print("    "..activeNullObjects[i].name)
+	end]]--
 	updateDisplayObjects()
 end
 
