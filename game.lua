@@ -41,6 +41,11 @@ local scoreText
 
 -- Removes everything from
 
+-- Removes all nill nulls from the active nulls table
+local function cleanUpNulls()
+
+end
+
 -- Stops all null object transitions and sets them to nil
 local function stopNulls()
     for i = 1, #activeNullObjects, 1 do
@@ -161,10 +166,28 @@ local function keyframeNull(thisNull)
     })]]
 end
 
+-- Creates a new Corona recognized display object from its data
+local function createDisplayObject(object_data)
+	local newObject
+	if object_data.type == "black_square" then
+		newObject = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+	elseif object_data.type == "spike" then
+		newObject = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
+	end
+	newObject.x = object_data.x
+	newObject.y = object_data.y
+	newObject.rotation = object_data.rotation
+	newObject.ancestry = object_data.ancestry
+	return newObject
+end
+
 -- Creates an objects and starts transition from frame_counter to frame_counter+1
 local function createObstacle(obstacle_data)
+	-- Note that there has to be at least 1 null and 1 display object, otherwise things crash
+	-- (And I make fun of you for making a useless obstacle)
+
     -- Initialize null objects
-    for i = 1, #obstacle_data.null_objects, 1 do -- We know there is at least 1 null (parent)
+    for i = 1, #obstacle_data.null_objects, 1 do
             local thisNull = obstacle_data.null_objects[i]
             print("Inserting name = "..thisNull.name)
             table.insert(activeNullObjects, thisNull)
@@ -182,8 +205,11 @@ local function createObstacle(obstacle_data)
             keyframeNull(thisNull)
     end
 
-
-
+    -- Initialize display objects
+    for i = 1, #obstacle_data.display_objects, 1 do
+    	local newObject = createDisplayObject(obstacle_data.display_objects[i])
+    	table.insert(activeDisplayObjects, newObject)
+    end
 
 
     --[[
@@ -269,6 +295,7 @@ local function victory()
 end
 
 local function onEnterFrame()
+
 
 end
 
