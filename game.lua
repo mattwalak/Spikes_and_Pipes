@@ -259,6 +259,18 @@ local function createObstacle(obstacle_data)
     return thisObstacleGroup]]--
 end
 
+-- Repositions a display object based on its ancestry
+local function reposition(ancestry, object)
+	
+end
+
+-- Updates all displayObjects (Spikes, squares, powerups, etc...)
+local function updateDisplayObjects()
+	for i = 1, #activeDisplayObjects, 1 do
+		
+	end
+end
+
 
 -- Update score element
 local function update_scoreText()
@@ -295,8 +307,7 @@ local function victory()
 end
 
 local function onEnterFrame()
-
-
+	updateDisplayObjects()
 end
 
 -- Updates obstacles and background (Updates twice a second)
