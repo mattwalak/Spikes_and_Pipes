@@ -49,6 +49,7 @@ function util.newParentObstacle(speed)
         keyframe_interpolation = easing.linear,
         on_complete = "destroy",
         first_frame = 2,
+        children = nil
     }
     return parent
 end

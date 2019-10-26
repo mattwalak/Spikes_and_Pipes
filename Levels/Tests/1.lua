@@ -7,15 +7,16 @@ local speed = 4000
 
 
 -- Define obstacles ------------------------------------------------------------
-local parent_1 = util.newParentObstacle(speed)
+local parent_1 = util.newParentObstacle(speed, "1P")
 local null_1A = {
-    name = "Parent",
+    name = "1A",
     position_path = {util.newPoint(-5, 0), util.newPoint(5, 0)},
     rotation_path = {0,0},
     transition_time = {1000, 1000},
     keyframe_interpolation = easing.linear,
     on_complete = "loop",
     first_frame = 1,
+    children = nil
 }
 local displayObject_1 = {
     type = "black_square",
@@ -24,6 +25,7 @@ local displayObject_1 = {
     rotation = 0,
     ancestry = {parent_1, null_1A}
 }
+parent_1.children = {null_1A}
 local obstacle_1 ={
     null_objects = {parent_1, null_1A},
     display_objects = {displayObject_1}
@@ -34,7 +36,7 @@ local obstacle_1 ={
 
 -- Define pairs
 local obstacles_list = {}
-obstacle_list[1] = obstacle_1
+obstacles_list[1] = obstacle_1
 
 local level_1 =  {
     name = "Test level 1",

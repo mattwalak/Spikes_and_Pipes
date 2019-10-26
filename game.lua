@@ -25,7 +25,8 @@ local backgroundGroup
 local uiGroup
 
 -- Define game loop
-local gameLoopTimer
+local slow_gameLoopTimer
+local fast_gameLoopTimer
 
 -- Define important gameplay variables
 local score -- Same as height within the level
@@ -48,21 +49,37 @@ local function stopNulls()
     end
 end
 
+-- Stops all transitions and destroys a null object and its children (And grandchildren)
+local function destroyNull(thisNull)
+	if not thisNull then -- thisNull was destroyed earlier
+		return
+	end
+
+	print("destroying name: "..thisNull.name)
+    transition.cancel(thisNull.name)
+    if thisNull.children then
+    	for i = 0, #thisNull.children, 1 do
+    		destroyNull(thisNull.children[i])
+    	end
+    end
+
+    thisNull = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
+end
+
 -- Transitions a null object from current_frame to current_frame + 1
 local function keyframeNull(thisNull)
     local num_frames = #thisNull.position_path
 
     -- Calculate current frame accounting for overflow
-    local current_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
+    local current_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
 
     -- Number of times we have completed the full animation
     -- (If > 1, we are currently at first frame ie. cycle is already complete)
     local revolutions = thisNull.frame_counter/num_frames
     if(revolutions > 0) then
         if(thisNull.on_complete == "destroy") then
-            transition.cancel(thisNull) -- In case the rotation keyframe hasn't finished
-            thisNull = nil  -- DisplayObjects know if one of their parents is
-            return          -- nil they should delete themselves
+        	destroyNull(thisNull)
+            return
         elseif(thisNull.on_complete == "stop") then
             return -- Do not start on the next transition
         elseif(thisNull.on_complete == "loop") then
@@ -74,26 +91,29 @@ local function keyframeNull(thisNull)
     local next_frame = (current_frame % num_frames) + 1
     thisNull.frame_counter = thisNull.frame_counter + 1
     local transition_time = thisNull.transition_time[next_frame]
-    local next_x = thisNull.position_path[next_frame].x
-    local next_y = thisNull.position_path[next_frame].y
+    local next_x = thisNull.position_path[next_frame].x * CN.COL_WIDTH
+    local next_y = thisNull.position_path[next_frame].y * CN.COL_WIDTH
     local next_rotation = thisNull.rotation_path[next_frame]
+
+    print("Transitioning name: "..thisNull.name.." to x = "..next_x..", y = "..next_y)
 
     -- To ensure transitions start at the same time, only the position transition
     -- causes the next transition to be called
-    transition.to(obstacleGroup, {
+    transition.to(thisNull, {
         time = transition_time,
         x = next_x,
         y = next_y,
         transition = thisNull.position_interpolation,
-        onComplete = keyframeObstacle
+        tag = thisNull.name,
+        onComplete = keyframeNull
     })
 
-    transition.to(obstacleGroup, {
+    transition.to(thisNull, {
         time = transition_time,
         rotation = next_rotation,
-        transition = thisNull.rotation_interpolation,
+        tag = thisNull.name,
+        transition = thisNull.rotation_interpolation
     })
-
 
     --[[
     -- OLD IMPLEMENTATION
@@ -146,14 +166,16 @@ local function createObstacle(obstacle_data)
     -- Initialize null objects
     for i = 1, #obstacle_data.null_objects, 1 do -- We know there is at least 1 null (parent)
             local thisNull = obstacle_data.null_objects[i]
+            print("Inserting name = "..thisNull.name)
             table.insert(activeNullObjects, thisNull)
 
             -- Set the state values of our null object
             thisNull.frame_counter = 0
             local num_frames = #thisNull.position_path
-            local this_frame = ( ((thisNull.first_frame - 1) + frame_counter) % num_frames ) + 1
-            thisNull.x = thisNull.position_path[this_frame].x
-            thisNull.y = thisNull.position_path[this_frame].y
+            local this_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
+            thisNull.x = thisNull.position_path[this_frame].x * CN.COL_WIDTH
+            thisNull.y = thisNull.position_path[this_frame].y * CN.COL_WIDTH
+            print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
             thisNull.rotation = thisNull.rotation_path[this_frame]
 
             -- Set the null objects on their way! (Start transitions)
@@ -230,7 +252,7 @@ local function on_victory_tapped(event)
 end
 
 local function victory()
-    timer.pause(gameLoopTimer)
+    timer.pause(slow_gameLoopTimer)
 
     -- Creates temporary victory button with event listener
     local button = display.newRect(uiGroup, display.contentWidth/2, display.contentHeight/2,
@@ -243,6 +265,10 @@ local function victory()
         display.contentWidth/2, display.contentHeight/2,
         native.systemFont)
     button.text:setFillColor(0,0,0)
+
+end
+
+local function onEnterFrame()
 
 end
 
@@ -274,7 +300,8 @@ end
 -- Starts the game!
 local function start_game()
     print("starting game")
-    gameLoopTimer = timer.performWithDelay(1000, gameLoop_slow, 0)
+    slow_gameLoopTimer = timer.performWithDelay(1000, gameLoop_slow, 0)
+    Runtime:addEventListener("enterFrame",onEnterFrame)
 
 end
 
@@ -359,7 +386,7 @@ function scene:hide( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-
+        Runtime:removeEventListener("enterFrame",onEnterFrame)
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
