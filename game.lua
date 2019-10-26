@@ -119,51 +119,6 @@ local function keyframeNull(thisNull)
         tag = thisNull.name,
         transition = thisNull.rotation_interpolation
     })
-
-    --[[
-    -- OLD IMPLEMENTATION
-    local obstacle_data = obstacleGroup.obstacle_data
-    local name = obstacleGroup.obstacle_data.name
-    local num_keyframes = (#obstacle_data.path/2)
-
-    -- Update keyframe for wrap-around
-    local keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
-
-    -- Initialize next_keyframe (With wrap-arround value)
-    local next_keyframe = keyframe + 1
-    next_keyframe = ((next_keyframe - 1) % num_keyframes) + 1
-
-    -- Initialize with number of times this animation has looped completely
-    local revolutions = (obstacle_data.frame_counter - 1)/num_keyframes
-    revolutions = math.floor(revolutions)
-
-    -- Full loop compelte actions
-    if(revolutions > 0) then
-        if(obstacle_data.on_complete == "destroy") then
-            stopTransitions(obstacleGroup)
-            obstacleGroup:removeSelf()
-            obstacleGroup = nil
-            return
-        elseif(obstacle_data.on_complete == "stop") then
-            return
-        elseif(obstacle_data.on_complete == "loop") then
-            -- Do nothing
-        end
-    end
-
-    -- Update our frame count and perform transition
-    obstacleGroup.obstacle_data.frame_counter = obstacleGroup.obstacle_data.frame_counter + 1
-
-    local transition_time = obstacle_data.time[keyframe]
-    local next_x = obstacle_data.path[(next_keyframe*2)-1] * CN.COL_WIDTH
-    local next_y = obstacle_data.path[next_keyframe*2] * CN.COL_WIDTH
-
-    transition.to(obstacleGroup, {
-        time = transition_time,
-        x = next_x,
-        y = next_y,
-        onComplete = keyframeObstacle
-    })]]
 end
 
 -- Repositions a display object based on its ancestry
@@ -230,53 +185,6 @@ local function createObstacle(obstacle_data)
     	reposition(newObject)
     	table.insert(activeDisplayObjects, newObject)
     end
-
-
-    --[[
-    -- OLD IMPLEMENTATION
-    local name = obstacle_data.name
-
-    -- Set up new group for obstacle
-    -- Will probably need to set anchor point at some point
-    local thisObstacleGroup = display.newGroup()
-    thisObstacleGroup.obstacle_data = obstacle_data
-
-    -- find frame and update position
-    local num_keyframes = #obstacle_data.path/2
-    local this_keyframe = ((obstacle_data.frame_counter - 1) % num_keyframes) + 1
-    thisObstacleGroup.x = obstacle_data.path[(this_keyframe*2)-1]*CN.COL_WIDTH
-    thisObstacleGroup.y = obstacle_data.path[this_keyframe*2]*CN.COL_WIDTH
-    thisObstacleGroup.rotation = obstacle_data.animation_options.rotation[(this_keyframe*2)-1]
-
-    -- Recursively add objects to this obstacle
-    local num_objects
-    if obstacle_data.objects then
-        num_objects = #obstacle_data.objects
-    else
-        num_objects = 0
-    end
-
-    for i = 1, num_objects, 1 do
-        local thisObject = obstacle_data.objects[i]
-        if not thisObject then
-            -- Do nothing
-        elseif type(thisObject) == "table" then
-            -- Recursively nestled objects!
-            thisObstacleGroup:insert(createObstacle(obstacle_data.objects[i]))
-        elseif type(thisObject) == "string" then
-            if thisObject == "black_square" then
-                local black_square = display.newImageRect(thisObstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
-                physics.addBody(black_square, "static")
-            elseif thisObject == "spike" then
-                local spike = display.newImageRect(thisObstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
-                physics.addBody(spike, "static")
-            end
-        end
-    end
-
-    -- Begin obstacle animation
-    keyframeObstacle(thisObstacleGroup)
-    return thisObstacleGroup]]--
 end
 
 
