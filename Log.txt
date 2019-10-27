@@ -38,8 +38,9 @@ HARD CORE CODING:
 10/24	9:30pm		1:25				Began implementing "Null object" structure. Rewrote createObstacle() method. Rewrote keyframeObstacle() (now keyframeNull)
 10/25	8:25pm		1:25				Continued implementing "Null object" structure. Debugged createObstacle() and keyframeNull() methods. Began writing DisplayObject manipulation methods
 10/26	10:10am		0:50				Continued implementing "Null object" structure. DisplayObject manipulation methods work for position.
+10/26	9:30pm		0:30				Debugging object manipulation methods
 ------------------------------------------------------------------------------------------------------------------------------
-					20:50 TOTAL
+					21:20 TOTAL
 
 
-THE GRAND TOTAL:	24:05
+THE GRAND TOTAL:	24:35

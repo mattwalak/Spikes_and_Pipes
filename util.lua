@@ -50,7 +50,8 @@ function util.newParentObstacle(speed)
         position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
         rotation_path = {0,0},
         transition_time = {speed, speed},
-        keyframe_interpolation = easing.linear,
+        position_interpolation = easing.linear,
+        rotation_interpolation = easing.linear,
         on_complete = "destroy",
         first_frame = 2,
         children = nil
@@ -93,6 +94,29 @@ function util.printMemUsage()
     print("------------------------------------------\n")
 
     return true
+end
+
+-- returns true if table contains entry, false otherwise
+function util.tableContains(tbl, item)
+    if not tbl then return false end
+    if not type(tbl) == "table" then return false end
+    for i = 1, #tbl, 1 do
+        if tbl[i] == item then return true end
+    end
+    return false
+end
+
+-- removes item from list. Returns true if success, false otherwise
+function util.removeFromList(tbl, item)
+    if not tbl then return false end
+    if not type(tbl) == "table" then return false end
+    for i = 1, #tbl, 1 do
+        if tbl[i] == item then 
+            table.remove(tbl, i)
+            return true 
+        end
+    end
+    return false
 end
 
 

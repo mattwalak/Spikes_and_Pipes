@@ -68,12 +68,7 @@ local function destroyNull(thisNull)
     	end
     end
 
-    -- Remove self from activeNull table
-    for i = 1, #activeNullObjects, 1 do
-    	if activeNullObjects[i] == thisNull then
-    		table.remove(activeNullObjects, i)
-    	end
-    end
+    util.removeFromList(activeNullObjects, thisNull)
 
     thisNull = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
 end
@@ -130,12 +125,21 @@ end
 
 -- Repositions a display object based on its ancestry
 -- Depth indicates how deep we are 
+-- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
 local function reposition(displayObject)
 	local x_offset = 0
 	local y_offset = 0
 	local rotation_offset = 0
 	local ancestry = displayObject.ancestry
 	for i = 1, #ancestry, 1 do
+        if not util.tableContains(activeNullObjects, ancestry[i]) then   -- This is TEMPORARY
+            print("destroying displayObject: "..displayObject.type)
+            displayObject.image:removeSelf()
+            displayObject.image = nil
+            util.removeFromList(activeDisplayObjects, displayObject)
+            displayObject = nil
+            return 0
+        end
 		x_offset = x_offset + ancestry[i].x
 		y_offset = y_offset + ancestry[i].y
 		rotation_offset = rotation_offset + ancestry[i].rotation
@@ -143,6 +147,7 @@ local function reposition(displayObject)
 	displayObject.image.x = displayObject.x + x_offset -- displayObject.x is unchanging, displayObject.image.x is the displayObjects position on the screen
 	displayObject.image.y = displayObject.y + y_offset
 	displayObject.image.rotation = displayObject.rotation + rotation_offset
+    return 1
 end
 
 -- Creates a new Corona recognized display object from its data
@@ -157,6 +162,7 @@ local function createDisplayObject(object_data)
 	newObject.image = image
 	newObject.x = object_data.x
 	newObject.y = object_data.y
+    newObject.type = object_data.type
 	newObject.rotation = object_data.rotation
 	newObject.ancestry = object_data.ancestry
 	return newObject
@@ -198,9 +204,11 @@ end
 
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
 local function updateDisplayObjects()
-	for i = 1, #activeDisplayObjects, 1 do
-		reposition(activeDisplayObjects[i])
-	end
+    local i = 1
+    while(i <= #activeDisplayObjects) do
+        print("length = "..#activeDisplayObjects.."; i = "..i)
+        i = i + reposition(activeDisplayObjects[i])
+    end
 end
 
 
@@ -249,6 +257,18 @@ end
 -- Updates obstacles and background (Updates twice a second)
 local function gameLoop_slow()
     score = score + 1
+
+    -- Print Active nulls and display objects
+    print("Active objects")
+    print("    Nulls:")
+    for i = 1, #activeNullObjects, 1 do
+        print("        "..i..") "..activeNullObjects[i].name)
+    end
+    print("    DisplayObjects:")
+    for i = 1, #activeDisplayObjects, 1 do
+        print("        "..i..") "..activeDisplayObjects[i].type)
+    end
+
 
     -- Check for VICTORY
     if (score == level_data.victory) then
