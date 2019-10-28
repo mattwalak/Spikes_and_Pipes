@@ -61,7 +61,7 @@ local function destroyNull(thisNull)
 	end
 
 	print("destroying name: "..thisNull.name)
-    transition.cancel(thisNull.name)
+    transition.cancel(thisNull) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
     if thisNull.children then
     	for i = 0, #thisNull.children, 1 do
     		destroyNull(thisNull.children[i])
