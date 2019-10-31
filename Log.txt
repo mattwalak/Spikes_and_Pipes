@@ -24,7 +24,7 @@ HARD CORE CODING:
 10/19	8:30am		1:35				Finally figured out my numbering system for keyframes. Continued writing keyframeObstacle()	
 10/19	10:20am		1:00				Keyframing system and obstacle presentation works! Working on destroying objects on animation finish
 10/20	8:10pm		0:40				Continued work on destroying objects on animation finish... Decided obstacle data needs to be stored differently for 
-											easier acsess (To hard to stop obstacles when they need to be removed from the screen)
+											easier acsess (Too hard to stop obstacles when they need to be removed from the screen)
 10/20	9:10pm		0:50				Discovered transition.cancel(), using it to stop animations mid transition.
 10/20	10:20pm		1:00				Began writing composer scene transition/setup code for game.lua
 10/23	9:50pm		1:00				Implemented memory leak checking print statements. Changed obstacle.object to obstacle.objects (Can now have a table)
@@ -32,13 +32,15 @@ HARD CORE CODING:
 											NOTE: Using the transition.to() command on large tables of objects creates unnaceptable differences between object
 													paths when lots of objects/obstacles are loaded. Must find a more precise method
 10/24	4:00pm		1:20				Began implementing bubbles! (Also physics)
-10/24	5:30pm		1:00				Realized that physics doesn't work with moving display groups... Researched alternatives. Looks like we are heading into the 
-								great Obstacle motion rewrite!
+10/24	5:30pm		1:00				Realized that physics doesn't work with moving display groups... Researched alternatives. Looks like we are heading 
+											into the great big obstacle motion rewrite!
 10/24	7:55pm		1:20				Designed new "Null object" structure (Think After Effects) for representing obstacles and for handling display object inheritance
 10/24	9:30pm		1:25				Began implementing "Null object" structure. Rewrote createObstacle() method. Rewrote keyframeObstacle() (now keyframeNull)
-10/25	8:25pm		1:25				Continued implementing "Null object" structure. Debugged createObstacle() and keyframeNull() methods. Began writing DisplayObject manipulation methods
+10/25	8:25pm		1:25				Continued implementing "Null object" structure. Debugged createObstacle() and keyframeNull() methods. Began writing 
+											DisplayObject manipulation methods
 10/26	10:10am		0:50				Continued implementing "Null object" structure. DisplayObject manipulation methods work for position.
 10/26	9:30pm		0:30				Debugging object manipulation methods
+10/31	6:00pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					21:20 TOTAL
 
