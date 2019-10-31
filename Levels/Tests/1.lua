@@ -32,6 +32,7 @@ local obstacle_1 ={
     display_objects = {displayObject_1A}
 }
 
+--***************************************************
 
 local parent_2 = util.newParentObstacle(speed, "2P")
 local null_2A = {
@@ -57,13 +58,27 @@ local obstacle_2 ={
     null_objects = {parent_2, null_2A},
     display_objects = {displayObject_2A}
 }
+
+--***************************************************
+
+local parent_3 = util.newParentObstacle(speed, "2P")
+local displayObject_3A = {
+    type = "black_square",
+    x = 0,
+    y = 0,
+    rotation = 0,
+    ancestry = {parent_3}
+}
+local obstacle_3 ={
+    null_objects = {parent_3},
+    display_objects = {displayObject_3A}
+}
 --------------------------------------------------------------------------------
 
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = obstacle_1
-obstacles_list[3] = obstacle_2
+--obstacles_list[1] = obstacle_3
 
 local level_1 =  {
     name = "Test level 1",

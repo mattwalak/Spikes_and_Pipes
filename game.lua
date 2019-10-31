@@ -102,8 +102,6 @@ local function keyframeNull(thisNull)
     local next_y = thisNull.position_path[next_frame].y * CN.COL_WIDTH
     local next_rotation = thisNull.rotation_path[next_frame]
 
-    print("Transitioning name: "..thisNull.name.." to x = "..next_x..", y = "..next_y)
-
     -- To ensure transitions start at the same time, only the position transition
     -- causes the next transition to be called
     transition.to(thisNull, {
@@ -159,6 +157,7 @@ local function createDisplayObject(object_data)
 	elseif object_data.type == "spike" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
 	end
+    physics.addBody(image,"static")
 	newObject.image = image
 	newObject.x = object_data.x
 	newObject.y = object_data.y
@@ -206,7 +205,6 @@ end
 local function updateDisplayObjects()
     local i = 1
     while(i <= #activeDisplayObjects) do
-        print("length = "..#activeDisplayObjects.."; i = "..i)
         i = i + reposition(activeDisplayObjects[i])
     end
 end
@@ -247,11 +245,8 @@ local function victory()
 end
 
 local function onEnterFrame()
-	--[[print("Active nulls: ")
-	for i = 1, #activeNullObjects, 1 do
-		print("    "..activeNullObjects[i].name)
-	end]]--
 	updateDisplayObjects()
+    bubble.applyForce()
 end
 
 -- Updates obstacles and background (Updates twice a second)
@@ -259,7 +254,7 @@ local function gameLoop_slow()
     score = score + 1
 
     -- Print Active nulls and display objects
-    print("Active objects")
+    --[[print("Active objects")
     print("    Nulls:")
     for i = 1, #activeNullObjects, 1 do
         print("        "..i..") "..activeNullObjects[i].name)
@@ -267,7 +262,7 @@ local function gameLoop_slow()
     print("    DisplayObjects:")
     for i = 1, #activeDisplayObjects, 1 do
         print("        "..i..") "..activeDisplayObjects[i].type)
-    end
+    end]]--
 
 
     -- Check for VICTORY
@@ -288,7 +283,7 @@ end
 -- Removes all intro-related graphics from screen itself
 local function run_intro()
     print("running intro!")
-    --bubble.introBubbles(bubbleGroup,display.contentWidth/2,5*display.contentHeight/6,10)
+    bubble.introBubbles(bubbleGroup, 10, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
 end
 
 -- Starts the game!
@@ -361,7 +356,7 @@ function scene:show( event )
         -- Start the physics!
         physics.start()
         physics.setGravity(0,0)
-        physics.setDrawMode("normal")
+        physics.setDrawMode("hybrid")
         Runtime:addEventListener("collision", onCollision) -- This should probably move somewhere else but it is here for now
 
         -- Run the intro, then start the game!

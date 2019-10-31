@@ -40,7 +40,7 @@ HARD CORE CODING:
 											DisplayObject manipulation methods
 10/26	10:10am		0:50				Continued implementing "Null object" structure. DisplayObject manipulation methods work for position.
 10/26	9:30pm		0:30				Debugging object manipulation methods
-10/31	6:00pm		
+10/31	6:00pm		-10min
 ------------------------------------------------------------------------------------------------------------------------------
 					21:20 TOTAL
 
