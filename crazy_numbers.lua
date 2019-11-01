@@ -12,7 +12,8 @@ local crazy_numbers = {
 
 	-- Physics
 	LN_DAMPING = 1,
-	GRAVITY = 500,
+	GRAVITY = 8000,
+	TOUCH_FORCE_FACTOR = 100000,
 
 
 	-- Intro

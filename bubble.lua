@@ -8,6 +8,11 @@ local util = require("util")
 local bubble_module = {}
 local bubbles = {} -- We will store all active bubbles in this list
 
+-- Stores information about where the user touched / Where and how to apply forces
+local touch
+local touch_location
+
+
 -- Creates a new bubble and adds it to our list of bubbles
 local function newBubble(displayGroup)
     local thisBubble = display.newImageRect("Game/bubble.png", CN.COL_WIDTH, CN.COL_WIDTH)
@@ -38,7 +43,8 @@ local function onSpawnBubble(event)
     end
 end
 
-local function applyGravity()
+-- Applies bubble to bubble gravity force
+local function applyGravityForce()
     -- Apply gravity force for all (i,j) bubble pairs
     for i = 1, #bubbles, 1 do
         for j = i+1, #bubbles, 1 do
@@ -78,10 +84,59 @@ function bubble_module.introBubbles(displayGroup, num_bubbles, initPoint)
     tm.params = {displayGroup=displayGroup, num_bubbles=num_bubbles, initPoint=initPoint}
 end
 
+-- Apply touch forces
+local function applyTouchForce()
+    if not touch then return end
+
+    -- Calculates force applied on each bubble in turn
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+        local xDist = thisBubble.x - touch_location.x
+        local yDist = thisBubble.y - touch_location.y
+        -- Force based on 1/x^2 relationship
+        local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+                    
+        local xSign -- Preserve direction
+        local ySign 
+        if xDist > 0 then xSign = 1 else xSign = -1 end
+        if yDist > 0 then ySign = 1 else ySign = -1 end
+
+        -- Calculate gravitational forces
+        local gx = 0
+        local gy = 0
+        if xDist ~= 0 then
+            gx = CN.TOUCH_FORCE_FACTOR*(1/math.pow(totalDist,2))
+        end
+        if yDist ~= 0 then
+            gy = CN.TOUCH_FORCE_FACTOR*(1/math.pow(totalDist,2))
+        end
+
+        thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
+    end
+      
+end
+
 -- Applies all forces to bubbles
 function bubble_module.applyForce()
-    applyGravity()
+    applyGravityForce()
+    applyTouchForce()
+end
 
+-- Bubble touch handler -> Called when the game area recieves a touch
+function bubble_module.onTouch(event)
+    if(event.phase == "began") then
+        touch = true
+        touch_location = util.newPoint(event.x, event.y)
+        --print("began at x = "..touch_location.x..", y = "..touch_location.y)
+    elseif(event.phase == "ended") then
+        touch = false
+        --print("ended at x = "..touch_location.x..", y = "..touch_location.y)
+    elseif(event.phase == "moved") then
+        touch_location = util.newPoint(event.x, event.y)
+        --print("moved at x = "..touch_location.x..", y = "..touch_location.y)
+    elseif(event.phase == "cancelled") then
+        touch = false
+    end
 end
 
 return bubble_module

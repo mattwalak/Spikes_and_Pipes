@@ -295,8 +295,15 @@ end
 
 -- Method tied to physics collision listener
 local function onCollision(event)
-    
+
 end
+
+-- Method tied to runtime touch listener -> Dispatches touched accordingly
+local function onTouch(event)
+    -- Will probably have to do some math here once you implement powerups to see if you are interacting with the UI
+    bubble.onTouch(event)
+end
+
 
 
 -- -----------------------------------------------------------------------------------
@@ -357,6 +364,7 @@ function scene:show( event )
         physics.setGravity(0,0)
         physics.setDrawMode("hybrid")
         Runtime:addEventListener("collision", onCollision) -- This should probably move somewhere else but it is here for now
+        Runtime:addEventListener("touch", onTouch)
 
         -- Run the intro, then start the game!
         run_intro()
