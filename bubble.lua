@@ -29,7 +29,7 @@ local function onSpawnBubble(event)
     thisBubble.x = params.initPoint.x
     thisBubble.y = params.initPoint.y
     local randomX = ((math.random()-.5)/2) * CN.INTRO_FORCE
-    thisBubble:applyLinearImpulse(randomX, CN.INTRO_FORCE, thisBubble.x, thisBubble.y)
+    thisBubble:applyLinearImpulse(.001, CN.INTRO_FORCE, thisBubble.x, thisBubble.y)
 
     -- Call self again with delay if bubbles still left
     if params.num_bubbles-1 > 0 then
@@ -50,8 +50,17 @@ local function applyGravity()
             if xDist > 0 then xSign = 1 else xSign = -1 end
             if yDist > 0 then ySign = 1 else ySign = -1 end
 
-            bubbles[i]:applyForce(xSign*CN.GRAVITY*(1/xDist^2), ySign*CN.GRAVITY*(1/yDist^2), bubbles[i].x, bubbles[i].y)
-            bubbles[j]:applyForce(-xSign*CN.GRAVITY*(1/xDist^2), -ySign*CN.GRAVITY*(1/yDist^2), bubbles[j].x, bubbles[j].y)
+            -- Temp non 1/x^2 solution
+            if xDist < CN.COL_WIDTH then xSign = 0 else end
+            if yDist < CN.COL_WIDTH then ySign = 0 else end
+
+            local gx = CN.GRAVITY*(1/xDist^2)
+            local gy = CN.GRAVITY*(1/yDist^2)
+            print("gx = "..gx..", gy = "..gy)
+
+
+            bubbles[i]:applyForce(xSign*gx, ySign*gy, bubbles[i].x, bubbles[i].y)
+            bubbles[j]:applyForce(-xSign*gx, -ySign*gy, bubbles[j].x, bubbles[j].y)
         end
     end
 

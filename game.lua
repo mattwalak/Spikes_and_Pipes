@@ -283,7 +283,7 @@ end
 -- Removes all intro-related graphics from screen itself
 local function run_intro()
     print("running intro!")
-    bubble.introBubbles(bubbleGroup, 10, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
+    bubble.introBubbles(bubbleGroup, 2, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
 end
 
 -- Starts the game!
