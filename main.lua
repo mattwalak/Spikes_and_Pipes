@@ -5,8 +5,6 @@
 -- CN = Crazy Numbers!!! (Constants)
 local CN = require "crazy_numbers"
 
-print("content width: "..display.contentWidth)
-
 -- Create a nice white background for y'all
 local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
 bg:setFillColor(1,1,1)

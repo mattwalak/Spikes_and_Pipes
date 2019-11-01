@@ -12,12 +12,13 @@ local crazy_numbers = {
 
 	-- Physics
 	LN_DAMPING = 1,
-	GRAVITY = 8,
+	GRAVITY = 500,
 
 
 	-- Intro
-	INTRO_DELAY = 100,
-	INTRO_FORCE = -1,
+	INTRO_DELAY = 80,
+	INTRO_FORCE = -2,
+	INTRO_RANDOM_WIDTH = .25,
 }
 
 return crazy_numbers

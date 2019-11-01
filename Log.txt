@@ -42,6 +42,7 @@ HARD CORE CODING:
 10/26	9:30pm		0:30				Debugging object manipulation methods
 10/31	6:00pm		1:20				Changed to 9:16 letterbox display. Added bubble intro animation. Bubbles work with physics now!
 10/31	7:50pm		0:40				I tried to implement gravity and tragically failed.
+10/31	9:30pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					23:20 TOTAL
 

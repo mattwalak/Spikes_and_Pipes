@@ -252,7 +252,6 @@ end
 -- Updates obstacles and background (Updates twice a second)
 local function gameLoop_slow()
     score = score + 1
-
     -- Print Active nulls and display objects
     --[[print("Active objects")
     print("    Nulls:")
@@ -283,7 +282,7 @@ end
 -- Removes all intro-related graphics from screen itself
 local function run_intro()
     print("running intro!")
-    bubble.introBubbles(bubbleGroup, 2, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
+    bubble.introBubbles(bubbleGroup, 10, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
 end
 
 -- Starts the game!
@@ -296,7 +295,7 @@ end
 
 -- Method tied to physics collision listener
 local function onCollision(event)
-    print("Things are colliding :)")
+    
 end
 
 

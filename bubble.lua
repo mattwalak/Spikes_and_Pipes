@@ -28,8 +28,8 @@ local function onSpawnBubble(event)
     local thisBubble = newBubble(params.displayGroup)
     thisBubble.x = params.initPoint.x
     thisBubble.y = params.initPoint.y
-    local randomX = ((math.random()-.5)/2) * CN.INTRO_FORCE
-    thisBubble:applyLinearImpulse(.001, CN.INTRO_FORCE, thisBubble.x, thisBubble.y)
+    local randomX = ((math.random()-.5)*CN.INTRO_RANDOM_WIDTH) * CN.INTRO_FORCE
+    thisBubble:applyLinearImpulse(randomX, CN.INTRO_FORCE, thisBubble.x, thisBubble.y)
 
     -- Call self again with delay if bubbles still left
     if params.num_bubbles-1 > 0 then
@@ -38,32 +38,38 @@ local function onSpawnBubble(event)
     end
 end
 
-
 local function applyGravity()
-    -- Itterate through all (i,j) pairs and calculate/apply gravity force
+    -- Apply gravity force for all (i,j) bubble pairs
     for i = 1, #bubbles, 1 do
         for j = i+1, #bubbles, 1 do
-            local xDist = bubbles[i].x - bubbles[j].x
-            local yDist = bubbles[i].y - bubbles[j].y
+            -- Calculates force applied on bubble1 by bubble2 by distance
+            local bubble1 = bubbles[i]
+            local bubble2 = bubbles[j]
+
+            local xDist = bubble2.x - bubble1.x
+            local yDist = bubble2.y - bubble1.y
+            -- Force based on 1/x^2 relationship
+            local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+                
             local xSign -- Preserve direction
             local ySign 
             if xDist > 0 then xSign = 1 else xSign = -1 end
             if yDist > 0 then ySign = 1 else ySign = -1 end
 
-            -- Temp non 1/x^2 solution
-            if xDist < CN.COL_WIDTH then xSign = 0 else end
-            if yDist < CN.COL_WIDTH then ySign = 0 else end
+            -- Calculate gravitational forces
+            local gx = 0
+            local gy = 0
+            if xDist ~= 0 then
+                gx = CN.GRAVITY*(1/math.pow(totalDist,2))
+            end
+            if yDist ~= 0 then
+                gy = CN.GRAVITY*(1/math.pow(totalDist,2))
+            end
 
-            local gx = CN.GRAVITY*(1/xDist^2)
-            local gy = CN.GRAVITY*(1/yDist^2)
-            print("gx = "..gx..", gy = "..gy)
-
-
-            bubbles[i]:applyForce(xSign*gx, ySign*gy, bubbles[i].x, bubbles[i].y)
-            bubbles[j]:applyForce(-xSign*gx, -ySign*gy, bubbles[j].x, bubbles[j].y)
+            bubble1:applyForce(xSign*gx, ySign*gy, bubble1.x, bubble1.y) -- Apply force to bubble1
+            bubble2:applyForce(-xSign*gx, -ySign*gy, bubble2.x, bubble2.y) -- Apply equal but opposite force to bubble2     
         end
     end
-
 end
 
 -- Animates in num_bubbles bubbles (intro style) from (x,y)
