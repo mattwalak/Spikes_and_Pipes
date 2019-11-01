@@ -12,6 +12,7 @@ local crazy_numbers = {
 
 	-- Physics
 	LN_DAMPING = 1,
+	GRAVITY = 8,
 
 
 	-- Intro

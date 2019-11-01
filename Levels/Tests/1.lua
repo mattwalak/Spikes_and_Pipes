@@ -39,7 +39,7 @@ local null_2A = {
     name = "2B",
     position_path = {util.newPoint(1, 1), util.newPoint(-1, 1), util.newPoint(-1, 0), util.newPoint(1, 0)},
     rotation_path = {0,0},
-    transition_time = {50, 50, 50, 50},
+    transition_time = {200, 200, 200, 200},
     position_interpolation = easing.inSine,
     rotation_interpolation = easing.linear,
     on_complete = "loop",
@@ -78,7 +78,7 @@ local obstacle_3 ={
 
 -- Define pairs
 local obstacles_list = {}
---obstacles_list[1] = obstacle_3
+obstacles_list[1] = obstacle_2
 
 local level_1 =  {
     name = "Test level 1",

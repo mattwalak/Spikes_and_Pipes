@@ -38,6 +38,25 @@ local function onSpawnBubble(event)
     end
 end
 
+
+local function applyGravity()
+    -- Itterate through all (i,j) pairs and calculate/apply gravity force
+    for i = 1, #bubbles, 1 do
+        for j = i+1, #bubbles, 1 do
+            local xDist = bubbles[i].x - bubbles[j].x
+            local yDist = bubbles[i].y - bubbles[j].y
+            local xSign -- Preserve direction
+            local ySign 
+            if xDist > 0 then xSign = 1 else xSign = -1 end
+            if yDist > 0 then ySign = 1 else ySign = -1 end
+
+            bubbles[i]:applyForce(xSign*CN.GRAVITY*(1/xDist^2), ySign*CN.GRAVITY*(1/yDist^2), bubbles[i].x, bubbles[i].y)
+            bubbles[j]:applyForce(-xSign*CN.GRAVITY*(1/xDist^2), -ySign*CN.GRAVITY*(1/yDist^2), bubbles[j].x, bubbles[j].y)
+        end
+    end
+
+end
+
 -- Animates in num_bubbles bubbles (intro style) from (x,y)
 function bubble_module.introBubbles(displayGroup, num_bubbles, initPoint)
     local tm = timer.performWithDelay(CN.INTRO_DELAY, onSpawnBubble)
@@ -46,6 +65,7 @@ end
 
 -- Applies all forces to bubbles
 function bubble_module.applyForce()
+    applyGravity()
 
 end
 
