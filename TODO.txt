@@ -1,1 +1,2 @@
 1. Figure out the deal with setting displayObjects and nullObjects to nil, without making it impossible to load the same level twice
+2. Improve bubble grouping algorithm

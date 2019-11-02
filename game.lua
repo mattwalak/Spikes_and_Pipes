@@ -247,6 +247,7 @@ end
 local function onEnterFrame()
 	updateDisplayObjects()
     bubble.applyForce()
+    bubble.updateNumText()
 end
 
 -- Updates obstacles and background (Updates twice a second)

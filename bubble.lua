@@ -7,6 +7,8 @@ local util = require("util")
 
 local bubble_module = {}
 local bubbles = {} -- We will store all active bubbles in this list
+local textGroup = {} -- Debug table to store numbers representing groups bubbles belong to
+-- bubbles[i] corresponds with textGroup[i]
 
 -- Stores information about where the user touched / Where and how to apply forces
 local touch
@@ -19,10 +21,16 @@ local function newBubble(displayGroup)
     displayGroup:insert(thisBubble)
     thisBubble.x = 0
     thisBubble.y = 0
-    physics.addBody(thisBubble, "dynamic",{radius=CN.COL_WIDTH/2})
+    thisBubble.group = -1
+    physics.addBody(thisBubble, "dynamic",{radius=CN.BUBBLE_RADIUS})
     thisBubble.linearDamping = CN.LN_DAMPING;
     thisBubble.type = "bubble"
     table.insert(bubbles, thisBubble)
+
+    -- Debug text for group numbering
+    local text = display.newText(displayGroup, "-1", 0, 0, native.systemFont, CN.COL_WIDTH)
+    text:setTextColor(0,0,0,255)
+    table.insert(textGroup, text)
 
     return thisBubble
 end
@@ -43,8 +51,41 @@ local function onSpawnBubble(event)
     end
 end
 
+-- Reassigns bubble groups based on proximity
+local function reassignGroups()
+	for i = 1, #bubbles, 1 do
+		bubbles[i].group = -1
+	end
+
+	-- We can definetely make this algoritm faster... We'll worry about that later
+	for i = 1, #bubbles, 1 do
+		local thisBubble = bubbles[i]
+		thisBubble.group = i
+		for j = 1, #bubbles, 1 do
+			cmpBubble = bubbles[j]
+			if j ~= i then
+				local xDist = cmpBubble.x - thisBubble.x
+				local yDist = cmpBubble.y - thisBubble.y
+				local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+				if totalDist < CN.BUBBLE_MIN_GROUP_DIST then
+					local oldGroup = cmpBubble.group
+					-- Flip all other bubbles in this group
+					for k = 1, #bubbles, 1 do
+						if bubbles[k].group == oldGroup then
+							bubbles[k].group = thisBubble.group
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 -- Applies bubble to bubble gravity force
+-- Force is proportional to 1/dist^2 and direction is determined by angle between touch and bubble group median
 local function applyGravityForce()
+
+	reassignGroups()
     -- Apply gravity force for all (i,j) bubble pairs
     for i = 1, #bubbles, 1 do
         for j = i+1, #bubbles, 1 do
@@ -114,6 +155,16 @@ local function applyTouchForce()
         thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
     end
       
+end
+
+-- Updates group numbers and positions
+function bubble_module.updateNumText()
+	reassignGroups()
+	for i = 1, #bubbles, 1 do
+		textGroup[i].text = bubbles[i].group
+		textGroup[i].x = bubbles[i].x
+		textGroup[i].y = bubbles[i].y
+	end
 end
 
 -- Applies all forces to bubbles
