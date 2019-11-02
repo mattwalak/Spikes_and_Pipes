@@ -43,7 +43,7 @@ HARD CORE CODING:
 10/31	6:00pm		1:20				Changed to 9:16 letterbox display. Added bubble intro animation. Bubbles work with physics now!
 10/31	7:50pm		0:40				I tried to implement gravity and tragically failed.
 10/31	9:30pm		1:15				Implemented gravity. Implemented touch forces.
-11/1	9:20pm		
+11/1	9:20pm		1:00				Implemented grouping for bubble groups (For calculating forces).
 ------------------------------------------------------------------------------------------------------------------------------
 					24:35 TOTAL
 
