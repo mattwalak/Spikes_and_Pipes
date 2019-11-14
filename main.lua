@@ -5,12 +5,11 @@
 -- CN = Crazy Numbers!!! (Constants)
 local CN = require "crazy_numbers"
 
-
---[[
 -- Create a nice white background for y'all
 local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
 bg:setFillColor(1,1,1)
 
+--[[
 -- Sets up a checkered background
 local yMax = math.ceil(display.contentHeight/CN.COL_WIDTH)
 print("x: 10, y: "..yMax)

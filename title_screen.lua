@@ -4,6 +4,7 @@
 
 local CN = require("crazy_numbers")
 local composer = require( "composer" )
+local util = require("util")
 
 local scene = composer.newScene()
  
