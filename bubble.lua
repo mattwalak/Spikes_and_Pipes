@@ -12,9 +12,6 @@ local textGroup = {} -- Debug table to store numbers representing groups bubbles
 local drawCOM = {} -- Debug table to store center of mass display data
 local comTable = {} -- List of (x,y) pairs describing the center of mass of each bubble clump
 
-
---local bubbleClumps = {} -- Stores pointers to individual bubbles and COM data
-
 -- Stores information about where the user touched / Where and how to apply forces
 local touch
 local touch_location
@@ -26,32 +23,6 @@ local function newBubbleClump()
     clump.com = util.newPoint(0,0)
     return clump
 end
-
--- Inserts a bubble into a clump and updates com accordingly
---[[
-local function BubbleClump.insert(bubbleClump, bubble)
-    local xTotal = clump.com.x * #clump.bubbles
-    local yTotal = clump.com.y * #clump.bubbles
-    xTotal = xTotal + bubble.x
-    yTotal = yTotal + bubble.y
-    table.insert(bubbleClump.bubbles, bubble)
-    bubbleClump.com.x = xTotal/#bubbleClump.bubbles
-    bubbleClump.com.y = yTotal/#bubbleClump.bubbles
-end
-
--- Returns true is a bubble is close enough to belong in a group, false otherwise
-local function BubbleClump.belongsInGroup(bubbleClump, thisBubble)
-    for i = 1, #bubbleClump.bubbles, 1 do
-        local cmpBubble = bubbleClump.bubbles[i]
-        local xDist = cmpBubble.x - thisBubble.x
-        local yDist = cmpBubble.y - thisBubble.y
-        local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
-        if totalDist < CN.BUBBLE_MIN_GROUP_DIST then
-            return true
-        end
-    end
-    return false -- No bubble in this group was close enough
-end]]--
 
 -- Creates a new bubble and adds it to our list of bubbles
 local function newBubble(displayGroup)
@@ -122,13 +93,17 @@ local function reassignGroups()
     local clumpSizes = {}
     comTable = {}
     for i = 1, #bubbles, 1 do
-        table.insert(comTable, util.newPoint(0, 0))
+        table.insert(comTable, nil)
         table.insert(clumpSizes, 0)
     end
 
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i];
         local groupNum = thisBubble.group
+        if not comTable[groupNum] then
+            comTable[groupNum] = util.newPoint(0,0)
+        end
+
         local xTotal = comTable[groupNum].x * clumpSizes[groupNum]
         local yTotal = comTable[groupNum].y * clumpSizes[groupNum]
 
@@ -143,10 +118,14 @@ local function reassignGroups()
     for i = 1, #bubbles, 1 do
         if drawCOM[i] then
             drawCOM[i]:removeSelf()
+            drawCOM[i] = nil
         end
-        drawCOM[i] = display.newRect(comTable[i].x, comTable[i].y,
-            CN.COL_WIDTH/2, CN.COL_WIDTH/2)
-        drawCOM[i]:setFillColor(.5, .5, .5)
+
+        if comTable[i] then
+            drawCOM[i] = display.newRect(comTable[i].x, comTable[i].y,
+                CN.COL_WIDTH/2, CN.COL_WIDTH/2)
+            drawCOM[i]:setFillColor(.5, .5, .5)
+        end
     end
 
 end
@@ -198,8 +177,20 @@ end
 -- Apply touch forces
 local function applyTouchForce()
     if not touch then return end
+    if #bubbles == 0 then return end
+
+    -- Finds closest group and applies the same force to all bubbles in that groups
+    -- There is at least one bubble, so there is at least 1 group to apply force to
+    local closestDist
+    local closestGroup
+    for i = 1, #bubbles, 1 do
+
+    end
+
+
 
     -- Calculates force applied on each bubble in turn
+    --[[
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
         local xDist = thisBubble.x - touch_location.x
@@ -223,7 +214,7 @@ local function applyTouchForce()
         end
 
         thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
-    end
+    end]]
 
 end
 
