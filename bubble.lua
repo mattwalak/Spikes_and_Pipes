@@ -8,12 +8,50 @@ local util = require("util")
 local bubble_module = {}
 local bubbles = {} -- We will store all active bubbles in this list
 local textGroup = {} -- Debug table to store numbers representing groups bubbles belong to
--- bubbles[i] corresponds with textGroup[i]
+                        -- bubbles[i] corresponds with textGroup[i]
+local drawCOM = {} -- Debug table to store center of mass display data
+local comTable = {} -- List of (x,y) pairs describing the center of mass of each bubble clump
+
+
+--local bubbleClumps = {} -- Stores pointers to individual bubbles and COM data
 
 -- Stores information about where the user touched / Where and how to apply forces
 local touch
 local touch_location
 
+-- Creates a new bubbleClump
+local function newBubbleClump()
+    local clump = {}
+    clump.bubbles = {}
+    clump.com = util.newPoint(0,0)
+    return clump
+end
+
+-- Inserts a bubble into a clump and updates com accordingly
+--[[
+local function BubbleClump.insert(bubbleClump, bubble)
+    local xTotal = clump.com.x * #clump.bubbles
+    local yTotal = clump.com.y * #clump.bubbles
+    xTotal = xTotal + bubble.x
+    yTotal = yTotal + bubble.y
+    table.insert(bubbleClump.bubbles, bubble)
+    bubbleClump.com.x = xTotal/#bubbleClump.bubbles
+    bubbleClump.com.y = yTotal/#bubbleClump.bubbles
+end
+
+-- Returns true is a bubble is close enough to belong in a group, false otherwise
+local function BubbleClump.belongsInGroup(bubbleClump, thisBubble)
+    for i = 1, #bubbleClump.bubbles, 1 do
+        local cmpBubble = bubbleClump.bubbles[i]
+        local xDist = cmpBubble.x - thisBubble.x
+        local yDist = cmpBubble.y - thisBubble.y
+        local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+        if totalDist < CN.BUBBLE_MIN_GROUP_DIST then
+            return true
+        end
+    end
+    return false -- No bubble in this group was close enough
+end]]--
 
 -- Creates a new bubble and adds it to our list of bubbles
 local function newBubble(displayGroup)
@@ -23,7 +61,7 @@ local function newBubble(displayGroup)
     thisBubble.y = 0
     thisBubble.group = -1
     physics.addBody(thisBubble, "dynamic",{radius=CN.BUBBLE_RADIUS})
-    thisBubble.linearDamping = CN.LN_DAMPING;
+    thisBubble.linearDamping = CN.LN_DAMPING
     thisBubble.type = "bubble"
     table.insert(bubbles, thisBubble)
 
@@ -37,7 +75,7 @@ end
 
 -- Listener to spawn an new bubble (Used in intro and menu sequences)
 local function onSpawnBubble(event)
-    local params = event.source.params;
+    local params = event.source.params
     local thisBubble = newBubble(params.displayGroup)
     thisBubble.x = params.initPoint.x
     thisBubble.y = params.initPoint.y
@@ -53,17 +91,17 @@ end
 
 -- Reassigns bubble groups based on proximity
 local function reassignGroups()
-	for i = 1, #bubbles, 1 do
-		bubbles[i].group = -1
-	end
+    for i = 1, #bubbles, 1 do
+        bubbles[i].group = -1
+    end
 
 	-- We can definetely make this algoritm faster... We'll worry about that later
 	for i = 1, #bubbles, 1 do
 		local thisBubble = bubbles[i]
 		thisBubble.group = i
 		for j = 1, #bubbles, 1 do
-			cmpBubble = bubbles[j]
-			if j ~= i then
+			if (j ~= i) and (bubbles[j].group ~= -1) and (bubbles[j].group ~= thisBubble.group) then
+                local cmpBubble = bubbles[j]
 				local xDist = cmpBubble.x - thisBubble.x
 				local yDist = cmpBubble.y - thisBubble.y
 				local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
@@ -79,6 +117,38 @@ local function reassignGroups()
 			end
 		end
 	end
+
+    -- recalculate center of mass
+    local clumpSizes = {}
+    comTable = {}
+    for i = 1, #bubbles, 1 do
+        table.insert(comTable, util.newPoint(0, 0))
+        table.insert(clumpSizes, 0)
+    end
+
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i];
+        local groupNum = thisBubble.group
+        local xTotal = comTable[groupNum].x * clumpSizes[groupNum]
+        local yTotal = comTable[groupNum].y * clumpSizes[groupNum]
+
+        clumpSizes[groupNum] = clumpSizes[groupNum] + 1
+        xTotal = xTotal + thisBubble.x
+        yTotal = yTotal + thisBubble.y
+        comTable[groupNum].x = xTotal / clumpSizes[groupNum]
+        comTable[groupNum].y = yTotal / clumpSizes[groupNum]
+    end
+
+    -- Update COM display (Debug only)
+    for i = 1, #bubbles, 1 do
+        if drawCOM[i] then
+            drawCOM[i]:removeSelf()
+        end
+        drawCOM[i] = display.newRect(comTable[i].x, comTable[i].y,
+            CN.COL_WIDTH/2, CN.COL_WIDTH/2)
+        drawCOM[i]:setFillColor(.5, .5, .5)
+    end
+
 end
 
 -- Applies bubble to bubble gravity force
@@ -97,9 +167,9 @@ local function applyGravityForce()
             local yDist = bubble2.y - bubble1.y
             -- Force based on 1/x^2 relationship
             local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
-                
+
             local xSign -- Preserve direction
-            local ySign 
+            local ySign
             if xDist > 0 then xSign = 1 else xSign = -1 end
             if yDist > 0 then ySign = 1 else ySign = -1 end
 
@@ -114,7 +184,7 @@ local function applyGravityForce()
             end
 
             bubble1:applyForce(xSign*gx, ySign*gy, bubble1.x, bubble1.y) -- Apply force to bubble1
-            bubble2:applyForce(-xSign*gx, -ySign*gy, bubble2.x, bubble2.y) -- Apply equal but opposite force to bubble2     
+            bubble2:applyForce(-xSign*gx, -ySign*gy, bubble2.x, bubble2.y) -- Apply equal but opposite force to bubble2
         end
     end
 end
@@ -136,9 +206,9 @@ local function applyTouchForce()
         local yDist = thisBubble.y - touch_location.y
         -- Force based on 1/x^2 relationship
         local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
-                    
+
         local xSign -- Preserve direction
-        local ySign 
+        local ySign
         if xDist > 0 then xSign = 1 else xSign = -1 end
         if yDist > 0 then ySign = 1 else ySign = -1 end
 
@@ -154,7 +224,7 @@ local function applyTouchForce()
 
         thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
     end
-      
+
 end
 
 -- Updates group numbers and positions

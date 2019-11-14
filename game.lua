@@ -245,7 +245,7 @@ local function victory()
 end
 
 local function onEnterFrame()
-	updateDisplayObjects()
+	  updateDisplayObjects()
     bubble.applyForce()
     bubble.updateNumText()
 end

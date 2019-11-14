@@ -16,7 +16,7 @@ local crazy_numbers = {
 	TOUCH_FORCE_FACTOR = 10000,
 
 	-- Bubble
-	BUBBLE_RADIUS = (2/3)*COL_WIDTH,
+	BUBBLE_RADIUS = (3/4)*(COL_WIDTH/2),
 	BUBBLE_MIN_GROUP_DIST = 2*COL_WIDTH,
 
 	-- Intro
