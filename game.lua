@@ -1,6 +1,6 @@
 -- game.lua
 -- © Matthew Walak 2019
--- Where you actually play a level!
+-- Where you actually play a level!!!
 
 
 local levels = require("levels")
@@ -122,7 +122,7 @@ local function keyframeNull(thisNull)
 end
 
 -- Repositions a display object based on its ancestry
--- Depth indicates how deep we are 
+-- Depth indicates how deep we are
 -- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
 local function reposition(displayObject)
 	local x_offset = 0
