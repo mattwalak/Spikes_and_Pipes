@@ -44,7 +44,7 @@ HARD CORE CODING:
 10/31	7:50pm		0:40				I tried to implement gravity and tragically failed.
 10/31	9:30pm		1:15				Implemented gravity. Implemented touch forces.
 11/1	9:20pm		1:00				Implemented grouping for bubble groups (For calculating forces).
-11/14	3:00pm
+11/14	3:00pm		2:00				
 ------------------------------------------------------------------------------------------------------------------------------
 					24:35 TOTAL
 

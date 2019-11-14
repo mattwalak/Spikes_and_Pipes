@@ -363,7 +363,7 @@ function scene:show( event )
         -- Start the physics!
         physics.start()
         physics.setGravity(0,0)
-        physics.setDrawMode("hybrid")
+        physics.setDrawMode("normal")
         Runtime:addEventListener("collision", onCollision) -- This should probably move somewhere else but it is here for now
         Runtime:addEventListener("touch", onTouch)
 

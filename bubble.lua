@@ -114,7 +114,8 @@ local function reassignGroups()
         comTable[groupNum].y = yTotal / clumpSizes[groupNum]
     end
 
-    -- Update COM display (Debug only)
+    -- Update drawCOM (Debug only)
+    --[[
     for i = 1, #bubbles, 1 do
         if drawCOM[i] then
             drawCOM[i]:removeSelf()
@@ -126,7 +127,7 @@ local function reassignGroups()
                 CN.COL_WIDTH/2, CN.COL_WIDTH/2)
             drawCOM[i]:setFillColor(.5, .5, .5)
         end
-    end
+    end]]
 
 end
 
@@ -183,11 +184,35 @@ local function applyTouchForce()
     -- There is at least one bubble, so there is at least 1 group to apply force to
     local closestDist
     local closestGroup
+    local closestAngle
+    local direction
     for i = 1, #bubbles, 1 do
-
+        if comTable[i] then
+            local xDist = comTable[i].x - touch_location.x
+            local yDist = comTable[i].y - touch_location.y
+            local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            if not closestDist then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            elseif math.abs(totalDist) < math.abs(closestDist) then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            end
+        end
     end
 
-
+    -- Apply force to bubbles in that group
+    local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+        if thisBubble.group == closestGroup then
+            thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+        end
+    end
 
     -- Calculates force applied on each bubble in turn
     --[[

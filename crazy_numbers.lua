@@ -13,7 +13,7 @@ local crazy_numbers = {
 	-- Physics
 	LN_DAMPING = 1,
 	GRAVITY = 600,
-	TOUCH_FORCE_FACTOR = 10000,
+	TOUCH_FORCE_FACTOR = 120,
 
 	-- Bubble
 	BUBBLE_RADIUS = (3/4)*(COL_WIDTH/2),
