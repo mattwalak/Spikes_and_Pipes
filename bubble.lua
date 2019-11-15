@@ -37,9 +37,9 @@ local function newBubble(displayGroup)
     table.insert(bubbles, thisBubble)
 
     -- Debug text for group numbering
-    local text = display.newText(displayGroup, "-1", 0, 0, native.systemFont, CN.COL_WIDTH)
-    text:setTextColor(0,0,0,255)
-    table.insert(textGroup, text)
+    --local text = display.newText(displayGroup, "-1", 0, 0, native.systemFont, CN.COL_WIDTH)
+    --text:setTextColor(0,0,0,255)
+    --table.insert(textGroup, text)
 
     return thisBubble
 end
@@ -135,9 +135,36 @@ end
 -- Force is proportional to 1/dist^2 and direction is determined by angle between touch and bubble group median
 local function applyGravityForce()
 
-	reassignGroups()
     -- Apply gravity force for all (i,j) bubble pairs
     for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+        local groupCOM = comTable[thisBubble.group]
+        local xDist = groupCOM.x - thisBubble.x
+        local yDist = groupCOM.y - thisBubble.y
+        local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+
+        -- Preserve direction
+        local xSign
+        local ySign
+        if xDist > 0 then xSign = 1 else xSign = -1 end
+        if yDist > 0 then ySign = 1 else ySign = -1 end
+
+        -- Calculate gravitational forces
+        local gx = 0
+        local gy = 0
+        if xDist ~= 0 then
+            gx = CN.GRAVITY*(totalDist/1000)--*(1/math.pow(totalDist,2))
+        end
+        if yDist ~= 0 then
+            gy = CN.GRAVITY*(totalDist/1000)--*(1/math.pow(totalDist,2))
+        end
+
+        thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y) -- Apply force to bubble1
+
+
+
+        --[[
+        -- METHOD TO MIMIC REAL GRAVITY (BUT KIND OF LAME)
         for j = i+1, #bubbles, 1 do
             -- Calculates force applied on bubble1 by bubble2 by distance
             local bubble1 = bubbles[i]
@@ -165,7 +192,7 @@ local function applyGravityForce()
 
             bubble1:applyForce(xSign*gx, ySign*gy, bubble1.x, bubble1.y) -- Apply force to bubble1
             bubble2:applyForce(-xSign*gx, -ySign*gy, bubble2.x, bubble2.y) -- Apply equal but opposite force to bubble2
-        end
+        end]]
     end
 end
 
@@ -206,10 +233,16 @@ local function applyTouchForce()
     end
 
     -- Apply force to bubbles in that group
-    local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
+    --local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
         if thisBubble.group == closestGroup then
+            local xDist = thisBubble.x - touch_location.x
+            local yDist = thisBubble.y - touch_location.y
+            local bubbleDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            local angle = math.atan(yDist/xDist)
+
+            local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(bubbleDist,1))
             thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
         end
     end
@@ -255,8 +288,27 @@ end
 
 -- Applies all forces to bubbles
 function bubble_module.applyForce()
+    reassignGroups()
     applyGravityForce()
     applyTouchForce()
+end
+
+-- Gets rid of all the bubbles
+function bubble_module.destroyBubbles()
+    for i = 1, #bubbles, 1 do
+        bubbles[i]:removeSelf()
+        bubbles[i] = nil
+        if textGroup[i] then
+            textGroup[i]:removeSelf()
+            textGroup[i] = nil
+        end
+    end
+
+    -- I'm like 80% sure garbanzo collection will take care of these for me
+    bubbles = {}
+    textGroup = {}
+    drawCOM = {}
+    comTable = {}
 end
 
 -- Bubble touch handler -> Called when the game area recieves a touch

@@ -217,6 +217,7 @@ end
 
 local function on_victory_tapped(event)
     print("on_victory_tapped")
+    bubble.destroyBubbles()
 
     -- Remove victory thing
     event.target.text:removeSelf()
@@ -245,9 +246,9 @@ local function victory()
 end
 
 local function onEnterFrame()
-	  updateDisplayObjects()
+	updateDisplayObjects()
     bubble.applyForce()
-    bubble.updateNumText()
+    --bubble.updateNumText()
 end
 
 -- Updates obstacles and background (Updates twice a second)
