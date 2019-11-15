@@ -1,6 +1,9 @@
 NEXT STEPS:
-2. Add spikes + collision detection
-4. Test build
+1. Create some test levels (Modify level structure code as needed)
+2. Add powerups
+
+
+
 
 THING TO DO BEFORE RELEASE:
 1. Figure out the deal with setting displayObjects and nullObjects to nil, without making it impossible to load the same level twice
