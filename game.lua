@@ -18,6 +18,12 @@ local scene = composer.newScene()
 -- Initialize physics
 local physics = require("physics")
 
+-- Game borders
+local leftBorder
+local rightBorder
+local bottomBorder
+local topBorder
+
 -- Define display groups
 local bubbleGroup
 local obstacleGroup
@@ -328,6 +334,16 @@ function scene:create( event )
     sceneGroup:insert(obstacleGroup)
     sceneGroup:insert(uiGroup)
 
+    -- Initialize borders
+    leftBorder = display.newRect(-100, display.contentHeight/2, 200, display.contentHeight)
+    rightBorder = display.newRect(display.contentWidth+100, display.contentHeight/2, 200, display.contentHeight)
+    topBorder = display.newRect(display.contentWidth/2, -100, display.contentWidth, 200)
+    bottomBorder = display.newRect(display.contentWidth/2, display.contentHeight+100, display.contentWidth, 200)
+    obstacleGroup:insert(leftBorder)
+    obstacleGroup:insert(rightBorder)
+    obstacleGroup:insert(topBorder)
+    obstacleGroup:insert(bottomBorder)
+
     -- Temporary white background (This should be replaced by backgroundGroup later)
     local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
     bg:setFillColor(1,1,1)
@@ -367,6 +383,13 @@ function scene:show( event )
         physics.setDrawMode("normal")
         Runtime:addEventListener("collision", onCollision) -- This should probably move somewhere else but it is here for now
         Runtime:addEventListener("touch", onTouch)
+
+        -- Add borders to Physics
+        local borderProperties = {density = 1.0, bounce = 0.2}
+        physics.addBody(leftBorder,"static", borderProperties)
+        physics.addBody(rightBorder,"static", borderProperties)
+        physics.addBody(topBorder,"static", borderProperties)
+        physics.addBody(bottomBorder,"static", borderProperties)
 
         -- Run the intro, then start the game!
         run_intro()

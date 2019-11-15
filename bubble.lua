@@ -276,6 +276,27 @@ local function applyTouchForce()
 
 end
 
+-- Applys force pushing bubbles away from the edge
+local function applyEdgeForce()
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+        if thisBubble.x < CN.EDGE_FORCE_DIST then
+            thisBubble:applyForce(CN.EDGE_FORCE_FACTOR, 0, thisBubble.x, thisBubble.y)
+        end
+        if thisBubble.x > (display.contentWidth - CN.EDGE_FORCE_DIST) then
+            thisBubble:applyForce(-CN.EDGE_FORCE_FACTOR, 0, thisBubble.x, thisBubble.y)
+        end
+
+        if thisBubble.y < CN.EDGE_FORCE_DIST then
+            thisBubble:applyForce(0, CN.EDGE_FORCE_FACTOR, thisBubble.x, thisBubble.y)
+        end
+        if thisBubble.y > (display.contentHeight - CN.EDGE_FORCE_DIST) then
+            thisBubble:applyForce(0, -CN.EDGE_FORCE_FACTOR, thisBubble.x, thisBubble.y)
+        end
+
+    end
+end
+
 -- Updates group numbers and positions
 function bubble_module.updateNumText()
 	reassignGroups()
@@ -291,6 +312,7 @@ function bubble_module.applyForce()
     reassignGroups()
     applyGravityForce()
     applyTouchForce()
+    applyEdgeForce()
 end
 
 -- Gets rid of all the bubbles
