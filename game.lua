@@ -131,6 +131,10 @@ end
 -- Depth indicates how deep we are
 -- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
 local function reposition(displayObject)
+    print("reposition()")
+    for i = 1, #displayObject.ancestry, 1 do
+        print("\t"..displayObject.ancestry[i].name)
+    end
 	local x_offset = 0
 	local y_offset = 0
 	local rotation_offset = 0
@@ -155,7 +159,13 @@ local function reposition(displayObject)
 end
 
 -- Creates a new Corona recognized display object from its data
-local function createDisplayObject(object_data)
+local function createDisplayObject(object_data, ancestry)
+    print("createDisplayObject")
+
+    for i = 1, #ancestry, 1 do
+        print("\t"..ancestry[i].name)
+    end
+
 	local newObject = {}
 	local image
     local imageOutline
@@ -167,16 +177,56 @@ local function createDisplayObject(object_data)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
     end
     physics.addBody(image, "static", {outline=imageOutline})
+    image.type = object_data.type
 	newObject.image = image
 	newObject.x = object_data.x * CN.COL_WIDTH
 	newObject.y = object_data.y * CN.COL_WIDTH
     newObject.type = object_data.type
-    image.type = object_data.type
 	newObject.rotation = object_data.rotation
-	newObject.ancestry = object_data.ancestry
+	newObject.ancestry = ancestry
 	return newObject
 end
 
+
+local function createObstacle(thisObstacle, ancestry)
+    if not thisObstacle then return end
+
+    if thisObstacle.type == "null" then
+        print("createObstacle() null")
+        local thisNull = thisObstacle
+        -- print("Inserting name = "..thisNull.name)
+        table.insert(activeNullObjects, thisNull)
+
+        -- Set the state values of our null object
+        thisNull.frame_counter = 0
+        local num_frames = #thisNull.position_path
+        local this_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
+        thisNull.x = thisNull.position_path[this_frame].x * CN.COL_WIDTH
+        thisNull.y = thisNull.position_path[this_frame].y * CN.COL_WIDTH
+        -- print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
+        thisNull.rotation = thisNull.rotation_path[this_frame]
+
+        -- Set the null objects on their way! (Start transitions)
+        keyframeNull(thisNull)
+
+        if not thisObstacle.children then return end
+        for i = 1, #thisObstacle.children, 1 do
+            local newAncestry = {}
+            newAncestry = util.deepcopy(ancestry)
+            table.insert(newAncestry, thisObstacle)
+            createObstacle(thisObstacle.children[i], newAncestry)
+        end
+    else
+        print("createObstacle() displayObject")
+        local newDisplayObject = createDisplayObject(thisObstacle, ancestry)
+        reposition(newDisplayObject)
+        table.insert(activeDisplayObjects, newDisplayObject)
+    end
+end
+
+
+--[[
+-- OLD ANCESTRY APPROACH
 -- Creates an objects and starts transition from frame_counter to frame_counter+1
 local function createObstacle(obstacle_data)
 	-- Note that there has to be at least 1 null and 1 display object, otherwise things crash
@@ -207,7 +257,7 @@ local function createObstacle(obstacle_data)
     	reposition(newObject)
     	table.insert(activeDisplayObjects, newObject)
     end
-end
+end]]--
 
 
 
@@ -265,7 +315,8 @@ end
 local function gameLoop_slow()
     score = score + 1
     -- Print Active nulls and display objects
-    --[[print("Active objects")
+    --[[
+    print("Active objects")
     print("    Nulls:")
     for i = 1, #activeNullObjects, 1 do
         print("        "..i..") "..activeNullObjects[i].name)
@@ -284,7 +335,24 @@ local function gameLoop_slow()
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         -- print("adding object "..score)
-        createObstacle(level_data.obstacles[score])
+        createObstacle(level_data.obstacles[score], {})
+
+        -- Print Active nulls and display objects
+        print("Active objects (After addition)")
+        print("    Nulls:")
+        for i = 1, #activeNullObjects, 1 do
+            print("        "..i..") "..activeNullObjects[i].name)
+        end
+        print("    DisplayObjects:")
+        for i = 1, #activeDisplayObjects, 1 do
+            print("        "..i..") "..activeDisplayObjects[i].type)
+        end
+
+
+        -- Check for VICTORY
+        if (score == level_data.victory) then
+            victory()
+        end
     end
 
     update_scoreText()

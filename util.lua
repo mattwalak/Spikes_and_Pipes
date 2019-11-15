@@ -108,6 +108,7 @@ function util.newParentObstacle(speed)
     local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
     local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
+        type = "null",
         name = "Parent",
         position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
         rotation_path = {0,0},
@@ -122,7 +123,7 @@ function util.newParentObstacle(speed)
 end
 
 function util.newVerticalSpike(ancestry)
-    
+
 
 end
 
