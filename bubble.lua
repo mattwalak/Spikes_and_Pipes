@@ -333,6 +333,18 @@ function bubble_module.destroyBubbles()
     comTable = {}
 end
 
+-- Pops a bubble :(
+function bubble_module.popBubble(thisBubble)
+    for i = 1, #bubbles, 1 do
+        if thisBubble == bubbles[i] then
+            thisBubble = table.remove(bubbles, i)
+            thisBubble:removeSelf()
+            thisBubble = nil
+            return
+        end
+    end
+end
+
 -- Bubble touch handler -> Called when the game area recieves a touch
 function bubble_module.onTouch(event)
     if(event.phase == "began") then

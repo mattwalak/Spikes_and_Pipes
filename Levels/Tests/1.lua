@@ -26,10 +26,24 @@ local displayObject_1A = {
     rotation = 0,
     ancestry = {parent_1, null_1A}
 }
+local spike_1A = {
+    type = "spike",
+    x = 0,
+    y = 1,
+    rotation = 180,
+    ancestry = {parent_1, null_1A}
+}
+local spike_1B = {
+    type = "spike",
+    x = 0,
+    y = -1,
+    rotation = 0,
+    ancestry = {parent_1, null_1A}
+}
 parent_1.children = {null_1A}
 local obstacle_1 ={
     null_objects = {parent_1, null_1A},
-    display_objects = {displayObject_1A}
+    display_objects = {displayObject_1A, spike_1A, spike_1B}
 }
 
 --***************************************************
@@ -69,10 +83,26 @@ local displayObject_3A = {
     rotation = 0,
     ancestry = {parent_3}
 }
+local spike_3A = {
+    type = "spike",
+    x = 0,
+    y = 1,
+    rotation = 180,
+    ancestry = {parent_3}
+}
+local spike_3B = {
+    type = "spike",
+    x = 0,
+    y = -1,
+    rotation = 0,
+    ancestry = {parent_3}
+}
+
 local obstacle_3 ={
     null_objects = {parent_3},
-    display_objects = {displayObject_3A}
+    display_objects = {displayObject_3A, spike_3A, spike_3B}
 }
+
 --------------------------------------------------------------------------------
 
 

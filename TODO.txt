@@ -1,7 +1,5 @@
 NEXT STEPS:
-1. Add forces around edge to prevent bubbles from leaving screen + make it easy to recover
 2. Add spikes + collision detection
-3. Continue experimenting with touch forces
 4. Test build
 
 THING TO DO BEFORE RELEASE:

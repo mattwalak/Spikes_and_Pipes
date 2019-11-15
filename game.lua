@@ -66,7 +66,7 @@ local function destroyNull(thisNull)
 		return
 	end
 
-	print("destroying name: "..thisNull.name)
+	-- print("destroying name: "..thisNull.name)
     transition.cancel(thisNull) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
     if thisNull.children then
     	for i = 0, #thisNull.children, 1 do
@@ -137,7 +137,7 @@ local function reposition(displayObject)
 	local ancestry = displayObject.ancestry
 	for i = 1, #ancestry, 1 do
         if not util.tableContains(activeNullObjects, ancestry[i]) then   -- This is TEMPORARY
-            print("destroying displayObject: "..displayObject.type)
+            -- print("destroying displayObject: "..displayObject.type)
             displayObject.image:removeSelf()
             displayObject.image = nil
             util.removeFromList(activeDisplayObjects, displayObject)
@@ -158,16 +158,20 @@ end
 local function createDisplayObject(object_data)
 	local newObject = {}
 	local image
+    local imageOutline
 	if object_data.type == "black_square" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
-	elseif object_data.type == "spike" then
+        imageOutline = graphics.newOutline(2, "Game/Obstacle/black_square.png")
+    elseif object_data.type == "spike" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
-	end
-    physics.addBody(image,"static")
+        imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
+    end
+    physics.addBody(image, "static", {outline=imageOutline})
 	newObject.image = image
-	newObject.x = object_data.x
-	newObject.y = object_data.y
+	newObject.x = object_data.x * CN.COL_WIDTH
+	newObject.y = object_data.y * CN.COL_WIDTH
     newObject.type = object_data.type
+    image.type = object_data.type
 	newObject.rotation = object_data.rotation
 	newObject.ancestry = object_data.ancestry
 	return newObject
@@ -181,7 +185,7 @@ local function createObstacle(obstacle_data)
     -- Initialize null objects
     for i = 1, #obstacle_data.null_objects, 1 do
             local thisNull = obstacle_data.null_objects[i]
-            print("Inserting name = "..thisNull.name)
+            -- print("Inserting name = "..thisNull.name)
             table.insert(activeNullObjects, thisNull)
 
             -- Set the state values of our null object
@@ -190,7 +194,7 @@ local function createObstacle(obstacle_data)
             local this_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
             thisNull.x = thisNull.position_path[this_frame].x * CN.COL_WIDTH
             thisNull.y = thisNull.position_path[this_frame].y * CN.COL_WIDTH
-            print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
+            -- print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
             thisNull.rotation = thisNull.rotation_path[this_frame]
 
             -- Set the null objects on their way! (Start transitions)
@@ -279,7 +283,7 @@ local function gameLoop_slow()
 
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
-        print("adding object "..score)
+        -- print("adding object "..score)
         createObstacle(level_data.obstacles[score])
     end
 
@@ -303,7 +307,26 @@ end
 
 -- Method tied to physics collision listener
 local function onCollision(event)
+    if(event.phase == "began") then
 
+		local obj1 = event.object1
+		local obj2 = event.object2
+		--SPIKE COLLISION
+		if(obj1.type == "bubble" and obj2.type == "spike") then
+			if(event.element2 == 2) then
+				return
+			end
+
+            bubble.popBubble(obj1)
+		elseif(obj1.type == "spike" and obj2.type == "bubble") then
+			if(event.element1 == 2) then
+				return
+			end
+
+			bubble.popBubble(obj2)
+		end
+
+	end
 end
 
 -- Method tied to runtime touch listener -> Dispatches touched accordingly
@@ -339,6 +362,10 @@ function scene:create( event )
     rightBorder = display.newRect(display.contentWidth+100, display.contentHeight/2, 200, display.contentHeight)
     topBorder = display.newRect(display.contentWidth/2, -100, display.contentWidth, 200)
     bottomBorder = display.newRect(display.contentWidth/2, display.contentHeight+100, display.contentWidth, 200)
+    leftBorder.type = "border"
+    rightBorder.type = "border"
+    topBorder.type = "border"
+    bottomBorder.type = "border"
     obstacleGroup:insert(leftBorder)
     obstacleGroup:insert(rightBorder)
     obstacleGroup:insert(topBorder)
@@ -380,7 +407,7 @@ function scene:show( event )
         -- Start the physics!
         physics.start()
         physics.setGravity(0,0)
-        physics.setDrawMode("normal")
+        physics.setDrawMode("hybrid")
         Runtime:addEventListener("collision", onCollision) -- This should probably move somewhere else but it is here for now
         Runtime:addEventListener("touch", onTouch)
 
