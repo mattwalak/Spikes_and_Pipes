@@ -47,6 +47,7 @@ HARD CORE CODING:
 11/14	3:00pm		2:30				Finished implementing grouping for bubble groups. Played around with forces to figure out what give both control and a sense of randomness	
 11/14	7:55pm		2:00				Implemented collisions, spikes, and bubble popping	
 11/14	10:40pm		0:20				Made first build		
+11/15	1:40pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					29:25 TOTAL
 

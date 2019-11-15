@@ -40,25 +40,6 @@ end
 end
 end
 
--- Returns the default parent object that travels from the top of the
--- screen to the bottom in a given ammount of time (Stored in speed)
-function util.newParentObstacle(speed)
-    local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
-    local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
-    local parent = {
-        name = "Parent",
-        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
-        rotation_path = {0,0},
-        transition_time = {speed, speed},
-        position_interpolation = easing.linear,
-        rotation_interpolation = easing.linear,
-        on_complete = "destroy",
-        first_frame = 2,
-        children = nil
-    }
-    return parent
-end
-
 -- Returns a Point object (x,y) pair
 function util.newPoint(x_in, y_in)
     local point = {x=x_in, y=y_in}
@@ -119,5 +100,30 @@ function util.removeFromList(tbl, item)
     return false
 end
 
+-- ******************************** LEVEL BUILDING UTILITIES ***************************************
+
+-- Returns the default parent object that travels from the top of the
+-- screen to the bottom in a given ammount of time (Stored in speed)
+function util.newParentObstacle(speed)
+    local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
+    local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
+    local parent = {
+        name = "Parent",
+        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
+        rotation_path = {0,0},
+        transition_time = {speed, speed},
+        position_interpolation = easing.linear,
+        rotation_interpolation = easing.linear,
+        on_complete = "destroy",
+        first_frame = 2,
+        children = nil
+    }
+    return parent
+end
+
+function util.newVerticalSpike(ancestry)
+    
+
+end
 
 return util

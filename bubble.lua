@@ -31,10 +31,11 @@ local function newBubble(displayGroup)
     thisBubble.x = 0
     thisBubble.y = 0
     thisBubble.group = -1
-    physics.addBody(thisBubble, "dynamic",{radius=CN.BUBBLE_RADIUS})
+    physics.addBody(thisBubble, "dynamic",{radius=CN.BUBBLE_RADIUS, desity=1.0})
     thisBubble.linearDamping = CN.LN_DAMPING
     thisBubble.type = "bubble"
     table.insert(bubbles, thisBubble)
+    print("mass = "..thisBubble.mass)
 
     -- Debug text for group numbering
     --local text = display.newText(displayGroup, "-1", 0, 0, native.systemFont, CN.COL_WIDTH)

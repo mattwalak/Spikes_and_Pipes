@@ -2,7 +2,7 @@
 -- © Matthew Walak 2019
 -- All the important constants and things
 
-local COL_NUM = 10
+local COL_NUM = 12
 local COL_WIDTH = display.contentWidth/COL_NUM
 
 local crazy_numbers = {
@@ -13,7 +13,7 @@ local crazy_numbers = {
 	-- Physics
 	LN_DAMPING = 1,
 	GRAVITY = 3.5,
-	TOUCH_FORCE_FACTOR = 225,
+	TOUCH_FORCE_FACTOR = 400,
 
 	-- Bubble
 	BUBBLE_RADIUS = (4/5)*(COL_WIDTH/2),

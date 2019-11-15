@@ -3,7 +3,7 @@ local util = require("util")
 
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
-local speed = 4000
+local speed = 8000
 
 
 -- Define obstacles ------------------------------------------------------------
@@ -12,7 +12,7 @@ local null_1A = {
     name = "1A",
     position_path = {util.newPoint(-5, 0), util.newPoint(5, 0)},
     rotation_path = {0,0},
-    transition_time = {1000, 1000},
+    transition_time = {5000, 5000},
     position_interpolation = easing.inSine,
     rotation_interpolation = easing.linear,
     on_complete = "loop",
