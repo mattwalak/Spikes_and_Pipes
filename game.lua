@@ -161,10 +161,6 @@ end
 -- Creates a new Corona recognized display object from its data
 local function createDisplayObject(thisObject, ancestry)
 
-    for i = 1, #ancestry, 1 do
-        print("\t"..ancestry[i].name)
-    end
-
 	local image
     local imageOutline
 	if thisObject.type == "black_square" then
@@ -330,18 +326,6 @@ local function gameLoop_slow()
     if level_data.obstacles[score] then
         -- print("adding object "..score)
         createObstacle(level_data.obstacles[score], {})
-
-        -- Print Active nulls and display objects
-        print("Active objects (After addition)")
-        print("    Nulls:")
-        for i = 1, #activeNullObjects, 1 do
-            print("        "..i..") "..activeNullObjects[i].name)
-        end
-        print("    DisplayObjects:")
-        for i = 1, #activeDisplayObjects, 1 do
-            print("        "..i..") "..activeDisplayObjects[i].type)
-        end
-
 
         -- Check for VICTORY
         if (score == level_data.victory) then

@@ -3,105 +3,17 @@ local util = require("util")
 
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
-local speed = 8000
+local speed = 10000
 
 
 -- Define obstacles ------------------------------------------------------------
-local parent_1 = util.newParentObstacle(speed, "1P")
-local null_1A = {
-    name = "1A",
-    position_path = {util.newPoint(-5, 0), util.newPoint(5, 0)},
-    rotation_path = {0,0},
-    transition_time = {5000, 5000},
-    position_interpolation = easing.inSine,
-    rotation_interpolation = easing.linear,
-    on_complete = "loop",
-    first_frame = 1,
-    children = nil
-}
-local displayObject_1A = {
-    type = "black_square",
-    x = 0,
-    y = 0,
-    rotation = 0,
-    ancestry = {parent_1, null_1A}
-}
-local spike_1A = {
-    type = "spike",
-    x = 0,
-    y = 1,
-    rotation = 180,
-    ancestry = {parent_1, null_1A}
-}
-local spike_1B = {
-    type = "spike",
-    x = 0,
-    y = -1,
-    rotation = 0,
-    ancestry = {parent_1, null_1A}
-}
-parent_1.children = {null_1A}
-local obstacle_1 ={
-    null_objects = {parent_1, null_1A},
-    display_objects = {displayObject_1A, spike_1A, spike_1B}
-}
+local obstacle_1 = util.newParentObstacle(speec, "1P")
+util.tableExtend(obstacle_1.children, util.newVerticalSpike(0,0))
 
---***************************************************
 
-local parent_2 = util.newParentObstacle(speed, "2P")
-local null_2A = {
-    name = "2B",
-    position_path = {util.newPoint(1, 1), util.newPoint(-1, 1), util.newPoint(-1, 0), util.newPoint(1, 0)},
-    rotation_path = {0,0},
-    transition_time = {200, 200, 200, 200},
-    position_interpolation = easing.inSine,
-    rotation_interpolation = easing.linear,
-    on_complete = "loop",
-    first_frame = 1,
-    children = nil
-}
-local displayObject_2A = {
-    type = "black_square",
-    x = 0,
-    y = 0,
-    rotation = 0,
-    ancestry = {parent_2, null_2A}
-}
-parent_2.children = {null_2A}
-local obstacle_2 ={
-    null_objects = {parent_2, null_2A},
-    display_objects = {displayObject_2A}
-}
-
---***************************************************
-
-local parent_3 = util.newParentObstacle(speed, "2P")
-local displayObject_3A = {
-    type = "black_square",
-    x = 0,
-    y = 0,
-    rotation = 0,
-    ancestry = {parent_3}
-}
-local spike_3A = {
-    type = "spike",
-    x = 0,
-    y = 1,
-    rotation = 180,
-    ancestry = {parent_3}
-}
-local spike_3B = {
-    type = "spike",
-    x = 0,
-    y = -1,
-    rotation = 0,
-    ancestry = {parent_3}
-}
-
-local obstacle_3 ={
-    null_objects = {parent_3},
-    display_objects = {displayObject_3A, spike_3A, spike_3B}
-}
+local obstacle_2 = util.newParentObstacle(speed, "2P")
+local spikeLine = util.newSpikeLine(-6, 0, 6, 0, 4, 8000, true)
+util.tableExtend(obstacle_2.children, spikeLine)
 
 --------------------------------------------------------------------------------
 
@@ -110,7 +22,6 @@ local obstacle_3 ={
 local obstacles_list = {}
 obstacles_list[1] = obstacle_1
 obstacles_list[3] = obstacle_2
-obstacles_list[5] = obstacle_3
 
 local level_1 =  {
     name = "Test level 1",

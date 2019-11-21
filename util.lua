@@ -116,6 +116,16 @@ function util.removeFromList(tbl, item)
     return false
 end
 
+-- Extends adds the elements of tbl2 to tbl1
+function util.tableExtend(tbl1, tbl2)
+    if not tbl1 then tbl1 = {} end
+    if not tbl2 then return end
+
+    for i = 1, #tbl2, 1 do
+        tbl1[#tbl1+i] = tbl2[i]
+    end
+end
+
 -- ******************************** LEVEL BUILDING UTILITIES ***************************************
 
 -- Returns the default parent object that travels from the top of the
@@ -138,9 +148,92 @@ function util.newParentObstacle(speed)
     return parent
 end
 
-function util.newVerticalSpike(ancestry)
+-- THE FOLLOWING LEVEL BUILDING UTILITIES ALL RETURN A TABLE OF OBJECTS (NULL OR DISPLAY)
 
+function util.newHorizontalSpike(x,y)
+    local topSpike = {}
+    local block = {}
+    local bottomSpike = {}
 
+    topSpike.type = "spike"
+    topSpike.x = -1+x
+    topSpike.y = 0+y
+    topSpike.rotation = 270
+    block.type = "black_square"
+    block.x = 0+x
+    block.y = 0+y
+    block.rotation = 0
+    bottomSpike.type = "spike"
+    bottomSpike.x = 1+x
+    bottomSpike.y = 0+y
+    bottomSpike.rotation = 90
+
+    return {topSpike, block, bottomSpike}
+end
+
+function util.newVerticalSpike(x,y)
+    local topSpike = {}
+    local block = {}
+    local bottomSpike = {}
+
+    topSpike.type = "spike"
+    topSpike.x = 0+x
+    topSpike.y = -1+y
+    topSpike.rotation = 0
+    block.type = "black_square"
+    block.x = 0+x
+    block.y = 0+y
+    block.rotation = 0
+    bottomSpike.type = "spike"
+    bottomSpike.x = 0+x
+    bottomSpike.y = 1+y
+    bottomSpike.rotation = 180
+
+    return {topSpike, block, bottomSpike}
+end
+
+-- Simple spike line from x to y, loops endlessly
+function util.newSpikeLine(start_x, start_y, end_x, end_y, num_spikes, period, isVertical)
+    local lineNull = {}
+    lineNull.type = "null"
+    lineNull.name = "SpikeLineNull_"
+    lineNull.position_interpolation = easing.linear
+    lineNull.rotation_interpolation = easing.linear
+    lineNull.on_complete = "loop"
+    lineNull.children = {}
+    if isVertical then
+        util.tableExtend(lineNull.children, util.newVerticalSpike(0,0))
+    else
+        util.tableExtend(lineNull.children, util.newHorizontalSpike(0,0))
+    end
+
+    -- Set position_path, rotation_path, transition_time
+    local position_path = {}
+    local rotation_path = {}
+    local transition_time = {}
+    for i = 1, num_spikes+1, 1 do
+        local dx = (end_x-start_x) * (i-1)
+        local dy = (end_y-start_y) * (i-1)
+        local x = dx + start_x
+        local y = dy + start_y
+        table.insert(position_path, util.newPoint(x, y))
+        table.insert(rotation_path, 0)
+        if i <= num_spikes then
+            table.insert(transition_time, period/num_spikes)
+        else
+            table.insert(transition_time, 0)
+        end
+    end
+
+    -- Assemble the list!
+    local objects = {}
+    for i = 1, num_spikes, 1 do
+        local thisObject = util.deepcopy(lineNull)
+        thisObject.first_frame = i
+        table.insert(objects, thisObject)
+    end
+
+    return objects
 end
 
 return util

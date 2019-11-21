@@ -22,14 +22,14 @@ HARD CORE CODING:
 10/14	12:00pm		0:45				Continued implementing methods to display and animate obstacles (Recursive animation). Obstacles now appear on screen and things!
 10/17	11:10pm		0:50				Continued implementing methods to display and animate obstacles (Yes, still recursive animation)	
 10/19	8:30am		1:35				Finally figured out my numbering system for keyframes. Continued writing keyframeObstacle()	
-10/19	10:20am		1:00				Keyframing system and obstacle presentation works! Working on destroying objects on animation finish
+10/19	10:20am		1:00				Key-framing system and obstacle presentation works! Working on destroying objects on animation finish
 10/20	8:10pm		0:40				Continued work on destroying objects on animation finish... Decided obstacle data needs to be stored differently for 
 											easier acsess (Too hard to stop obstacles when they need to be removed from the screen)
 10/20	9:10pm		0:50				Discovered transition.cancel(), using it to stop animations mid transition.
 10/20	10:20pm		1:00				Began writing composer scene transition/setup code for game.lua
 10/23	9:50pm		1:00				Implemented memory leak checking print statements. Changed obstacle.object to obstacle.objects (Can now have a table)
 											NOTE: For some reason memory is not freed from obstacles between scenes. Should check into that
-											NOTE: Using the transition.to() command on large tables of objects creates unnaceptable differences between object
+											NOTE: Using the transition.to() command on large tables of objects creates unacceptable differences between object
 													paths when lots of objects/obstacles are loaded. Must find a more precise method
 10/24	4:00pm		1:20				Began implementing bubbles! (Also physics)
 10/24	5:30pm		1:00				Realized that physics doesn't work with moving display groups... Researched alternatives. Looks like we are heading 
@@ -48,9 +48,9 @@ HARD CORE CODING:
 11/14	7:55pm		2:00				Implemented collisions, spikes, and bubble popping	
 11/14	10:40pm		0:20				Made first build		
 11/15	1:40pm		1:30				Began re-writing obstacle inheritance things for easier level building
-11/21	2:20pm		
+11/21	2:20pm		1:50				Debugged new inheritance method. Began writing level building utilities
 ------------------------------------------------------------------------------------------------------------------------------
-					30:55 TOTAL
+					32:45 TOTAL
 
 
-THE GRAND TOTAL:	34:10
+THE GRAND TOTAL:	36:00
