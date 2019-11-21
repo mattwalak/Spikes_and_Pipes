@@ -35,7 +35,7 @@ local function newBubble(displayGroup)
     thisBubble.linearDamping = CN.LN_DAMPING
     thisBubble.type = "bubble"
     table.insert(bubbles, thisBubble)
-    print("mass = "..thisBubble.mass)
+    --print("mass = "..thisBubble.mass)
 
     -- Debug text for group numbering
     --local text = display.newText(displayGroup, "-1", 0, 0, native.systemFont, CN.COL_WIDTH)

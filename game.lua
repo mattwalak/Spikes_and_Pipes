@@ -61,23 +61,29 @@ local function stopNulls()
 end
 
 -- Stops all transitions and destroys a null object and its children (And grandchildren)
-local function destroyNull(thisNull)
-	if not thisNull then -- thisNull was destroyed earlier
+local function destroyObject(thisObject)
+	if not thisObject then -- thisNull was destroyed earlier
 		return
 	end
 
-	-- print("destroying name: "..thisNull.name)
-    transition.cancel(thisNull) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
-    if thisNull.children then
-    	for i = 0, #thisNull.children, 1 do
-    		destroyNull(thisNull.children[i])
-    	end
+
+    if thisObject.type == "null" then
+        transition.cancel(thisObject) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
+        if thisObject.children then
+        	for i = 0, #thisObject.children, 1 do
+        		destroyObject(thisObject.children[i])
+        	end
+        end
+        util.removeFromList(activeNullObjects, thisObject)
+        thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
+    else
+        thisObject.image:removeSelf()
+        thisObject.image = nil
+        util.removeFromList(activeDisplayObjects, thisObject)
+        thisObject = nil
     end
-
-    util.removeFromList(activeNullObjects, thisNull)
-
-    thisNull = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
 end
+
 
 -- Transitions a null object from current_frame to current_frame + 1
 local function keyframeNull(thisNull)
@@ -91,7 +97,7 @@ local function keyframeNull(thisNull)
     local revolutions = thisNull.frame_counter/num_frames
     if(revolutions > 0) then
         if(thisNull.on_complete == "destroy") then
-        	destroyNull(thisNull)
+        	destroyObject(thisNull)
             return
         elseif(thisNull.on_complete == "stop") then
             return -- Do not start on the next transition
@@ -125,29 +131,23 @@ local function keyframeNull(thisNull)
         tag = thisNull.name,
         transition = thisNull.rotation_interpolation
     })
+
 end
 
 -- Repositions a display object based on its ancestry
 -- Depth indicates how deep we are
 -- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
 local function reposition(displayObject)
-    print("reposition()")
+    --print("reposition()")
     for i = 1, #displayObject.ancestry, 1 do
-        print("\t"..displayObject.ancestry[i].name)
+        --print("\t"..displayObject.ancestry[i].name)
     end
 	local x_offset = 0
 	local y_offset = 0
 	local rotation_offset = 0
 	local ancestry = displayObject.ancestry
 	for i = 1, #ancestry, 1 do
-        if not util.tableContains(activeNullObjects, ancestry[i]) then   -- This is TEMPORARY
-            -- print("destroying displayObject: "..displayObject.type)
-            displayObject.image:removeSelf()
-            displayObject.image = nil
-            util.removeFromList(activeDisplayObjects, displayObject)
-            displayObject = nil
-            return 0
-        end
+        --print("NULL: "..ancestry[i].name.."; x = "..ancestry[i].x.."; y = "..ancestry[i].y)
 		x_offset = x_offset + ancestry[i].x
 		y_offset = y_offset + ancestry[i].y
 		rotation_offset = rotation_offset + ancestry[i].rotation
@@ -159,32 +159,28 @@ local function reposition(displayObject)
 end
 
 -- Creates a new Corona recognized display object from its data
-local function createDisplayObject(object_data, ancestry)
-    print("createDisplayObject")
+local function createDisplayObject(thisObject, ancestry)
 
     for i = 1, #ancestry, 1 do
         print("\t"..ancestry[i].name)
     end
 
-	local newObject = {}
 	local image
     local imageOutline
-	if object_data.type == "black_square" then
+	if thisObject.type == "black_square" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/black_square.png")
-    elseif object_data.type == "spike" then
+    elseif thisObject.type == "spike" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
     end
     physics.addBody(image, "static", {outline=imageOutline})
-    image.type = object_data.type
-	newObject.image = image
-	newObject.x = object_data.x * CN.COL_WIDTH
-	newObject.y = object_data.y * CN.COL_WIDTH
-    newObject.type = object_data.type
-	newObject.rotation = object_data.rotation
-	newObject.ancestry = ancestry
-	return newObject
+    image.type = thisObject.type
+	thisObject.image = image
+	thisObject.x = thisObject.x * CN.COL_WIDTH
+	thisObject.y = thisObject.y * CN.COL_WIDTH
+	thisObject.ancestry = ancestry
+	return thisObject
 end
 
 
@@ -192,7 +188,6 @@ local function createObstacle(thisObstacle, ancestry)
     if not thisObstacle then return end
 
     if thisObstacle.type == "null" then
-        print("createObstacle() null")
         local thisNull = thisObstacle
         -- print("Inserting name = "..thisNull.name)
         table.insert(activeNullObjects, thisNull)
@@ -212,12 +207,11 @@ local function createObstacle(thisObstacle, ancestry)
         if not thisObstacle.children then return end
         for i = 1, #thisObstacle.children, 1 do
             local newAncestry = {}
-            newAncestry = util.deepcopy(ancestry)
+            newAncestry = util.shallowcopy(ancestry)
             table.insert(newAncestry, thisObstacle)
             createObstacle(thisObstacle.children[i], newAncestry)
         end
     else
-        print("createObstacle() displayObject")
         local newDisplayObject = createDisplayObject(thisObstacle, ancestry)
         reposition(newDisplayObject)
         table.insert(activeDisplayObjects, newDisplayObject)

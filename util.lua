@@ -20,6 +20,21 @@ function util.deepcopy(orig)
     return copy
 end
 
+-- Clones a table at the first level
+function util.shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for i = 1, #orig, 1 do
+            copy[i] = orig[i]
+        end
+    else
+        copy = orig
+    end
+    return copy
+end
+
 -- Print contents of `tbl`, with indentation.
 -- `indent` sets the initial level of indentation.
 -- Credit: https://gist.github.com/hashmal/874792
@@ -92,11 +107,12 @@ function util.removeFromList(tbl, item)
     if not tbl then return false end
     if not type(tbl) == "table" then return false end
     for i = 1, #tbl, 1 do
-        if tbl[i] == item then 
+        if tbl[i] == item then
             table.remove(tbl, i)
-            return true 
+            return true
         end
     end
+    print("removeFromList() ERROR: item not found in list")
     return false
 end
 

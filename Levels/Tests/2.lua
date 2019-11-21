@@ -3,7 +3,7 @@ local util = require("util")
 
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
-local speed = 10000
+local speed = 2000
 
 -- Define obstacles ------------------------------------------------------------
 local null_1A = {}

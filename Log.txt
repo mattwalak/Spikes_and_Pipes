@@ -48,6 +48,7 @@ HARD CORE CODING:
 11/14	7:55pm		2:00				Implemented collisions, spikes, and bubble popping	
 11/14	10:40pm		0:20				Made first build		
 11/15	1:40pm		1:30				Began re-writing obstacle inheritance things for easier level building
+11/21	2:20pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					30:55 TOTAL
 
