@@ -10,10 +10,12 @@ local speed = 10000
 local null_1A = {}
 
 local obstacle_1 = util.newParentObstacle(speed, "1P")
-local s = util.newPoint(-6, 0)
-local e = util.newPoint(6, 0)
-util.tableExtend(obstacle_1.children, util.newSpikeLine(s,e,10,1000,true))
-
+local s = util.newPoint(-6.5, 1)
+local e = util.newPoint(6.5, -1)
+local things = util.newSpikeLine(s,e,3,2000,true)
+print("HERE")
+util.tableExtend(obstacle_1.children, things)
+print("DONE")
 
 --[[obstacle_1.children = {null_1A}
 null_1A.type = "null"

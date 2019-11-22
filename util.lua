@@ -121,8 +121,10 @@ function util.tableExtend(tbl1, tbl2)
     if not tbl1 then return end
     if not tbl2 then return end
 
+    local start_i = #tbl1
     for i = 1, #tbl2, 1 do
-        tbl1[#tbl1+i] = tbl2[i]
+    	print(i)
+        tbl1[start_i+i] = tbl2[i]
     end
 end
 
@@ -192,16 +194,16 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
     lineNull.on_complete = "loop"
     lineNull.children = {}
     if isVertical then
-        util.tableExtend(lineNull.children, util.newVerticalSpike(0,0))
+    	lineNull.children = util.newVerticalSpike(0,0)
     else
-        util.tableExtend(lineNull.children, util.newHorizontalSpike(0,0))
+    	lineNull.children = util.newHorizontalSpike(0,0)
     end
 
     -- Set position_path, rotation_path, transition_time
     local position_path = {}
     local rotation_path = {}
     local transition_time = {}
-    for i = 1, num_spikes+1, 1 do
+    for i = 1, (num_spikes+1), 1 do
         local dx = ((endPoint.x-startPoint.x)/num_spikes) * (i-1)
         local dy = ((endPoint.y-startPoint.y)/num_spikes) * (i-1)
         local x = dx + startPoint.x

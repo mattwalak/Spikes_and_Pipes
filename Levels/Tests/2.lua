@@ -19,7 +19,7 @@ null_1A.rotation_interpolation = easing.linear
 null_1A.on_complete = "loop"
 null_1A.first_frame = 1
 null_1A.children = {}
-util.tableExtend(null_1A.children, util.newHorizontalSpike(0,0))
+--util.tableExtend(null_1A.children, util.newHorizontalSpike(0,0))
 
 
 
