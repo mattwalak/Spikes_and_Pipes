@@ -7,13 +7,27 @@ local speed = 10000
 
 
 -- Define obstacles ------------------------------------------------------------
-local obstacle_1 = util.newParentObstacle(speec, "1P")
-util.tableExtend(obstacle_1.children, util.newVerticalSpike(0,0))
+local null_1A = {}
+
+local obstacle_1 = util.newParentObstacle(speed, "1P")
+local s = util.newPoint(-6, 0)
+local e = util.newPoint(6, 0)
+util.tableExtend(obstacle_1.children, util.newSpikeLine(s,e,10,1000,true))
 
 
-local obstacle_2 = util.newParentObstacle(speed, "2P")
-local spikeLine = util.newSpikeLine(-6, 0, 6, 0, 4, 8000, true)
-util.tableExtend(obstacle_2.children, spikeLine)
+--[[obstacle_1.children = {null_1A}
+null_1A.type = "null"
+null_1A.name = "1A"
+null_1A.position_path = {util.newPoint(-6, 0), util.newPoint(6, 0)}
+null_1A.rotation_path = {0,0}
+null_1A.transition_time = {5000, 5000}
+null_1A.position_interpolation = easing.inSine
+null_1A.rotation_interpolation = easing.linear
+null_1A.on_complete = "loop"
+null_1A.first_frame = 1
+null_1A.children = {}
+util.tableExtend(null_1A.children, util.newHorizontalSpike(0,0))]]--
+
 
 --------------------------------------------------------------------------------
 
@@ -21,7 +35,6 @@ util.tableExtend(obstacle_2.children, spikeLine)
 -- Define pairs
 local obstacles_list = {}
 obstacles_list[1] = obstacle_1
-obstacles_list[3] = obstacle_2
 
 local level_1 =  {
     name = "Test level 1",

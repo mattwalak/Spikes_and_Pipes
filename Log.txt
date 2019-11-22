@@ -49,8 +49,9 @@ HARD CORE CODING:
 11/14	10:40pm		0:20				Made first build		
 11/15	1:40pm		1:30				Began re-writing obstacle inheritance things for easier level building
 11/21	2:20pm		1:50				Debugged new inheritance method. Began writing level building utilities
+11/22	10:00am		0:40				Continued work on implementing spikeLine
 ------------------------------------------------------------------------------------------------------------------------------
-					32:45 TOTAL
+					33:25 TOTAL
 
 
-THE GRAND TOTAL:	36:00
+THE GRAND TOTAL:	36:40

@@ -3,6 +3,9 @@ NEXT STEPS:
 2. Add powerups
 
 
+PLZ CHECK:
+1. Check keyframe time interpolation numbers (Does looping back to first keyframe use last time value or first?)
+
 
 
 THING TO DO BEFORE RELEASE:

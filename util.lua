@@ -118,7 +118,7 @@ end
 
 -- Extends adds the elements of tbl2 to tbl1
 function util.tableExtend(tbl1, tbl2)
-    if not tbl1 then tbl1 = {} end
+    if not tbl1 then return end
     if not tbl2 then return end
 
     for i = 1, #tbl2, 1 do
@@ -143,57 +143,47 @@ function util.newParentObstacle(speed)
         rotation_interpolation = easing.linear,
         on_complete = "destroy",
         first_frame = 2,
-        children = nil
+        children = {}
     }
     return parent
 end
 
 -- THE FOLLOWING LEVEL BUILDING UTILITIES ALL RETURN A TABLE OF OBJECTS (NULL OR DISPLAY)
 
+function util.newBlackSquare(x, y, rot)
+    local square = {}
+    square.type = "black_square"
+    square.x = x
+    square.y = y
+    square.rotation = rot
+    return square
+end
+
+function util.newSpike(x, y, rot)
+    local spike = {}
+    spike.type = "spike"
+    spike.x = x
+    spike.y = y
+    spike.rotation = rot
+    return spike
+end
+
 function util.newHorizontalSpike(x,y)
-    local topSpike = {}
-    local block = {}
-    local bottomSpike = {}
-
-    topSpike.type = "spike"
-    topSpike.x = -1+x
-    topSpike.y = 0+y
-    topSpike.rotation = 270
-    block.type = "black_square"
-    block.x = 0+x
-    block.y = 0+y
-    block.rotation = 0
-    bottomSpike.type = "spike"
-    bottomSpike.x = 1+x
-    bottomSpike.y = 0+y
-    bottomSpike.rotation = 90
-
+    local topSpike = util.newSpike(-1+x, y, 270)
+    local block = util.newBlackSquare(x, y, 0)
+    local bottomSpike = util.newSpike(x+1, y, 90)
     return {topSpike, block, bottomSpike}
 end
 
 function util.newVerticalSpike(x,y)
-    local topSpike = {}
-    local block = {}
-    local bottomSpike = {}
-
-    topSpike.type = "spike"
-    topSpike.x = 0+x
-    topSpike.y = -1+y
-    topSpike.rotation = 0
-    block.type = "black_square"
-    block.x = 0+x
-    block.y = 0+y
-    block.rotation = 0
-    bottomSpike.type = "spike"
-    bottomSpike.x = 0+x
-    bottomSpike.y = 1+y
-    bottomSpike.rotation = 180
-
+    local topSpike = util.newSpike(x, y-1, 0)
+    local block = util.newBlackSquare(x, y, 0)
+    local bottomSpike = util.newSpike(x, y+1, 180)
     return {topSpike, block, bottomSpike}
 end
 
 -- Simple spike line from x to y, loops endlessly
-function util.newSpikeLine(start_x, start_y, end_x, end_y, num_spikes, period, isVertical)
+function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical)
     local lineNull = {}
     lineNull.type = "null"
     lineNull.name = "SpikeLineNull_"
@@ -212,18 +202,23 @@ function util.newSpikeLine(start_x, start_y, end_x, end_y, num_spikes, period, i
     local rotation_path = {}
     local transition_time = {}
     for i = 1, num_spikes+1, 1 do
-        local dx = (end_x-start_x) * (i-1)
-        local dy = (end_y-start_y) * (i-1)
-        local x = dx + start_x
-        local y = dy + start_y
+        local dx = ((endPoint.x-startPoint.x)/num_spikes) * (i-1)
+        local dy = ((endPoint.y-startPoint.y)/num_spikes) * (i-1)
+        local x = dx + startPoint.x
+        local y = dy + startPoint.y
         table.insert(position_path, util.newPoint(x, y))
         table.insert(rotation_path, 0)
-        if i <= num_spikes then
-            table.insert(transition_time, period/num_spikes)
-        else
+        if i == 1 then
             table.insert(transition_time, 0)
+        else
+            table.insert(transition_time, period/num_spikes)
         end
     end
+
+
+    lineNull.position_path = position_path
+    lineNull.rotation_path = rotation_path
+    lineNull.transition_time = transition_time
 
     -- Assemble the list!
     local objects = {}
