@@ -120,10 +120,10 @@ end
 function util.tableExtend(tbl1, tbl2)
     if not tbl1 then return end
     if not tbl2 then return end
+    if type(tbl2) ~= "table" then table.insert(tbl1, tbl2) end
 
     local start_i = #tbl1
     for i = 1, #tbl2, 1 do
-    	print(i)
         tbl1[start_i+i] = tbl2[i]
     end
 end
@@ -184,19 +184,39 @@ function util.newVerticalSpike(x,y)
     return {topSpike, block, bottomSpike}
 end
 
+-- Wraps list of objects around a path (and loops)
+-- number of objects and number of path vertices must be equal
+-- Used to create line, square, polygon, and other looping fun things
+function util.wrapLoopPath(nullModel, objectList)
+	local result = {}
+	for i = 1, #nullModel.position_path, 1 do
+		local thisObject = util.deepcopy(nullModel)
+		util.tableExtend(thisObject.children, objectList[i])
+		thisObject.first_frame = i
+		table.insert(result, thisObject)
+	end
+	return result
+end
+
+
 -- Simple spike line from x to y, loops endlessly
 function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical)
-    local lineNull = {}
-    lineNull.type = "null"
-    lineNull.name = "SpikeLineNull_"
-    lineNull.position_interpolation = easing.linear
-    lineNull.rotation_interpolation = easing.linear
-    lineNull.on_complete = "loop"
-    lineNull.children = {}
-    if isVertical then
-    	lineNull.children = util.newVerticalSpike(0,0)
-    else
-    	lineNull.children = util.newHorizontalSpike(0,0)
+    local nullModel = {}
+    nullModel.type = "null"
+    nullModel.name = "SpikeLineNull"
+    nullModel.position_interpolation = easing.linear
+    nullModel.rotation_interpolation = easing.linear
+    nullModel.on_complete = "loop"
+    nullModel.children = {}
+
+    -- Create objects list to wrap around path
+    local objectsList = {}
+    for i = 1, num_spikes, 1 do
+    	if isVertical then
+    		table.insert(objectsList, util.newVerticalSpike(0,0))
+    	else
+    		table.insert(objectsList, util.newHorizontalSpike(0,0))
+    	end
     end
 
     -- Set position_path, rotation_path, transition_time
@@ -216,21 +236,19 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
             table.insert(transition_time, period/num_spikes)
         end
     end
+    nullModel.position_path = position_path
+    nullModel.rotation_path = rotation_path
+    nullModel.transition_time = transition_time
+
+    -- Assemble and return the list!
+    return util.wrapLoopPath(nullModel, objectsList)
+end
 
 
-    lineNull.position_path = position_path
-    lineNull.rotation_path = rotation_path
-    lineNull.transition_time = transition_time
+-- Creates a new square (4 vertices) with spikes that rotate around the square
+function util.newSquare(center_x, center_y, edge_size, num_spikes, period, isVertical)
+	local nullModel = {}
 
-    -- Assemble the list!
-    local objects = {}
-    for i = 1, num_spikes, 1 do
-        local thisObject = util.deepcopy(lineNull)
-        thisObject.first_frame = i
-        table.insert(objects, thisObject)
-    end
-
-    return objects
 end
 
 return util
