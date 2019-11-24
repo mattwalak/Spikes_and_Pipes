@@ -214,43 +214,6 @@ local function createObstacle(thisObstacle, ancestry)
     end
 end
 
-
---[[
--- OLD ANCESTRY APPROACH
--- Creates an objects and starts transition from frame_counter to frame_counter+1
-local function createObstacle(obstacle_data)
-	-- Note that there has to be at least 1 null and 1 display object, otherwise things crash
-	-- (And I make fun of you for making a useless obstacle)
-
-    -- Initialize null objects
-    for i = 1, #obstacle_data.null_objects, 1 do
-            local thisNull = obstacle_data.null_objects[i]
-            -- print("Inserting name = "..thisNull.name)
-            table.insert(activeNullObjects, thisNull)
-
-            -- Set the state values of our null object
-            thisNull.frame_counter = 0
-            local num_frames = #thisNull.position_path
-            local this_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
-            thisNull.x = thisNull.position_path[this_frame].x * CN.COL_WIDTH
-            thisNull.y = thisNull.position_path[this_frame].y * CN.COL_WIDTH
-            -- print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
-            thisNull.rotation = thisNull.rotation_path[this_frame]
-
-            -- Set the null objects on their way! (Start transitions)
-            keyframeNull(thisNull)
-    end
-
-    -- Initialize display objects
-    for i = 1, #obstacle_data.display_objects, 1 do
-    	local newObject = createDisplayObject(obstacle_data.display_objects[i])
-    	reposition(newObject)
-    	table.insert(activeDisplayObjects, newObject)
-    end
-end]]--
-
-
-
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
 local function updateDisplayObjects()
     local i = 1
