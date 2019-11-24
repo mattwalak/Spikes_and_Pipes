@@ -138,24 +138,31 @@ end
 -- Depth indicates how deep we are
 -- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
 local function reposition(displayObject)
-    --print("reposition()")
-    for i = 1, #displayObject.ancestry, 1 do
-        --print("\t"..displayObject.ancestry[i].name)
+    local total_x = 0
+    local total_y = 0
+    local last_rot = 0
+    local total_rot = 0
+    local ancestry = displayObject.ancestry
+    for i = 1, #ancestry+1, 1 do
+        local thisObject
+        if i > #ancestry then
+            thisObject = displayObject
+        else
+            thisObject = ancestry[i]
+        end
+
+        local r_x = thisObject.x*math.cos(math.rad(last_rot))-thisObject.y*math.sin(math.rad(last_rot))
+        local r_y = thisObject.y*math.cos(math.rad(last_rot))+thisObject.x*math.sin(math.rad(last_rot))
+        total_x = total_x + r_x
+        total_y = total_y + r_y
+        total_rot = total_rot + thisObject.rotation
+        last_rot = thisObject.rotation
     end
-	local x_offset = 0
-	local y_offset = 0
-	local rotation_offset = 0
-	local ancestry = displayObject.ancestry
-	for i = 1, #ancestry, 1 do
-        --print("NULL: "..ancestry[i].name.."; x = "..ancestry[i].x.."; y = "..ancestry[i].y)
-		x_offset = x_offset + ancestry[i].x
-		y_offset = y_offset + ancestry[i].y
-		rotation_offset = rotation_offset + ancestry[i].rotation
-	end
-	displayObject.image.x = displayObject.x + x_offset -- displayObject.x is unchanging, displayObject.image.x is the displayObjects position on the screen
-	displayObject.image.y = displayObject.y + y_offset
-	displayObject.image.rotation = displayObject.rotation + rotation_offset
-    return 1
+
+    -- Place this object (rotated) at this point
+    displayObject.image.x = total_x
+    displayObject.image.y = total_y
+    displayObject.image.rotation = total_rot
 end
 
 -- Creates a new Corona recognized display object from its data
@@ -216,9 +223,8 @@ end
 
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
 local function updateDisplayObjects()
-    local i = 1
-    while(i <= #activeDisplayObjects) do
-        i = i + reposition(activeDisplayObjects[i])
+    for i = 1, #activeDisplayObjects, 1 do
+        reposition(activeDisplayObjects[i])
     end
 end
 
