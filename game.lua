@@ -325,7 +325,8 @@ local function gameLoop_slow()
     -- Check if we put on another object (The slot in the array is not null)
     if level_data.obstacles[score] then
         -- print("adding object "..score)
-        createObstacle(level_data.obstacles[score], {})
+        local toAdd = util.deepcopy(level_data.obstacles[score])
+        createObstacle(toAdd, {})
 
         -- Check for VICTORY
         if (score == level_data.victory) then
@@ -419,7 +420,7 @@ function scene:create( event )
 
     -- Temporary white background (This should be replaced by backgroundGroup later)
     local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
-    bg:setFillColor(1,1,1)
+    bg:setFillColor(.9,.9,.9)
     backgroundGroup:insert(bg)
 
     -- Initialize ui

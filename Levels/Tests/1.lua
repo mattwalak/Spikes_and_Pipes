@@ -23,19 +23,6 @@ e = util.newPoint(-6.5, -8-10-10)
 s = util.newPoint(6.5, -12-10-10)
 util.tableExtend(obstacle_1.children, util.newSpikeLine(s,e,2,2000,true))
 
---[[obstacle_1.children = {null_1A}
-null_1A.type = "null"
-null_1A.name = "1A"
-null_1A.position_path = {util.newPoint(-6, 0), util.newPoint(6, 0)}
-null_1A.rotation_path = {0,0}
-null_1A.transition_time = {5000, 5000}
-null_1A.position_interpolation = easing.inSine
-null_1A.rotation_interpolation = easing.linear
-null_1A.on_complete = "loop"
-null_1A.first_frame = 1
-null_1A.children = {}
-util.tableExtend(null_1A.children, util.newHorizontalSpike(0,0))]]--
-
 
 --------------------------------------------------------------------------------
 
@@ -46,7 +33,7 @@ obstacles_list[1] = obstacle_1
 
 local level_1 =  {
     name = "Test level 1",
-    victory = 20,
+    victory = 10,
     obstacles = obstacles_list,
 }
 
