@@ -152,6 +152,15 @@ end
 
 -- THE FOLLOWING LEVEL BUILDING UTILITIES ALL RETURN A TABLE OF OBJECTS (NULL OR DISPLAY)
 
+function util.newCoin(x,y)
+	local coin = {}
+	coin.type = "coin"
+	coin.x = x
+	coin.y = y
+	coin.rotation = 0
+	return coin
+end
+
 function util.newBlackSquare(x, y, rot)
     local square = {}
     square.type = "black_square"

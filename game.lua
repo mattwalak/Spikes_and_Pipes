@@ -6,6 +6,7 @@
 local levels = require("levels")
 local util = require("util")
 local CN = require ("crazy_numbers")
+local A = require ("animation")
 local composer = require( "composer" )
 local bubble = require("bubble")
 local scene = composer.newScene()
@@ -77,6 +78,10 @@ local function destroyObject(thisObject)
         util.removeFromList(activeNullObjects, thisObject)
         thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
     else
+        -- Don't know if I have to stop animations somewhere
+        --[[if thisObject.type == "coin" then
+            thisObject:pause()
+        end]]--
         thisObject.image:removeSelf()
         thisObject.image = nil
         util.removeFromList(activeDisplayObjects, thisObject)
@@ -176,6 +181,10 @@ local function createDisplayObject(thisObject, ancestry)
     elseif thisObject.type == "spike" then
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
+    elseif thisObject.type == "coin" then
+        image = display.newSprite(A.sheet_coin, A.sequences_coin)
+        image:play()
+        imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
     end
     physics.addBody(image, "static", {outline=imageOutline})
     image.type = thisObject.type
@@ -327,21 +336,36 @@ local function onCollision(event)
 
 		local obj1 = event.object1
 		local obj2 = event.object2
+
 		--SPIKE COLLISION
 		if(obj1.type == "bubble" and obj2.type == "spike") then
 			if(event.element2 == 2) then
 				return
 			end
-
             bubble.popBubble(obj1)
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
-
 			bubble.popBubble(obj2)
 		end
 
+        --COIN COLLISION (Temporary)
+        if(obj1.type == "bubble" and obj2.type == "coin") then
+            if(event.element2 == 2) then
+                return
+            end
+
+            obj2:removeSelf()
+            obj2 = nil
+        elseif(obj1.type == "coin" and obj2.type == "bubble") then
+            if(event.element1 == 2) then
+                return
+            end
+
+            obj1:removeSelf()
+            obj1 = nil
+        end
 	end
 end
 
