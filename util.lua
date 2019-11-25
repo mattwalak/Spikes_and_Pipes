@@ -238,7 +238,6 @@ function util.wrapLoopPath(nullModel, objectList)
 	return result
 end
 
-
 -- Simple spike line from x to y, loops endlessly
 function util.newLineModel(startPoint, endPoint, num_spikes, period)
     local nullModel = {}
@@ -324,10 +323,18 @@ end
 -- This means there must be no clipping/dissapearing elements
 -- Careful assuming spike size is 3*COL_WIDTH -> do something in CN to fix that
 
-function util.simpleMiddleSpike_(speed)
-	local spike = util.newSpike(0,0,true)
-	local obstacle = util.newParentObstacle(speed, "simpleMiddleSpike_", 1.5, 1.5)
-	util.tableExtend(obstacle.children, spike)
+-- ignore -> if a number is contained in ignore, no spike will be added at that index
+function util.stillSpikeLine_(speed, num_spikes, ignore)
+	local obstacle = util.newParentObstacle(speed, "stillSpikeLine_", 1.5, 1.5)
+	local width = CN.COL_NUM/(num_spikes+1)
+	local center = CN.COL_NUM/2
+	for i = 1, num_spikes, 1 do
+		if not util.tableContains(ignore, i) then
+			local x = (i*width)-center
+			local spike = util.newSpike(x,0,true)
+			util.tableExtend(obstacle.children, spike)
+		end
+	end
 	return obstacle
 end
 
@@ -343,6 +350,18 @@ function util.smallSquareLine_(speed, squareSize)
 	return obstacle
 end
 
-
+-- ignore -> if a number is contained in ignore, no spike will be added at that index
+function util.spikeLine_(speed, startPoint, endPoint, num_spikes, period, ignore)
+	if not ignore then ignore = {} end
+	local obstacle = util.newParentObstacle(speed, "spikeLine_", 1.5+(startPoint.y), 1.5+(endPoint.y))
+	local lineModel = util.newLineModel(startPoint, endPoint, num_spikes, period)
+	local wrapList = util.newSpikeList(num_spikes, true)
+	for i = 1, #ignore, 1 do
+		wrapList[ignore[i]] = nil
+	end
+	local line = util.wrapLoopPath(lineModel, wrapList)
+	util.tableExtend(obstacle.children, line)
+	return obstacle
+end
 
 return util

@@ -9,8 +9,9 @@ DESIGN:
 					3:15 TOTAL
 
 MUSIC:
+11/25	9:30am		1:00 (NOT COOL BRO)	Tracked "Not Cool Bro"
 ------------------------------------------------------------------------------------------------------------------------------
-					0:00 TOTAL
+					1:00 TOTAL
 
 
 HARD CORE CODING:
@@ -56,8 +57,9 @@ HARD CORE CODING:
 11/24	7:35pm		0:40				Added masking bars
 11/24	8:50pm		0:50				Implemented 4square(). Started making things easier for nestled obstacles
 11/24	10:15pm		1:15				Adjusted speed for obstacles that travel more than display.contentHeight. Made first finished obstacles
+11/25	10:40am		
 ------------------------------------------------------------------------------------------------------------------------------
 					39:15 TOTAL
 
 
-THE GRAND TOTAL:	42:30
+THE GRAND TOTAL:	43:30

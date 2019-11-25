@@ -2,7 +2,7 @@
 -- © Matthew Walak 2019
 -- All the important constants and things
 
-local COL_NUM = 12
+local COL_NUM = 14
 local COL_WIDTH = display.contentWidth/COL_NUM
 
 local crazy_numbers = {

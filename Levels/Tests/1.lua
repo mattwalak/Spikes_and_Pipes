@@ -14,12 +14,18 @@ local speed = 10000
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = util.smallSquareLine_(speed, 4)
-obstacles_list[2] = util.simpleMiddleSpike_(speed)
+obstacles_list[3] = util.stillSpikeLine_(speed, 1)
+obstacles_list[10] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[17] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[20] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[23] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[26] = util.stillSpikeLine_(speed, 1)
+obstacles_list[29] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[32] = util.stillSpikeLine_(speed, 1)
 
 local level_1 =  {
     name = "Test level 1",
-    victory = 10,
+    victory = 43,
     obstacles = obstacles_list,
 }
 
