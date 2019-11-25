@@ -331,6 +331,7 @@ end
 -- This means there must be no clipping/dissapearing elements
 -- Careful assuming spike size is 3*COL_WIDTH -> do something in CN to fix that
 
+-- Simple stationary spike line (No animation)
 -- ignore -> if a number is contained in ignore, no spike will be added at that index
 function util.stillSpikeLine_(speed, num_spikes, ignore)
 	local obstacle = util.newParentObstacle(speed, "stillSpikeLine_", 1.5, 1.5)
@@ -346,6 +347,7 @@ function util.stillSpikeLine_(speed, num_spikes, ignore)
 	return obstacle
 end
 
+-- Two squares animated along a line
 function util.smallSquareLine_(speed, squareSize)
 	local obstacle = util.newParentObstacle(speed, "smallSquareLine_", _halfSpikeHeight+(squareSize/2), _halfSpikeHeight+(squareSize/2))
 	local s = util.newPoint(2*_left, 0)
@@ -358,6 +360,24 @@ function util.smallSquareLine_(speed, squareSize)
 	return obstacle
 end
 
+-- Simple 4 square with no special movement
+function util.still4Square_(speed, squareSize, period)
+	--local obstacle = util.newParentObstacle()
+end
+
+function util.coinCircle_(speed, radius, num_coins)
+	local obstacle = util.newParentObstacle(speed, "coinCircle_", .5+(radius/2), .5+(radius/2))
+	local coins = {}
+	local angle = 2*math.pi/num_coins
+
+	for i = 1, num_coins, 1 do
+		table.insert(coins, util.newCoin(radius*math.cos(i*angle),radius*math.sin(i*angle)))
+	end
+	util.tableExtend(obstacle.children, coins)
+	return obstacle
+end
+
+-- Simple animated spike line
 -- ignore -> if a number is contained in ignore, no spike will be added at that index
 function util.spikeLine_(speed, startPoint, endPoint, num_spikes, period, ignore)
 	if not ignore then ignore = {} end

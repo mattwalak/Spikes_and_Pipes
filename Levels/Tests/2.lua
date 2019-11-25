@@ -21,7 +21,8 @@ local e1 = util.newPoint(_right+_halfSpikeWidth, 0)
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = util.spikeLine_(speed, s1, e1, 1, 4000)
+obstacles_list[1] = util.coinCircle_(speed, 2, 8)
+obstacles_list[2] = util.spikeLine_(speed, s1, e1, 1, 4000)
 obstacles_list[8] = util.spikeLine_(speed, e1, s1, 1, 4000)
 obstacles_list[15] = util.spikeLine_(speed, s1, e1, 2, 4000)
 obstacles_list[18] = util.spikeLine_(speed, e1, s1, 2, 4000)

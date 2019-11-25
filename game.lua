@@ -87,10 +87,8 @@ end
 
 -- Stops all transitions and destroys a null object and its children (And grandchildren)
 local function destroyObject(thisObject)
-	if not thisObject then -- thisNull was destroyed earlier
-		return
-	end
-
+    -- Test if destroyed before
+	if not thisObject then return end
 
     if thisObject.type == "null" then
         transition.cancel(thisObject) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
@@ -102,10 +100,9 @@ local function destroyObject(thisObject)
         util.removeFromList(activeNullObjects, thisObject)
         thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
     else
-        -- Don't know if I have to stop animations somewhere
-        --[[if thisObject.type == "coin" then
-            thisObject:pause()
-        end]]--
+        -- Test if object already removed (ie coin collected)
+        if not thisObject.image then return end
+        print("removing: "..thisObject.type)
         thisObject.image:removeSelf()
         thisObject.image = nil
         util.removeFromList(activeDisplayObjects, thisObject)
@@ -216,6 +213,7 @@ local function createDisplayObject(thisObject, ancestry)
 	thisObject.x = thisObject.x * CN.COL_WIDTH
 	thisObject.y = thisObject.y * CN.COL_WIDTH
 	thisObject.ancestry = ancestry
+    thisObject.image.parent = thisObject
 	return thisObject
 end
 
@@ -307,16 +305,16 @@ end
 local function gameLoop_slow()
     score = score + 1
     -- Print Active nulls and display objects
-    --[[
+    
     print("Active objects")
-    print("    Nulls:")
+    print("\tNulls:")
     for i = 1, #activeNullObjects, 1 do
-        print("        "..i..") "..activeNullObjects[i].name)
+        print("\t\t"..i..") "..activeNullObjects[i].name)
     end
-    print("    DisplayObjects:")
+    print("\tDisplayObjects:")
     for i = 1, #activeDisplayObjects, 1 do
-        print("        "..i..") "..activeDisplayObjects[i].type)
-    end]]--
+        print("\t\t"..i..") "..activeDisplayObjects[i].type)
+    end
 
 
     -- Check for VICTORY
@@ -380,14 +378,18 @@ local function onCollision(event)
                 return
             end
 
+            util.removeFromList(activeDisplayObjects, obj2.parent)
             obj2:removeSelf()
+            obj2.parent = nil
             obj2 = nil
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
 
+            util.removeFromList(activeDisplayObjects, obj1.parent)
             obj1:removeSelf()
+            obj1.parent = nil
             obj1 = nil
         end
 	end

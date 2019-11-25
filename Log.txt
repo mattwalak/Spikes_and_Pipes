@@ -58,8 +58,9 @@ HARD CORE CODING:
 11/24	8:50pm		0:50				Implemented 4square(). Started making things easier for nestled obstacles
 11/24	10:15pm		1:15				Adjusted speed for obstacles that travel more than display.contentHeight. Made first finished obstacles
 11/25	10:40am		1:00				Accounted for varying spike size. Wrote second intro level
+11/25	12:30pm		1:00				Made coin circle. Debugged coin collection functionality
 ------------------------------------------------------------------------------------------------------------------------------
-					40:15 TOTAL
+					41:15 TOTAL
 
 
-THE GRAND TOTAL:	44:30
+THE GRAND TOTAL:	45:30

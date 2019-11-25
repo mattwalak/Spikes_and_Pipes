@@ -8,7 +8,7 @@ local COL_WIDTH = display.contentWidth/COL_NUM
 
 -- Physics
 local LN_DAMPING = 1
-local GRAVITY = 3.8
+local GRAVITY = 3.5
 local TOUCH_FORCE_FACTOR = 400
 
 -- Spike
@@ -18,9 +18,9 @@ local SPIKE_HEIGHT = 3
 -- Bubble
 local BUBBLE_SIZE = COL_WIDTH
 local BUBBLE_RADIUS = (4/5)*(BUBBLE_SIZE/2)
-local BUBBLE_MIN_GROUP_DIST = 2*BUBBLE_SIZE
+local BUBBLE_MIN_GROUP_DIST = 3*BUBBLE_SIZE
 local EDGE_FORCE_FACTOR = .5
-local EDGE_FORCE_DIST = COL_WIDTH
+local EDGE_FORCE_DIST = BUBBLE_SIZE
 
 -- Intro
 local INTRO_DELAY = 80
