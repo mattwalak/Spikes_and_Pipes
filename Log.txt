@@ -52,6 +52,7 @@ HARD CORE CODING:
 11/22	10:00am		0:40				Continued work on implementing spikeLine
 11/22	5:45pm		1:15				Debugged spikeLine, wrote wrapLoopPath
 11/24	1:35pm		1:50				Added null rotation, fixed weird dissapearing spikes, implemented sprites (for coin and other powerups)
+11/24	7:35pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					36:30 TOTAL
 

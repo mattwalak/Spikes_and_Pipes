@@ -30,6 +30,7 @@ local bubbleGroup
 local obstacleGroup
 local backgroundGroup
 local uiGroup
+local padGroup -- In front of everything
 
 -- Define game loop
 local slow_gameLoopTimer
@@ -46,12 +47,18 @@ local level_data
 -- ui elements
 local scoreText
 
--- Removes everything from
+-- Screen size data & pads
+local _top = display.screenOriginY
+local _left = display.screenOriginX
+local _bottom = display.actualContentHeight
+local _right = display.actualContentWidth
+local _width = display.contentWidth
+local _height = display.contentHeight
+local leftPad
+local bottomPad
+local rightPad
+local topPad
 
--- Removes all nill nulls from the active nulls table
-local function cleanUpNulls()
-
-end
 
 -- Stops all null object transitions and sets them to nil
 local function stopNulls()
@@ -260,14 +267,14 @@ local function victory()
     timer.pause(slow_gameLoopTimer)
 
     -- Creates temporary victory button with event listener
-    local button = display.newRect(uiGroup, display.contentWidth/2, display.contentHeight/2,
-    display.contentWidth/2,display.contentHeight/8)
+    local button = display.newRect(uiGroup, _width/2, _height/2,
+    _width/2,_height/8)
     button:setFillColor(0,127,127)
     button:addEventListener("tap", on_victory_tapped)
 
     -- Adds text
     button.text = display.newText(uiGroup, "Back to level select",
-        display.contentWidth/2, display.contentHeight/2,
+        _width/2, _height/2,
         native.systemFont)
     button.text:setFillColor(0,0,0)
 
@@ -319,7 +326,7 @@ end
 -- Removes all intro-related graphics from screen itself
 local function run_intro()
     print("running intro!")
-    bubble.introBubbles(bubbleGroup, 10, util.newPoint(display.contentWidth/2,5*display.contentHeight/6))
+    bubble.introBubbles(bubbleGroup, 10, util.newPoint(_width/2,5*_height/6))
 end
 
 -- Starts the game!
@@ -392,16 +399,18 @@ function scene:create( event )
     obstacleGroup = display.newGroup()
     backgroundGroup = display.newGroup()
     uiGroup = display.newGroup()
+    padGroup = display.newGroup()
     sceneGroup:insert(backgroundGroup)
     sceneGroup:insert(bubbleGroup)
     sceneGroup:insert(obstacleGroup)
     sceneGroup:insert(uiGroup)
+    sceneGroup:insert(padGroup)
 
     -- Initialize borders
-    leftBorder = display.newRect(-100, display.contentHeight/2, 200, display.contentHeight)
-    rightBorder = display.newRect(display.contentWidth+100, display.contentHeight/2, 200, display.contentHeight)
-    topBorder = display.newRect(display.contentWidth/2, -100, display.contentWidth, 200)
-    bottomBorder = display.newRect(display.contentWidth/2, display.contentHeight+100, display.contentWidth, 200)
+    leftBorder = display.newRect(-100, _height/2, 200, _height)
+    rightBorder = display.newRect(_width+100, _height/2, 200, _height)
+    topBorder = display.newRect(_width/2, -100, _width, 200)
+    bottomBorder = display.newRect(_width/2, _height+100, _width, 200)
     leftBorder.type = "border"
     rightBorder.type = "border"
     topBorder.type = "border"
@@ -411,14 +420,28 @@ function scene:create( event )
     obstacleGroup:insert(topBorder)
     obstacleGroup:insert(bottomBorder)
 
+    -- Cover unused portions (Temporary solution)
+    local sideWidth = (_right-_width)/2
+    local topHeight = (_bottom-_height)/2
+
+    leftPad = display.newRect(_left+(sideWidth/2), _top+(_bottom/2), sideWidth, _bottom)
+    rightPad = display.newRect(_width+(sideWidth/2), _top+(_bottom/2), sideWidth, _bottom)
+    topPad = display.newRect(_width/2, _top+(topHeight/2), _right, topHeight)
+    bottomPad = display.newRect(_width/2, _height+(topHeight/2), _right, topHeight)
+
+    leftPad:setFillColor(0,0,0)
+    rightPad:setFillColor(0,0,0)
+    topPad:setFillColor(0,0,0)
+    bottomPad:setFillColor(0,0,0)
+
     -- Temporary white background (This should be replaced by backgroundGroup later)
-    local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
-    bg:setFillColor(.9,.9,.9)
+    local bg = display.newRect(_width/2, _height/2, _width, _height)
+    bg:setFillColor(1,1,1) -- This isn't the only white thing... I don't know why
     backgroundGroup:insert(bg)
 
     -- Initialize ui
     score = 0
-    scoreText = display.newText(uiGroup, score, display.contentWidth/2, display.contentHeight/8, native.systemFont, 36)
+    scoreText = display.newText(uiGroup, score, _width/2, _height/8, native.systemFont, 36)
     scoreText:setFillColor(0,0,0)
 end
 
