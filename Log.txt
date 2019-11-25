@@ -44,7 +44,8 @@ HARD CORE CODING:
 10/31	7:50pm		0:40				I tried to implement gravity and tragically failed.
 10/31	9:30pm		1:15				Implemented gravity. Implemented touch forces.
 11/1	9:20pm		1:00				Implemented grouping for bubble groups (For calculating forces).
-11/14	3:00pm		2:30				Finished implementing grouping for bubble groups. Played around with forces to figure out what give both control and a sense of randomness	
+11/14	3:00pm		2:30				Finished implementing grouping for bubble groups. Played around with forces to figure out what give both control and a 
+											sense of randomness	
 11/14	7:55pm		2:00				Implemented collisions, spikes, and bubble popping	
 11/14	10:40pm		0:20				Made first build		
 11/15	1:40pm		1:30				Began re-writing obstacle inheritance things for easier level building
@@ -54,6 +55,7 @@ HARD CORE CODING:
 11/24	1:35pm		1:50				Added null rotation, fixed weird dissapearing spikes, implemented sprites (for coin and other powerups)
 11/24	7:35pm		0:40				Added masking bars
 11/24	8:50pm		0:50				Implemented 4square(). Started making things easier for nestled obstacles
+11/24	10:15pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					38:00 TOTAL
 

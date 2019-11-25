@@ -118,7 +118,7 @@ end
 
 -- Extends adds the elements of tbl2 to tbl1
 function util.tableExtend(tbl1, tbl2)
-    if not tbl1 then return end
+    if not tbl1 then tbl1 = {} end
     if not tbl2 then return end
     if type(tbl2) ~= "table" then table.insert(tbl1, tbl2) end
 
@@ -128,16 +128,26 @@ function util.tableExtend(tbl1, tbl2)
     end
 end
 
+-- deepcopies item n times
+function util.list(item, n)
+	local result = {}
+	for i = 1, n, 1 do
+		table.insert(result, util.deepcopy(item))
+	end
+	return result
+end
+
 -- ******************************** LEVEL BUILDING UTILITIES ***************************************
 
 -- Returns the default parent object that travels from the top of the
 -- screen to the bottom in a given ammount of time (Stored in speed)
-function util.newParentObstacle(speed)
+function util.newParentObstacle(speed, name)
+	if not name then name = "Parent" end
     local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
     local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
         type = "null",
-        name = "Parent",
+        name = name,
         position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
         rotation_path = {0,0},
         transition_time = {speed, speed},
@@ -197,10 +207,10 @@ function util.newSpike(x,y, isVertical)
     return {topSpike, block, bottomSpike}
 end
 
-function util.spikeList(n, isVertical)
+function util.newSpikeList(n, isVertical)
 	local result = {}
 	for i = 1, n, 1 do
-		table.insert(result, util.newSpikePoint(0,0,0))
+		table.insert(result, util.newSpike(0,0,isVertical))
 	end
 	return result
 end
@@ -213,6 +223,7 @@ function util.wrapLoopPath(nullModel, objectList)
 	for i = 1, #nullModel.position_path, 1 do
 		local thisObject = util.deepcopy(nullModel)
 		if objectList[i] then
+			util.tprint(objectList[i])
 			util.tableExtend(thisObject.children, objectList[i])
 			thisObject.first_frame = i
 			table.insert(result, thisObject)
@@ -223,7 +234,7 @@ end
 
 
 -- Simple spike line from x to y, loops endlessly
-function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical)
+function util.newLineModel(startPoint, endPoint, num_spikes, period)
     local nullModel = {}
     nullModel.type = "null"
     nullModel.name = "SpikeLineNull"
@@ -231,12 +242,6 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
     nullModel.rotation_interpolation = easing.linear
     nullModel.on_complete = "loop"
     nullModel.children = {}
-
-    -- Create objects list to wrap around path
-    local objectsList = {}
-    for i = 1, num_spikes, 1 do
-    	table.insert(objectsList, util.newSpike(0,0, isVertical))
-    end
 
     -- Set position_path, rotation_path, transition_time
     local position_path = {}
@@ -259,14 +264,12 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
     nullModel.rotation_path = rotation_path
     nullModel.transition_time = transition_time
 
-    -- Assemble and return the list!
-    --return util.wrapLoopPath(nullModel, objectsList)
     return nullModel
 end
 
 
 -- Creates a new square (4 vertices) with 4 spikes
-function util.new4Square(center, edge_size, period, isVertical)
+function util.new4SquareModel(center, edge_size, period)
 	local nullModel = {}
     nullModel.type = "null"
     nullModel.name = "4SquareModel"
@@ -274,12 +277,6 @@ function util.new4Square(center, edge_size, period, isVertical)
     nullModel.rotation_interpolation = easing.linear
     nullModel.on_complete = "loop"
     nullModel.children = {}
-
-    -- Create objects list to wrap around path
-    local objectsList = {}
-    for i = 1, 4, 1 do
-    	table.insert(objectsList, util.newSpike(0,0,isVertical))
-    end
 
     -- Set position_path, rotation_path, transition_time
     local position_path = {}
@@ -304,8 +301,6 @@ function util.new4Square(center, edge_size, period, isVertical)
     nullModel.rotation_path = rotation_path
     nullModel.transition_time = transition_time
 
-    -- Assemble and return the list!
-    -- return util.wrapLoopPath(nullModel, objectsList)
     return nullModel
 end
 
