@@ -1,6 +1,13 @@
 local CN = require("crazy_numbers")
 local util = require("util")
 
+-- Helpful numbers
+local _left = -CN.COL_NUM/2
+local _right = CN.COL_NUM/2
+local _top = (display.contentHeight/CN.COL_WIDTH)/2
+local _bottom = -(display.contentHeight/CN.COL_WIDTH)/2
+local _halfSpikeWidth = CN.SPIKE_WIDTH/2
+local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
 local speed = 10000

@@ -3,6 +3,15 @@
 local CN = require("crazy_numbers")
 local util = {}
 
+-- Helpful numbers
+local _left = -CN.COL_NUM/2
+local _right = CN.COL_NUM/2
+local _top = (display.contentHeight/CN.COL_WIDTH)/2
+local _bottom = -(display.contentHeight/CN.COL_WIDTH)/2
+local _halfSpikeWidth = CN.SPIKE_WIDTH/2
+local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
+
+
 -- Table clone method (Put this somewhere else when you are done plz)
 -- Credit: http://lua-users.org/wiki/CopyTable
 function util.deepcopy(orig)
@@ -229,7 +238,6 @@ function util.wrapLoopPath(nullModel, objectList)
 	for i = 1, #nullModel.position_path, 1 do
 		local thisObject = util.deepcopy(nullModel)
 		if objectList[i] then
-			util.tprint(objectList[i])
 			util.tableExtend(thisObject.children, objectList[i])
 			thisObject.first_frame = i
 			table.insert(result, thisObject)
@@ -339,9 +347,9 @@ function util.stillSpikeLine_(speed, num_spikes, ignore)
 end
 
 function util.smallSquareLine_(speed, squareSize)
-	local obstacle = util.newParentObstacle(speed, "smallSquareLine_", 1.5+(squareSize/2), 1.5+(squareSize/2))
-	local s = util.newPoint(-12, 0)
-	local e = util.newPoint(12, 0)
+	local obstacle = util.newParentObstacle(speed, "smallSquareLine_", _halfSpikeHeight+(squareSize/2), _halfSpikeHeight+(squareSize/2))
+	local s = util.newPoint(2*_left, 0)
+	local e = util.newPoint(2*_right, 0)
 	local lineModel = util.newLineModel(s, e, 2, 8000)
 	local squareModel = util.new4SquareModel(util.newPoint(0,0), squareSize, 8000)
 	local square = util.wrapLoopPath(squareModel, util.newSpikeList(4, true))
@@ -353,7 +361,7 @@ end
 -- ignore -> if a number is contained in ignore, no spike will be added at that index
 function util.spikeLine_(speed, startPoint, endPoint, num_spikes, period, ignore)
 	if not ignore then ignore = {} end
-	local obstacle = util.newParentObstacle(speed, "spikeLine_", 1.5+(startPoint.y), 1.5+(endPoint.y))
+	local obstacle = util.newParentObstacle(speed, "spikeLine_", _halfSpikeHeight+(startPoint.y), _halfSpikeHeight+(endPoint.y))
 	local lineModel = util.newLineModel(startPoint, endPoint, num_spikes, period)
 	local wrapList = util.newSpikeList(num_spikes, true)
 	for i = 1, #ignore, 1 do
