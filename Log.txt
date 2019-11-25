@@ -52,9 +52,10 @@ HARD CORE CODING:
 11/22	10:00am		0:40				Continued work on implementing spikeLine
 11/22	5:45pm		1:15				Debugged spikeLine, wrote wrapLoopPath
 11/24	1:35pm		1:50				Added null rotation, fixed weird dissapearing spikes, implemented sprites (for coin and other powerups)
-11/24	7:35pm		
+11/24	7:35pm		0:40				Added masking bars
+11/24	8:50pm		0:50				Implemented 4square(). Started making things easier for nestled obstacles
 ------------------------------------------------------------------------------------------------------------------------------
-					36:30 TOTAL
+					38:00 TOTAL
 
 
-THE GRAND TOTAL:	39:45
+THE GRAND TOTAL:	41:15

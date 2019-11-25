@@ -433,7 +433,7 @@ function scene:create( event )
     rightPad:setFillColor(0,0,0)
     topPad:setFillColor(0,0,0)
     bottomPad:setFillColor(0,0,0)
-
+    
     -- Temporary white background (This should be replaced by backgroundGroup later)
     local bg = display.newRect(_width/2, _height/2, _width, _height)
     bg:setFillColor(1,1,1) -- This isn't the only white thing... I don't know why

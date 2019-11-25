@@ -170,7 +170,7 @@ function util.newBlackSquare(x, y, rot)
     return square
 end
 
-function util.newSpike(x, y, rot)
+function util.newSpikePoint(x, y, rot)
     local spike = {}
     spike.type = "spike"
     spike.x = x
@@ -179,18 +179,30 @@ function util.newSpike(x, y, rot)
     return spike
 end
 
-function util.newHorizontalSpike(x,y)
-    local topSpike = util.newSpike(-1+x, y, 270)
-    local block = util.newBlackSquare(x, y, 0)
-    local bottomSpike = util.newSpike(x+1, y, 90)
+function util.newSpike(x,y, isVertical)
+    local topSpike
+    local block
+    local bottomSpike
+
+    if isVertical then
+    	topSpike = util.newSpikePoint(x, y-1, 0)
+   		block = util.newBlackSquare(x, y, 0)
+    	bottomSpike = util.newSpikePoint(x, y+1, 180)
+    else
+    	topSpike = util.newSpikePoint(-1+x, y, 270)
+    	block = util.newBlackSquare(x, y, 0)
+    	bottomSpike = util.newSpikePoint(x+1, y, 90)
+    end
+
     return {topSpike, block, bottomSpike}
 end
 
-function util.newVerticalSpike(x,y)
-    local topSpike = util.newSpike(x, y-1, 0)
-    local block = util.newBlackSquare(x, y, 0)
-    local bottomSpike = util.newSpike(x, y+1, 180)
-    return {topSpike, block, bottomSpike}
+function util.spikeList(n, isVertical)
+	local result = {}
+	for i = 1, n, 1 do
+		table.insert(result, util.newSpikePoint(0,0,0))
+	end
+	return result
 end
 
 -- Wraps list of objects around a path (and loops)
@@ -200,9 +212,11 @@ function util.wrapLoopPath(nullModel, objectList)
 	local result = {}
 	for i = 1, #nullModel.position_path, 1 do
 		local thisObject = util.deepcopy(nullModel)
-		util.tableExtend(thisObject.children, objectList[i])
-		thisObject.first_frame = i
-		table.insert(result, thisObject)
+		if objectList[i] then
+			util.tableExtend(thisObject.children, objectList[i])
+			thisObject.first_frame = i
+			table.insert(result, thisObject)
+		end
 	end
 	return result
 end
@@ -221,11 +235,7 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
     -- Create objects list to wrap around path
     local objectsList = {}
     for i = 1, num_spikes, 1 do
-    	if isVertical then
-    		table.insert(objectsList, util.newVerticalSpike(0,0))
-    	else
-    		table.insert(objectsList, util.newHorizontalSpike(0,0))
-    	end
+    	table.insert(objectsList, util.newSpike(0,0, isVertical))
     end
 
     -- Set position_path, rotation_path, transition_time
@@ -250,14 +260,53 @@ function util.newSpikeLine(startPoint, endPoint , num_spikes, period, isVertical
     nullModel.transition_time = transition_time
 
     -- Assemble and return the list!
-    return util.wrapLoopPath(nullModel, objectsList)
+    --return util.wrapLoopPath(nullModel, objectsList)
+    return nullModel
 end
 
 
--- Creates a new square (4 vertices) with spikes that rotate around the square
-function util.newSquare(center_x, center_y, edge_size, num_spikes, period, isVertical)
+-- Creates a new square (4 vertices) with 4 spikes
+function util.new4Square(center, edge_size, period, isVertical)
 	local nullModel = {}
+    nullModel.type = "null"
+    nullModel.name = "4SquareModel"
+    nullModel.position_interpolation = easing.linear
+    nullModel.rotation_interpolation = easing.linear
+    nullModel.on_complete = "loop"
+    nullModel.children = {}
 
+    -- Create objects list to wrap around path
+    local objectsList = {}
+    for i = 1, 4, 1 do
+    	table.insert(objectsList, util.newSpike(0,0,isVertical))
+    end
+
+    -- Set position_path, rotation_path, transition_time
+    local position_path = {}
+    local rotation_path = {}
+    local transition_time = {}
+    local max = edge_size/2
+    for i = 1, 4, 1 do
+    	local xSign = 1
+    	local ySign = 1
+    	if (i == 1) or (i == 4) then
+    		xSign = -1
+    	end
+    	if (i == 3) or (i == 4) then
+    		ySign = -1
+    	end
+
+    	table.insert(position_path, util.newPoint(center.x + xSign*max, center.y + ySign*max))
+    	table.insert(transition_time, period/4)
+    	table.insert(rotation_path, 0)
+    end
+    nullModel.position_path = position_path
+    nullModel.rotation_path = rotation_path
+    nullModel.transition_time = transition_time
+
+    -- Assemble and return the list!
+    -- return util.wrapLoopPath(nullModel, objectsList)
+    return nullModel
 end
 
 return util

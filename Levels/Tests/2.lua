@@ -16,7 +16,7 @@ null_1A.position_interpolation = easing.inSine
 null_1A.rotation_interpolation = easing.linear
 null_1A.on_complete = "loop"
 null_1A.first_frame = 1
-null_1A.children = util.newVerticalSpike(0,0)
+null_1A.children = util.newSpike(0,0, true)
 
 obstacle_1 = util.newParentObstacle(speed, "1P")
 obstacle_1.children = {null_1A}
