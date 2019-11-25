@@ -207,13 +207,15 @@ local function createDisplayObject(thisObject, ancestry)
         image:play()
         imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
     end
-    physics.addBody(image, "static", {outline=imageOutline})
     image.type = thisObject.type
-	thisObject.image = image
+    image.parent = thisObject
+    thisObject.image = image
+
 	thisObject.x = thisObject.x * CN.COL_WIDTH
 	thisObject.y = thisObject.y * CN.COL_WIDTH
 	thisObject.ancestry = ancestry
-    thisObject.image.parent = thisObject
+
+    physics.addBody(thisObject.image, "static", {outline=imageOutline})
 	return thisObject
 end
 
@@ -247,8 +249,9 @@ local function createObstacle(thisObstacle, ancestry)
         end
     else
         local newDisplayObject = createDisplayObject(thisObstacle, ancestry)
-        reposition(newDisplayObject)
+        newDisplayObject.image.parent = newDisplayObject
         table.insert(activeDisplayObjects, newDisplayObject)
+        reposition(newDisplayObject)
     end
 end
 
@@ -306,6 +309,7 @@ local function gameLoop_slow()
     score = score + 1
     -- Print Active nulls and display objects
     
+    
     print("Active objects")
     print("\tNulls:")
     for i = 1, #activeNullObjects, 1 do
@@ -313,7 +317,7 @@ local function gameLoop_slow()
     end
     print("\tDisplayObjects:")
     for i = 1, #activeDisplayObjects, 1 do
-        print("\t\t"..i..") "..activeDisplayObjects[i].type)
+        print("\t\t"..i..") "..activeDisplayObjects[i].type..", "..activeDisplayObjects[i].x)
     end
 
 
@@ -364,21 +368,30 @@ local function onCollision(event)
 			if(event.element2 == 2) then
 				return
 			end
-            bubble.popBubble(obj1)
+            --bubble.popBubble(obj1)
+            util.removeFromList(activeDisplayObjects, obj2.parent)
+            obj2:removeSelf()
+            obj2.parent = nil
+            obj2 = nil
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
-			bubble.popBubble(obj2)
-		end
+			--bubble.popBubble(obj2)
+            util.removeFromList(activeDisplayObjects, obj1.parent)
+            obj1:removeSelf()
+            obj1.parent = nil
+            obj1 = nil
 
-        --COIN COLLISION (Temporary)
-        if(obj1.type == "bubble" and obj2.type == "coin") then
+        -- COIN COLLISION
+		elseif(obj1.type == "bubble" and obj2.type == "coin") then
             if(event.element2 == 2) then
                 return
             end
 
-            util.removeFromList(activeDisplayObjects, obj2.parent)
+            print(obj2.parent.x..", "..obj2.parent.y)
+
+            util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
             obj2.parent = nil
             obj2 = nil
@@ -387,7 +400,9 @@ local function onCollision(event)
                 return
             end
 
-            util.removeFromList(activeDisplayObjects, obj1.parent)
+            print(obj1.parent.x..", "..obj1.parent.y)
+
+            util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
             obj1.parent = nil
             obj1 = nil

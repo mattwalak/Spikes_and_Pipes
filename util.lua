@@ -369,7 +369,6 @@ function util.coinCircle_(speed, radius, num_coins)
 	local obstacle = util.newParentObstacle(speed, "coinCircle_", .5+(radius/2), .5+(radius/2))
 	local coins = {}
 	local angle = 2*math.pi/num_coins
-
 	for i = 1, num_coins, 1 do
 		table.insert(coins, util.newCoin(radius*math.cos(i*angle),radius*math.sin(i*angle)))
 	end
