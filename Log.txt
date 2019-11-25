@@ -55,9 +55,9 @@ HARD CORE CODING:
 11/24	1:35pm		1:50				Added null rotation, fixed weird dissapearing spikes, implemented sprites (for coin and other powerups)
 11/24	7:35pm		0:40				Added masking bars
 11/24	8:50pm		0:50				Implemented 4square(). Started making things easier for nestled obstacles
-11/24	10:15pm		
+11/24	10:15pm		1:15				Adjusted speed for obstacles that travel more than display.contentHeight. Made first finished obstacles
 ------------------------------------------------------------------------------------------------------------------------------
-					38:00 TOTAL
+					39:15 TOTAL
 
 
-THE GRAND TOTAL:	41:15
+THE GRAND TOTAL:	42:30

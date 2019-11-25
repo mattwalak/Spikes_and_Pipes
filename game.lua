@@ -59,6 +59,23 @@ local bottomPad
 local rightPad
 local topPad
 
+-- Draws a checkerboard for debug things
+local function drawCheckerboard()
+    local yMax = math.ceil(display.contentHeight/CN.COL_WIDTH)
+    print("x: 10, y: "..yMax)
+    for y = 0, yMax, 1 do
+        for x = 0, CN.COL_NUM, 1 do
+            local rect = display.newRect(backgroundGroup, (x*CN.COL_WIDTH) + CN.COL_WIDTH/2, (y*CN.COL_WIDTH) + CN.COL_WIDTH/2,
+                CN.COL_WIDTH, CN.COL_WIDTH)
+            if(((x+y)%2) == 0) then
+                rect:setFillColor(.5, .5, .5)
+            else
+                rect:setFillColor(1,1,1)
+            end
+        end
+    end
+end
+
 
 -- Stops all null object transitions and sets them to nil
 local function stopNulls()
@@ -443,6 +460,8 @@ function scene:create( event )
     score = 0
     scoreText = display.newText(uiGroup, score, _width/2, _height/8, native.systemFont, 36)
     scoreText:setFillColor(0,0,0)
+
+    --drawCheckerboard()
 end
 
 

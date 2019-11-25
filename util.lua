@@ -141,16 +141,22 @@ end
 
 -- Returns the default parent object that travels from the top of the
 -- screen to the bottom in a given ammount of time (Stored in speed)
-function util.newParentObstacle(speed, name)
+function util.newParentObstacle(speed, name, topExtend, bottomExtend)
+	if not topExtend then topExtend = 0 end
+	if not bottomExtend then bottomExtend = 0 end
 	if not name then name = "Parent" end
+	local heightBlocks = (display.contentHeight/CN.COL_WIDTH)
+	local travelDist = heightBlocks + topExtend + bottomExtend
+	local adjustSpeed = speed*travelDist/heightBlocks
+
     local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
     local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
         type = "null",
         name = name,
-        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y), util.newPoint(MIDDLE_X, 0)},
+        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y+bottomExtend), util.newPoint(MIDDLE_X, 0-topExtend)},
         rotation_path = {0,0},
-        transition_time = {speed, speed},
+        transition_time = {adjustSpeed, adjustSpeed},
         position_interpolation = easing.linear,
         rotation_interpolation = easing.linear,
         on_complete = "destroy",
@@ -303,5 +309,40 @@ function util.new4SquareModel(center, edge_size, period)
 
     return nullModel
 end
+
+-- Duplicates object 1-#Nodes in line model and animates as line
+-- Returns list of nulls
+function util.wrapToLine(lineModel, object)
+	local n = #lineModel.position_path - 1
+	local objectList = util.list(object, n)
+	local combine = util.wrapLoopPath(lineModel, objectList)
+	return combine
+end
+
+------------------------------ FULLY FORMED OBSTACLES --------------------------
+-- All obstacles returned from these methods must be game ready
+-- This means there must be no clipping/dissapearing elements
+-- Careful assuming spike size is 3*COL_WIDTH -> do something in CN to fix that
+
+function util.simpleMiddleSpike_(speed)
+	local spike = util.newSpike(0,0,true)
+	local obstacle = util.newParentObstacle(speed, "simpleMiddleSpike_", 1.5, 1.5)
+	util.tableExtend(obstacle.children, spike)
+	return obstacle
+end
+
+function util.smallSquareLine_(speed, squareSize)
+	local obstacle = util.newParentObstacle(speed, "smallSquareLine_", 1.5+(squareSize/2), 1.5+(squareSize/2))
+	local s = util.newPoint(-12, 0)
+	local e = util.newPoint(12, 0)
+	local lineModel = util.newLineModel(s, e, 2, 8000)
+	local squareModel = util.new4SquareModel(util.newPoint(0,0), squareSize, 8000)
+	local square = util.wrapLoopPath(squareModel, util.newSpikeList(4, true))
+	util.tableExtend(obstacle.children, util.wrapToLine(lineModel, square))
+	
+	return obstacle
+end
+
+
 
 return util

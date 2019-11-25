@@ -9,22 +9,6 @@ local CN = require "crazy_numbers"
 local bg = display.newRect(display.contentWidth/2, display.contentHeight/2, display.contentWidth, display.contentHeight)
 bg:setFillColor(1,1,1)
 
---[[
--- Sets up a checkered background
-local yMax = math.ceil(display.contentHeight/CN.COL_WIDTH)
-print("x: 10, y: "..yMax)
-for y = 0, yMax, 1 do
-	for x = 0, CN.COL_NUM, 1 do
-		local rect = display.newRect((x*CN.COL_WIDTH) + CN.COL_WIDTH/2, (y*CN.COL_WIDTH) + CN.COL_WIDTH/2,
-			CN.COL_WIDTH, CN.COL_WIDTH)
-		if(((x+y)%2) == 0) then
-			rect:setFillColor(.5, .5, .5)
-		else
-			rect:setFillColor(1,1,1)
-		end
-	end
-end]]
-
 local composer = require("composer")
 
 --Hide status bar
