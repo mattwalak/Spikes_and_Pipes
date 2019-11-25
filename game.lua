@@ -101,10 +101,10 @@ local function destroyObject(thisObject)
         thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
     else
         -- Test if object already removed (ie coin collected)
-        if not thisObject.image then return end
+        if not thisObject then return end
         print("removing: "..thisObject.type)
-        thisObject.image:removeSelf()
-        thisObject.image = nil
+        thisObject:removeSelf()
+        thisObject = nil
         util.removeFromList(activeDisplayObjects, thisObject)
         thisObject = nil
     end
@@ -175,25 +175,27 @@ local function reposition(displayObject)
             thisObject = displayObject
         else
             thisObject = ancestry[i]
+            thisObject.r_x = thisObject.x
+            thisObject.r_y = thisObject.y
+            thisObject.r_rot = thisObject.rotation
         end
 
-        local r_x = thisObject.x*math.cos(math.rad(last_rot))-thisObject.y*math.sin(math.rad(last_rot))
-        local r_y = thisObject.y*math.cos(math.rad(last_rot))+thisObject.x*math.sin(math.rad(last_rot))
+        local r_x = thisObject.r_x*math.cos(math.rad(last_rot))-thisObject.r_y*math.sin(math.rad(last_rot))
+        local r_y = thisObject.r_y*math.cos(math.rad(last_rot))+thisObject.r_x*math.sin(math.rad(last_rot))
         total_x = total_x + r_x
         total_y = total_y + r_y
-        total_rot = total_rot + thisObject.rotation
-        last_rot = thisObject.rotation
+        total_rot = total_rot + thisObject.r_rot
+        last_rot = thisObject.r_rot
     end
 
     -- Place this object (rotated) at this point
-    displayObject.image.x = total_x
-    displayObject.image.y = total_y
-    displayObject.image.rotation = total_rot
+    displayObject.x = total_x
+    displayObject.y = total_y
+    displayObject.rotation = total_rot
 end
 
 -- Creates a new Corona recognized display object from its data
 local function createDisplayObject(thisObject, ancestry)
-
 	local image
     local imageOutline
 	if thisObject.type == "black_square" then
@@ -208,15 +210,13 @@ local function createDisplayObject(thisObject, ancestry)
         imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
     end
     image.type = thisObject.type
-    image.parent = thisObject
-    thisObject.image = image
-
-	thisObject.x = thisObject.x * CN.COL_WIDTH
-	thisObject.y = thisObject.y * CN.COL_WIDTH
-	thisObject.ancestry = ancestry
-
-    physics.addBody(thisObject.image, "static", {outline=imageOutline})
-	return thisObject
+    image.r_x = thisObject.x * CN.COL_WIDTH
+    image.r_y = thisObject.y * CN.COL_WIDTH
+    image.r_rot = thisObject.rotation
+    image.ancestry = ancestry
+    image.object = thisObject -- Used to set both to nill when destroying
+    physics.addBody(image, "static", {outline=imageOutline})
+	return image
 end
 
 
@@ -249,7 +249,6 @@ local function createObstacle(thisObstacle, ancestry)
         end
     else
         local newDisplayObject = createDisplayObject(thisObstacle, ancestry)
-        newDisplayObject.image.parent = newDisplayObject
         table.insert(activeDisplayObjects, newDisplayObject)
         reposition(newDisplayObject)
     end
@@ -369,18 +368,18 @@ local function onCollision(event)
 				return
 			end
             --bubble.popBubble(obj1)
-            util.removeFromList(activeDisplayObjects, obj2.parent)
+            util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
-            obj2.parent = nil
+            obj2.object = nil
             obj2 = nil
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
 			--bubble.popBubble(obj2)
-            util.removeFromList(activeDisplayObjects, obj1.parent)
+            util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
-            obj1.parent = nil
+            obj1.object = nil
             obj1 = nil
 
         -- COIN COLLISION
@@ -389,22 +388,18 @@ local function onCollision(event)
                 return
             end
 
-            print(obj2.parent.x..", "..obj2.parent.y)
-
             util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
-            obj2.parent = nil
+            obj2.object = nil
             obj2 = nil
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
 
-            print(obj1.parent.x..", "..obj1.parent.y)
-
             util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
-            obj1.parent = nil
+            obj1.object = nil
             obj1 = nil
         end
 	end
