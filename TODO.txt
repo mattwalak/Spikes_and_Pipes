@@ -5,6 +5,7 @@ NEXT STEPS:
 
 PLZ CHECK:
 1. Check keyframe time interpolation numbers (Does looping back to first keyframe use last time value or first?)
+2. Coins issue "Not found in table" when calling util.removeFromList() when level 2 is launched a second time after game overing
 
 
 
