@@ -260,18 +260,22 @@ local function applyTouchForce()
             local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y
 
             -- A little bit of variation based on distance
+            --[[
+            local xFactor = CN.INTERCEPT + (1/math.pow(xDist,1)) * CN.INVERSE_VARIATION
+            local yFactor = CN.INTERCEPT + (1/math.pow(yDist,1)) * CN.INVERSE_VARIATION
+
             xforce = xforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
             yforce = yforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
 
             local thisFactor = (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
             if thisFactor > maxFactor then maxFactor = thisFactor end
             if thisFactor < minFactor then minFactor = thisFactor end
+            ]]
 
             --thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
             thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
         end
     end
-    --print("max = "..maxFactor..", min = "..minFactor)
 
     -- Calculates force applied on each bubble in turn
     --[[
