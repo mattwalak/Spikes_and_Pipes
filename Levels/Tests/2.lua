@@ -13,8 +13,12 @@ local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 local speed = 10000
 
 -- Define obstacles ------------------------------------------------------------
-local s1 = util.newPoint(_left-_halfSpikeWidth, 0)
-local e1 = util.newPoint(_right+_halfSpikeWidth, 0)
+local s1 = util.newPoint(2*_left-_halfSpikeWidth, 0)
+local e1 = util.newPoint(2*_right+_halfSpikeWidth, 0)
+
+local coins = util.coinCircle_(speed, 2, 6)
+local spikeSquare = util.still4Square_(speed, 10, 8000)
+util.mergeObstacle(spikeSquare, coins)
 
 --------------------------------------------------------------------------------
 
@@ -22,17 +26,17 @@ local e1 = util.newPoint(_right+_halfSpikeWidth, 0)
 -- Define pairs
 local obstacles_list = {}
 obstacles_list[1] = util.coinCircle_(speed, 2, 8)
-obstacles_list[2] = util.spikeLine_(speed, s1, e1, 1, 4000)
-obstacles_list[8] = util.spikeLine_(speed, e1, s1, 1, 4000)
-obstacles_list[15] = util.spikeLine_(speed, s1, e1, 2, 4000)
-obstacles_list[18] = util.spikeLine_(speed, e1, s1, 2, 4000)
-obstacles_list[21] = util.spikeLine_(speed, s1, e1, 2, 4000)
-
+obstacles_list[8] = util.spikeLine_(speed, s1, e1, 3, 8000)
+obstacles_list[14] = util.spikeLine_(speed, e1, s1, 3, 8000)
+obstacles_list[20] = util.spikeLine_(speed, s1, e1, 4, 8000)
+obstacles_list[25] = util.spikeLine_(speed, e1, s1, 4, 8000)
+obstacles_list[30] = util.spikeLine_(speed, s1, e1, 4, 8000)
+obstacles_list[36] = spikeSquare
 
 local level_2 =  {
     name = "Test level 2",
-    speed = 10,
-    victory = 30,
+    speed = 50,
+    victory = 60,
     obstacles = obstacles_list,
 }
 

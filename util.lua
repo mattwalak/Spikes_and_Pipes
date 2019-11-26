@@ -326,6 +326,11 @@ function util.wrapToLine(lineModel, object)
 	return combine
 end
 
+-- Takes all children from obstacle2 and adds them to obstacle1
+function util.mergeObstacle(ob1, ob2)
+    util.tableExtend(ob1.children, ob2.children)
+end
+
 ------------------------------ FULLY FORMED OBSTACLES --------------------------
 -- All obstacles returned from these methods must be game ready
 -- This means there must be no clipping/dissapearing elements
@@ -362,7 +367,11 @@ end
 
 -- Simple 4 square with no special movement
 function util.still4Square_(speed, squareSize, period)
-	--local obstacle = util.newParentObstacle()
+	local obstacle = util.newParentObstacle(speed, "still4Square_", _halfSpikeHeight+(squareSize/2), _halfSpikeHeight+(squareSize/2))
+    local squareModel = util.new4SquareModel(util.newPoint(0,0), squareSize, period)
+    local squares = util.wrapLoopPath(squareModel, util.newSpikeList(4, true))
+    util.tableExtend(obstacle.children, squares)
+    return obstacle
 end
 
 function util.coinCircle_(speed, radius, num_coins)
