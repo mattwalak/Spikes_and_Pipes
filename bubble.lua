@@ -14,7 +14,10 @@ local comTable = {} -- List of (x,y) pairs describing the center of mass of each
 
 -- Stores information about where the user touched / Where and how to apply forces
 local touch
+local touch_velocity
 local touch_location
+local touch_last_location
+local touch_last_time
 
 -- Creates a new bubbleClump
 local function newBubbleClump()
@@ -233,8 +236,11 @@ local function applyTouchForce()
         end
     end
 
+    
     -- Apply force to bubbles in that group
     --local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
+    local maxFactor = 0
+    local minFactor = 100
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
         if thisBubble.group == closestGroup then
@@ -243,10 +249,29 @@ local function applyTouchForce()
             local bubbleDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
             local angle = math.atan(yDist/xDist)
 
-            local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(bubbleDist,1))
-            thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+            -- Push method
+            -- local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(bubbleDist,1))
+
+            -- Pull method
+            -- local force = -CN.TOUCH_PULL_FACTOR
+
+            -- Pull based on velocity
+            local xforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.x
+            local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y
+
+            -- A little bit of variation based on distance
+            xforce = xforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            yforce = yforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+
+            local thisFactor = (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            if thisFactor > maxFactor then maxFactor = thisFactor end
+            if thisFactor < minFactor then minFactor = thisFactor end
+
+            --thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+            thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
         end
     end
+    --print("max = "..maxFactor..", min = "..minFactor)
 
     -- Calculates force applied on each bubble in turn
     --[[
@@ -308,11 +333,33 @@ function bubble_module.updateNumText()
 	end
 end
 
+-- Updates velocity of touch
+function updateTouchData()
+    local time = system.getTimer()
+    if not touch_last_location then
+        touch_velocity = util.newPoint(0,0)
+    else
+        local dt = time - touch_last_time
+        local vx = touch_location.x - touch_last_location.x
+        vx = vx/dt
+        local vy = touch_location.y - touch_last_location.y
+        vy = vy/dt
+        touch_velocity.x = vx
+        touch_velocity.y = vy
+    end
+    touch_last_location = touch_location
+    touch_last_time = time
+end
+
 -- Applies all forces to bubbles
 function bubble_module.applyForce()
     reassignGroups()
     applyGravityForce()
-    applyTouchForce()
+    if touch then
+        updateTouchData()
+        applyTouchForce()
+    end
+    
     applyEdgeForce()
 end
 
@@ -349,19 +396,19 @@ end
 -- Bubble touch handler -> Called when the game area recieves a touch
 function bubble_module.onTouch(event)
     if(event.phase == "began") then
-        touch = true
         touch_location = util.newPoint(event.x, event.y)
-        --print("began at x = "..touch_location.x..", y = "..touch_location.y)
+        touch_last_location = nil
+        touch = true
     elseif(event.phase == "ended") then
         touch = false
-        --print("ended at x = "..touch_location.x..", y = "..touch_location.y)
     elseif(event.phase == "moved") then
         touch_location = util.newPoint(event.x, event.y)
-        --print("moved at x = "..touch_location.x..", y = "..touch_location.y)
     elseif(event.phase == "cancelled") then
         touch = false
     end
 end
+
+
 
 -- Returns number of bubbles left
 function bubble_module.numBubbles()

@@ -72,7 +72,7 @@ obstacles_list[6] = obstacle_3
 local level_3 =  {
     name = "Test level 3",
     speed = 4,
-    victory = 10,
+    victory = -1,
     obstacles = obstacles_list,
 }
 

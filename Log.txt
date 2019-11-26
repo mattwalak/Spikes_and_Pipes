@@ -63,6 +63,7 @@ HARD CORE CODING:
 11/25	8:00pm		1:00				Added .colected tag for coins. Wrote still4Square()
 11/25	9:00pm		0:50				Wrote clear(), stopTransitions(), and implemented gameover().
 											NOTE: Coins issue "not found in table" from util.removeFromList() -> see TODO.txt
+11/15	12:35pm		-10min
 ------------------------------------------------------------------------------------------------------------------------------
 					44:15 TOTAL
 
