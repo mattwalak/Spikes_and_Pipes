@@ -101,12 +101,15 @@ local function destroyObject(thisObject)
         thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
     else
         -- Test if object already removed (ie coin collected)
-        if not thisObject then return end
-        print("removing: "..thisObject.type)
-        thisObject:removeSelf()
-        thisObject = nil
-        util.removeFromList(activeDisplayObjects, thisObject)
-        thisObject = nil
+        if thisObject.image.collected then 
+            thisObject.image = nil
+            thisObject = nil
+        else
+            util.removeFromList(activeDisplayObjects, thisObject.image)
+            thisObject.image:removeSelf()
+            thisObject.image = nil
+            thisObject = nil
+        end
     end
 end
 
@@ -206,6 +209,7 @@ local function createDisplayObject(thisObject, ancestry)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
     elseif thisObject.type == "coin" then
         image = display.newSprite(A.sheet_coin, A.sequences_coin)
+        obstacleGroup:insert(image)
         image:play()
         imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
     end
@@ -215,6 +219,7 @@ local function createDisplayObject(thisObject, ancestry)
     image.r_rot = thisObject.rotation
     image.ancestry = ancestry
     image.object = thisObject -- Used to set both to nill when destroying
+    thisObject.image = image
     physics.addBody(image, "static", {outline=imageOutline})
 	return image
 end
@@ -308,7 +313,7 @@ local function gameLoop_slow()
     score = score + 1
     -- Print Active nulls and display objects
     
-    
+    --[[
     print("Active objects")
     print("\tNulls:")
     for i = 1, #activeNullObjects, 1 do
@@ -317,7 +322,7 @@ local function gameLoop_slow()
     print("\tDisplayObjects:")
     for i = 1, #activeDisplayObjects, 1 do
         print("\t\t"..i..") "..activeDisplayObjects[i].type..", "..activeDisplayObjects[i].x)
-    end
+    end]]--
 
 
     -- Check for VICTORY
@@ -367,20 +372,13 @@ local function onCollision(event)
 			if(event.element2 == 2) then
 				return
 			end
-            --bubble.popBubble(obj1)
-            util.removeFromList(activeDisplayObjects, obj2)
-            obj2:removeSelf()
-            obj2.object = nil
-            obj2 = nil
+            bubble.popBubble(obj1)
+
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
-			--bubble.popBubble(obj2)
-            util.removeFromList(activeDisplayObjects, obj1)
-            obj1:removeSelf()
-            obj1.object = nil
-            obj1 = nil
+			bubble.popBubble(obj2)
 
         -- COIN COLLISION
 		elseif(obj1.type == "bubble" and obj2.type == "coin") then
@@ -390,8 +388,7 @@ local function onCollision(event)
 
             util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
-            obj2.object = nil
-            obj2 = nil
+            obj2.collected = true
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
@@ -399,8 +396,7 @@ local function onCollision(event)
 
             util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
-            obj1.object = nil
-            obj1 = nil
+            obj1.collected = true
         end
 	end
 end

@@ -366,7 +366,7 @@ function util.still4Square_(speed, squareSize, period)
 end
 
 function util.coinCircle_(speed, radius, num_coins)
-	local obstacle = util.newParentObstacle(speed, "coinCircle_", .5+(radius/2), .5+(radius/2))
+	local obstacle = util.newParentObstacle(speed, "coinCircle_", .5+radius, .5+radius)
 	local coins = {}
 	local angle = 2*math.pi/num_coins
 	for i = 1, num_coins, 1 do
