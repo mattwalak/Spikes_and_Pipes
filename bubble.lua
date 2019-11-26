@@ -363,4 +363,9 @@ function bubble_module.onTouch(event)
     end
 end
 
+-- Returns number of bubbles left
+function bubble_module.numBubbles()
+    return #bubbles
+end
+
 return bubble_module

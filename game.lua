@@ -40,6 +40,7 @@ local fast_gameLoopTimer
 local score -- Same as height within the level
 local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
 local activeNullObjects = {} -- All active Null objects
+local gameStarted = false
 
 -- Define variable for level data
 local level_data
@@ -77,11 +78,43 @@ local function drawCheckerboard()
 end
 
 
--- Stops all null object transitions and sets them to nil
-local function stopNulls()
+-- Clears everything from the screen
+-- Does so by traversing every null, ultimately reaching every display object
+local function clearScreen()
+    while activeNullObjects[1] do
+        local thisNull = activeNullObjects[1]
+        if thisNull.children and (type(thisNull.children) == "table") then
+            -- Stop transitions for any displayObjects underneath
+            for i = 1, #thisNull.children, 1 do
+                if thisNull.children[i].type ~= "null" then
+                    thisObject = thisNull.children[i]
+                    if not thisObject.image.collected then
+                        thisObject.image:removeSelf()
+                        util.removeFromList(activeDisplayObjects, thisObject.image)
+                        thisObject.image = nil
+                    end
+                    thisObject = nil
+                end
+            end
+        end
+        util.removeFromList(activeNullObjects, thisNull)
+        thisNull = nil
+    end
+end
+
+-- Stops all object transitions and sets them to nil
+local function stopTransitions()
     for i = 1, #activeNullObjects, 1 do
-        transition.cancel(activeNullObjects[i])
-        activeNullObjects[i] = nil -- Should probably remove them from the table... maybe?
+        thisNull = activeNullObjects[i]
+        transition.cancel(thisNull)
+        if thisNull.children and (type(thisNull.children) == "table") then
+            -- Stop transitions for any displayObjects underneath
+            for i = 1, #thisNull.children, 1 do
+                if thisNull.children[i].type ~= "null" then
+                    transition.cancel(thisNull.children[i])
+                end
+            end
+        end
     end
 end
 
@@ -281,6 +314,7 @@ local function on_victory_tapped(event)
     event.target:removeSelf()
 
     -- Remove all obstacles still on screen
+    clearScreen()
 
     composer.gotoScene("level_select")
 end
@@ -299,12 +333,33 @@ local function victory()
         _width/2, _height/2,
         native.systemFont)
     button.text:setFillColor(0,0,0)
+end
+
+local function gameOver()
+    timer.pause(slow_gameLoopTimer)
+    stopTransitions()
+
+    -- Creates temporary victory button with event listener
+    local button = display.newRect(uiGroup, _width/2, _height/2,
+    _width/2,_height/8)
+    button:setFillColor(127,0,0)
+    button:addEventListener("tap", on_victory_tapped)
+
+    -- Adds text
+    button.text = display.newText(uiGroup, "Back to level select",
+        _width/2, _height/2,
+        native.systemFont)
+    button.text:setFillColor(0,0,0)
 
 end
 
 local function onEnterFrame()
 	updateDisplayObjects()
     bubble.applyForce()
+    if gameStarted and (bubble.numBubbles() == 0) then
+        gameStarted = false
+        gameOver()
+    end
     --bubble.updateNumText()
 end
 
@@ -357,7 +412,7 @@ local function start_game()
     print("starting game")
     slow_gameLoopTimer = timer.performWithDelay(1000, gameLoop_slow, 0)
     Runtime:addEventListener("enterFrame",onEnterFrame)
-
+    gameStarted = true
 end
 
 -- Method tied to physics collision listener
@@ -510,7 +565,7 @@ function scene:show( event )
 
         -- Run the intro, then start the game!
         run_intro()
-        timer.performWithDelay(0, start_game)
+        timer.performWithDelay(1000, start_game)
     end
 end
 

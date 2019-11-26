@@ -60,9 +60,10 @@ HARD CORE CODING:
 11/25	10:40am		1:00				Accounted for varying spike size. Wrote second intro level
 11/25	12:30pm		1:00				Made coin circle. Debugged coin collection functionality
 11/25	2:40pm		1:10				Still trying to get this coin thing to work
-11/25	8:00pm			
+11/25	8:00pm		1:00				Added .colected tag for coins. Wrote still4Square()
+11/25	9:00pm
 ------------------------------------------------------------------------------------------------------------------------------
-					42:25 TOTAL
+					43:25 TOTAL
 
 
-THE GRAND TOTAL:	46:40
+THE GRAND TOTAL:	47:40

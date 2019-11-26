@@ -24,7 +24,7 @@ local EDGE_FORCE_DIST = BUBBLE_SIZE
 
 -- Intro
 local INTRO_DELAY = 80
-local INTRO_FORCE = -1
+local INTRO_FORCE = -.7
 local INTRO_RANDOM_WIDTH = .25
 
 
