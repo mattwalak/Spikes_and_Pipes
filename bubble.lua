@@ -211,6 +211,23 @@ local function applyTouchForce()
     if not touch then return end
     if #bubbles == 0 then return end
 
+    local TOUCH_RADIUS = 3*CN.COL_WIDTH
+    -- OPTION 3: Wind based on velocity of touch, applied if bubble is within radius of touch
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+        local xDist = thisBubble.x - touch_location.x
+        local yDist = thisBubble.y - touch_location.y
+        local dist = math.sqrt(math.pow(xDist, 2) + math.pow(yDist, 2))
+        if dist < TOUCH_RADIUS then
+            dist = dist + 2*CN.COL_WIDTH
+            local xforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.x*(1/math.pow(dist, 2))
+            local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y*(1/math.pow(dist, 2))
+            thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
+        end
+    end
+
+
+    --[[
     -- Finds closest group and applies the same force to all bubbles in that groups
     -- There is at least one bubble, so there is at least 1 group to apply force to
     local closestDist
@@ -243,6 +260,8 @@ local function applyTouchForce()
     local minFactor = 100
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
+
+
         if thisBubble.group == closestGroup then
             local xDist = thisBubble.x - touch_location.x
             local yDist = thisBubble.y - touch_location.y
@@ -260,7 +279,6 @@ local function applyTouchForce()
             local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y
 
             -- A little bit of variation based on distance
-            --[[
             local xFactor = CN.INTERCEPT + (1/math.pow(xDist,1)) * CN.INVERSE_VARIATION
             local yFactor = CN.INTERCEPT + (1/math.pow(yDist,1)) * CN.INVERSE_VARIATION
 
@@ -270,15 +288,13 @@ local function applyTouchForce()
             local thisFactor = (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
             if thisFactor > maxFactor then maxFactor = thisFactor end
             if thisFactor < minFactor then minFactor = thisFactor end
-            ]]
 
-            --thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+            thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
             thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
         end
     end
 
     -- Calculates force applied on each bubble in turn
-    --[[
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
         local xDist = thisBubble.x - touch_location.x
@@ -302,7 +318,7 @@ local function applyTouchForce()
         end
 
         thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
-    end]]
+    end]]--
 
 end
 

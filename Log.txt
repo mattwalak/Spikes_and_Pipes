@@ -10,8 +10,9 @@ DESIGN:
 
 MUSIC:
 11/25	9:30am		1:00 (NOT COOL BRO)	Tracked "Not Cool Bro"
+11/26	3:00pm		1:30 (JINGLE)		Recorded jingle
 ------------------------------------------------------------------------------------------------------------------------------
-					1:00 TOTAL
+					2:30 TOTAL
 
 
 HARD CORE CODING:
@@ -63,9 +64,10 @@ HARD CORE CODING:
 11/25	8:00pm		1:00				Added .colected tag for coins. Wrote still4Square()
 11/25	9:00pm		0:50				Wrote clear(), stopTransitions(), and implemented gameover().
 											NOTE: Coins issue "not found in table" from util.removeFromList() -> see TODO.txt
-11/15	12:35pm		-10min
+11/15	12:35pm		1:30				Implemented "pull force" bubble movement. Experimented with distance also playing a role
+12/12	2:30pm		1:00				Implemented "Swipe to blow wind" bubble movement (Based on velocity of touch and distance from touch)
 ------------------------------------------------------------------------------------------------------------------------------
-					44:15 TOTAL
+					46:45 TOTAL
 
 
-THE GRAND TOTAL:	48:30
+THE GRAND TOTAL:	52:30

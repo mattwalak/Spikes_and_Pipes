@@ -11,7 +11,7 @@ local LN_DAMPING = 1
 local GRAVITY = 3.5
 local TOUCH_FORCE_FACTOR = 400
 local TOUCH_PULL_FACTOR = 2
-local TOUCH_VELOCITY_FACTOR = 1.5
+local TOUCH_VELOCITY_FACTOR = 50000 -- 1.5 is good without 1/x^2 thing, 10000+ is good with
 local INVERSE_VARIATION = 50
 local INTERCEPT = .5
 
