@@ -61,6 +61,9 @@ local crazy_numbers = {
 	INTRO_DELAY = INTRO_DELAY,
 	INTRO_FORCE = INTRO_FORCE,
 	INTRO_RANDOM_WIDTH = INTRO_RANDOM_WIDTH,
+
+	-- Debug
+	DBG_TOUCH_TYPE = "1",
 }
 
 return crazy_numbers

@@ -206,13 +206,145 @@ function bubble_module.introBubbles(displayGroup, num_bubbles, initPoint)
     tm.params = {displayGroup=displayGroup, num_bubbles=num_bubbles, initPoint=initPoint}
 end
 
--- Apply touch forces
-local function applyTouchForce()
-    if not touch then return end
-    if #bubbles == 0 then return end
+-- Groupwise position based push (With dist variation)
+local function touchForce1()
+     -- Find closest group
+    local closestDist
+    local closestGroup
+    local closestAngle
+    local direction
+    for i = 1, #bubbles, 1 do
+        if comTable[i] then
+            local xDist = comTable[i].x - touch_location.x
+            local yDist = comTable[i].y - touch_location.y
+            local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            if not closestDist then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            elseif math.abs(totalDist) < math.abs(closestDist) then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            end
+        end
+    end
 
+    
+    -- Apply force to bubbles in that group
+    --local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
+    local maxFactor = 0
+    local minFactor = 100
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+
+
+        if thisBubble.group == closestGroup then
+            local xDist = thisBubble.x - touch_location.x
+            local yDist = thisBubble.y - touch_location.y
+            local bubbleDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            local angle = math.atan(yDist/xDist)
+
+            -- Push method
+            local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(bubbleDist,1))
+
+            -- Pull method
+            -- local force = -CN.TOUCH_PULL_FACTOR
+
+            -- Pull based on velocity
+            -- local xforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.x
+            -- local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y
+
+            -- A little bit of variation based on distance
+            --local xFactor = CN.INTERCEPT + (1/math.pow(xDist+CN.COL_WIDTH,1)) * CN.INVERSE_VARIATION
+            --local yFactor = CN.INTERCEPT + (1/math.pow(yDist+CN.COL_WIDTH,1)) * CN.INVERSE_VARIATION
+
+            --xforce = xforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            --yforce = yforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+
+            --local thisFactor = (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            --if thisFactor > maxFactor then maxFactor = thisFactor end
+            --if thisFactor < minFactor then minFactor = thisFactor end
+
+            thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+            --thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
+        end
+    end
+end
+
+-- Groupwise velocity based pull (With dist variation)
+local function touchForce2()
+    -- Find closest group
+    local closestDist
+    local closestGroup
+    local closestAngle
+    local direction
+    for i = 1, #bubbles, 1 do
+        if comTable[i] then
+            local xDist = comTable[i].x - touch_location.x
+            local yDist = comTable[i].y - touch_location.y
+            local totalDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            if not closestDist then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            elseif math.abs(totalDist) < math.abs(closestDist) then
+                closestDist = totalDist
+                closestGroup = i
+                closestAngle = math.atan(yDist/xDist)
+                if xDist < 0 then direction = -1 else direction = 1 end
+            end
+        end
+    end
+
+    
+    -- Apply force to bubbles in that group
+    --local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(closestDist,1))
+    local maxFactor = 0
+    local minFactor = 100
+    for i = 1, #bubbles, 1 do
+        local thisBubble = bubbles[i]
+
+
+        if thisBubble.group == closestGroup then
+            local xDist = thisBubble.x - touch_location.x
+            local yDist = thisBubble.y - touch_location.y
+            local bubbleDist = math.sqrt(math.pow(xDist,2) + math.pow(yDist,2))
+            local angle = math.atan(yDist/xDist)
+
+            -- Push method
+            -- local force = CN.TOUCH_FORCE_FACTOR*(1/math.pow(bubbleDist,1))
+
+            -- Pull method
+            -- local force = -CN.TOUCH_PULL_FACTOR
+
+            -- Pull based on velocity
+            local xforce = 1*touch_velocity.x
+            local yforce = 1*touch_velocity.y
+
+            -- A little bit of variation based on distance
+            local xFactor = CN.INTERCEPT + (1/math.pow(xDist+CN.COL_WIDTH,1)) * CN.INVERSE_VARIATION
+            local yFactor = CN.INTERCEPT + (1/math.pow(yDist+CN.COL_WIDTH,1)) * CN.INVERSE_VARIATION
+
+            xforce = xforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            yforce = yforce * (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+
+            local thisFactor = (1/math.pow(bubbleDist,1)) * CN.INVERSE_VARIATION
+            if thisFactor > maxFactor then maxFactor = thisFactor end
+            if thisFactor < minFactor then minFactor = thisFactor end
+
+            --thisBubble:applyForce(force*direction*math.cos(closestAngle), force*direction*math.sin(closestAngle), thisBubble.x, thisBubble.y)
+            thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
+        end
+    end
+end
+
+-- Individually velocity based pull (With dist variation)
+local function touchForce3()
     local TOUCH_RADIUS = 3*CN.COL_WIDTH
-    -- OPTION 3: Wind based on velocity of touch, applied if bubble is within radius of touch
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
         local xDist = thisBubble.x - touch_location.x
@@ -220,16 +352,32 @@ local function applyTouchForce()
         local dist = math.sqrt(math.pow(xDist, 2) + math.pow(yDist, 2))
         if dist < TOUCH_RADIUS then
             dist = dist + 2*CN.COL_WIDTH
-            local xforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.x*(1/math.pow(dist, 2))
-            local yforce = CN.TOUCH_VELOCITY_FACTOR*touch_velocity.y*(1/math.pow(dist, 2))
+            local xforce = 50000*touch_velocity.x*(1/math.pow(dist, 2))
+            local yforce = 50000*touch_velocity.y*(1/math.pow(dist, 2))
             thisBubble:applyForce(xforce, yforce, thisBubble.x, thisBubble.y)
         end
+    end
+end
+
+
+
+
+-- Apply touch forces
+local function applyTouchForce()
+    if not touch then return end
+    if #bubbles == 0 then return end
+
+    if CN.DBG_TOUCH_TYPE == "1" then
+        touchForce1()
+    elseif CN.DBG_TOUCH_TYPE == "2" then
+        touchForce2()
+    elseif CN.DBG_TOUCH_TYPE == "3" then
+        touchForce3()
     end
 
 
     --[[
-    -- Finds closest group and applies the same force to all bubbles in that groups
-    -- There is at least one bubble, so there is at least 1 group to apply force to
+    -- Find closest group
     local closestDist
     local closestGroup
     local closestAngle
@@ -294,6 +442,8 @@ local function applyTouchForce()
         end
     end
 
+
+
     -- Calculates force applied on each bubble in turn
     for i = 1, #bubbles, 1 do
         local thisBubble = bubbles[i]
@@ -318,8 +468,8 @@ local function applyTouchForce()
         end
 
         thisBubble:applyForce(xSign*gx, ySign*gy, thisBubble.x, thisBubble.y)
-    end]]--
-
+    end
+    ]]--
 end
 
 -- Applys force pushing bubbles away from the edge

@@ -13,6 +13,11 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
+local function on_wind_tap(event)
+    CN.DBG_TOUCH_TYPE = event.target.wind_type
+    print("Setting DBG_TOUCH_TYPE to "..CN.DBG_TOUCH_TYPE)
+end
+
 -- Handles button taps
 local function on_button_tap(event)
     print("Going to level "..event.target.level)
@@ -58,6 +63,44 @@ local function setupTempButtons(sceneGroup)
         display.contentWidth/2, 3*display.contentHeight/4,
         native.systemFont)
     text3:setFillColor(0,0,0)
+
+    -- Set wind gen method
+    local button1 = display.newRect(sceneGroup, display.contentWidth/4, 7*display.contentHeight/8,
+    display.contentWidth/6,display.contentHeight/10)
+    button1:setFillColor(127,127,0)
+    button1.wind_type = "1"
+    button1:addEventListener("tap", on_wind_tap)
+
+    local button2 = display.newRect(sceneGroup, 2*display.contentWidth/4, 7*display.contentHeight/8,
+    display.contentWidth/6,display.contentHeight/10)
+    button2:setFillColor(127,127,0)
+    button2.wind_type = "2"
+    button2:addEventListener("tap", on_wind_tap)
+
+    local button3 = display.newRect(sceneGroup, 3*display.contentWidth/4, 7*display.contentHeight/8,
+    display.contentWidth/6,display.contentHeight/10)
+    button3:setFillColor(127,127,0)
+    button3.wind_type = "3"
+    button3:addEventListener("tap", on_wind_tap)
+
+    -- Adds text for level selection
+    local text1 = display.newText(sceneGroup, "Wind 1",
+        display.contentWidth/4, 7*display.contentHeight/8,
+        native.systemFont)
+    text1:setFillColor(0,0,0)
+
+    local text2 = display.newText(sceneGroup, "Wind 2",
+        2*display.contentWidth/4, 7*display.contentHeight/8,
+        native.systemFont)
+    text2:setFillColor(0,0,0)
+
+    local text3 = display.newText(sceneGroup, "Wind 3",
+        3*display.contentWidth/4, 7*display.contentHeight/8,
+        native.systemFont)
+    text3:setFillColor(0,0,0)
+
+
+
 end
 
 -- -----------------------------------------------------------------------------------
