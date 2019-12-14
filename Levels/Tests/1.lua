@@ -21,18 +21,23 @@ local speed = 10000
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = util.stillText_(speed, 0, 0, "Hello!", native.systemFont, 1, {0,0,0})
-obstacles_list[2] = util.stillSpikeLine_(speed, 3, {2})
-obstacles_list[17] = util.stillSpikeLine_(speed, 3, {2})
-obstacles_list[20] = util.stillSpikeLine_(speed, 3, {2})
-obstacles_list[23] = util.stillSpikeLine_(speed, 3, {2})
-obstacles_list[26] = util.stillSpikeLine_(speed, 1)
-obstacles_list[29] = util.stillSpikeLine_(speed, 3, {2})
-obstacles_list[32] = util.stillSpikeLine_(speed, 1)
+obstacles_list[1] = util.stillText_(speed, 0, 0, "Tap to blow wind", native.systemFont, 1, {0,0,0})
+obstacles_list[12] = util.stillText_(speed, 0, 0, "Collect the coins", native.systemFont, 1, {0,0,0})
+obstacles_list[13] = util.stillLine_(speed, 1, nil, "coin")
+obstacles_list[17] = util.stillLine_(speed, 3, {2}, "coin")
+obstacles_list[21] = util.stillLine_(speed, 1, nil, "coin")
+obstacles_list[25] = util.coinCircle_(speed, 4, 8)
+obstacles_list[32] = util.stillText_(speed, 0, 0, "Avoid the spikes", native.systemFont, 1, {0,0,0})
+obstacles_list[33] = util.stillLine_(speed, 1, nil, "spike")
+obstacles_list[37] = util.stillLine_(speed, 3, {2}, "spike")
+obstacles_list[41] = util.stillLine_(speed, 1, nil, "spike")
+obstacles_list[47] = util.stillText_(speed, 0, 0, "Hold tap for constant wind", native.systemFont, 1, {0,0,0})
+
+
 
 local level_1 =  {
     name = "Test level 1",
-    victory = 43,
+    victory = 60,
     obstacles = obstacles_list,
 }
 

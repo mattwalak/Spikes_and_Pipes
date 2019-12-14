@@ -358,6 +358,26 @@ function util.stillText_(speed, x, y, displayText, font, fontSize, color)
     return obstacle
 end
 
+-- Simple stationary line with different objects (Spike, square, coin, etc...)
+function util.stillLine_(speed, num_objects, ignore, object_type)
+    local obstacle = util.newParentObstacle(speed, "stillLine_", 1.5, 1.5) -- This 1.5 will change depending on object_type
+    local width = CN.COL_NUM/(num_objects+1)
+    local center = CN.COL_NUM/2
+    for i = 1, num_objects, 1 do
+        if not util.tableContains(ignore, i) then
+            local x = (i*width)-center
+            local object
+            if object_type == "spike" then
+                object = util.newSpike(x, 0, true)
+            elseif object_type == "coin" then
+                object = {util.newCoin(x, 0)}
+            end
+            util.tableExtend(obstacle.children, object)
+        end
+    end
+    return obstacle
+end
+
 -- Simple stationary spike line (No animation)
 -- ignore -> if a number is contained in ignore, no spike will be added at that index
 function util.stillSpikeLine_(speed, num_spikes, ignore)
