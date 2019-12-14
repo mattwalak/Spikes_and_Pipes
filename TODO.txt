@@ -1,11 +1,13 @@
 NEXT STEPS:
-1. Create some test levels (Modify level structure code as needed)
-2. Add powerups
+1. Make tutorial (Will probably need to add text as scrolling object)
+2. Start building beginner levels (Do this first! This might impact menu design)
+3. Menu design
 
 
 PLZ CHECK:
 1. Check keyframe time interpolation numbers (Does looping back to first keyframe use last time value or first?)
 2. Coins issue "Not found in table" when calling util.removeFromList() when level 2 is launched a second time after game overing
+3. ^^^ Check everything (memory usage, .collected status) when a level is quit or restarted
 
 
 

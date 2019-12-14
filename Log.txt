@@ -67,6 +67,7 @@ HARD CORE CODING:
 11/15	12:35pm		1:30				Implemented "pull force" bubble movement. Experimented with distance also playing a role
 12/12	2:30pm		1:00				Implemented "Swipe to blow wind" bubble movement (Based on velocity of touch and distance from touch)
 12/12	8:30pm		0:30				Implement wind type selection on level select screen
+12/13	9:15pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					47:15 TOTAL
 
