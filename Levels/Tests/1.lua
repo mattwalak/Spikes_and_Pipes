@@ -21,8 +21,8 @@ local speed = 10000
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[3] = util.stillSpikeLine_(speed, 1)
-obstacles_list[10] = util.stillSpikeLine_(speed, 3, {2})
+obstacles_list[1] = util.stillText_(speed, 0, 0, "Hello!", native.systemFont, 1, {0,0,0})
+obstacles_list[2] = util.stillSpikeLine_(speed, 3, {2})
 obstacles_list[17] = util.stillSpikeLine_(speed, 3, {2})
 obstacles_list[20] = util.stillSpikeLine_(speed, 3, {2})
 obstacles_list[23] = util.stillSpikeLine_(speed, 3, {2})

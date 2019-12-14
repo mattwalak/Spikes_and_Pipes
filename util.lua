@@ -177,6 +177,22 @@ end
 
 -- THE FOLLOWING LEVEL BUILDING UTILITIES ALL RETURN A TABLE OF OBJECTS (NULL OR DISPLAY)
 
+-- Note that color is stored as a list and is used as follows: myText:setFillColor( color[1], color[2], color[3]) 
+function util.newText(x, y, displayText, font, fontSize, color)
+    if not font then font = native.systemFont end
+    if not color then color = {0,0,0} end
+    local text = {}
+    text.type = "text" -- Special text attribute
+    text.font = font -- Special text attribute
+    text.fontSize = CN.COL_WIDTH * fontSize -- Special text attribute
+    text.color = color -- Special text attribute
+    text.x = x
+    text.y = y
+    text.text = displayText
+    text.rotation = 0
+    return text
+end
+
 function util.newCoin(x,y)
 	local coin = {}
 	coin.type = "coin"
@@ -335,6 +351,12 @@ end
 -- All obstacles returned from these methods must be game ready
 -- This means there must be no clipping/dissapearing elements
 -- Careful assuming spike size is 3*COL_WIDTH -> do something in CN to fix that
+
+function util.stillText_(speed, x, y, displayText, font, fontSize, color)
+    local obstacle = util.newParentObstacle(speed, "stillText_", 0, 0)
+    obstacle.children = {util.newText(x, y, displayText, font, fontSize, color)}
+    return obstacle
+end
 
 -- Simple stationary spike line (No animation)
 -- ignore -> if a number is contained in ignore, no spike will be added at that index

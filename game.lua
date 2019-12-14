@@ -245,6 +245,11 @@ local function createDisplayObject(thisObject, ancestry)
         obstacleGroup:insert(image)
         image:play()
         imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
+    elseif thisObject.type == "text" then
+    	print("New text")
+    	image = display.newText(obstacleGroup, thisObject.text, thisObject.x, thisObject.y, thisObject.font, thisObject.fontSize)
+    	image:setFillColor( thisObject.color[1], thisObject.color[2], thisObject.color[3] )
+    	imageOutline = nil
     end
     image.type = thisObject.type
     image.r_x = thisObject.x * CN.COL_WIDTH
@@ -253,7 +258,11 @@ local function createDisplayObject(thisObject, ancestry)
     image.ancestry = ancestry
     image.object = thisObject -- Used to set both to nill when destroying
     thisObject.image = image
-    physics.addBody(image, "static", {outline=imageOutline})
+
+    if thisObject.type ~= "text" then
+    	physics.addBody(image, "static", {outline=imageOutline})
+    end
+
 	return image
 end
 

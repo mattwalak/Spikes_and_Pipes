@@ -14,3 +14,7 @@ PLZ CHECK:
 THING TO DO BEFORE RELEASE:
 1. Figure out the deal with setting displayObjects and nullObjects to nil, without making it impossible to load the same level twice
 2. Improve bubble grouping algorithm
+
+
+IDEAS!!!
+1. Increase scrolling speed as number of bubbles goes down (Would require re-writing transition to to be clock based)
