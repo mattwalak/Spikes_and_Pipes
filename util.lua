@@ -352,6 +352,27 @@ end
 -- This means there must be no clipping/dissapearing elements
 -- Careful assuming spike size is 3*COL_WIDTH -> do something in CN to fix that
 
+
+-- Fills a horizontal line across the screen with object_type except for at ignore_locations
+-- specified in object_locations (1 object at the center of every column division)
+function util.fillHorizontalLine_(speed, ignore_locations, object_type)
+    local obstacle = util.newParentObstacle(speed, "fillHorizontalLine_", 1.5, 1.5) -- This 1.5 will change depending on object_type
+    for i = 1, CN.COL_NUM, 1 do
+        if not util.tableContains(ignore_locations, i) then
+            print("adding "..i)
+            local x = (i-1)+.5
+            x = x - CN.COL_NUM/2 -- Because center line is 0
+            if object_type == "spike" then
+                object = util.newSpike(x, 0, true)
+            elseif object_type == "coin" then
+                object = {util.newCoin(x, 0)}
+            end
+            util.tableExtend(obstacle.children, object)
+        end
+    end
+    return obstacle
+end
+
 function util.stillText_(speed, x, y, displayText, font, fontSize, color)
     local obstacle = util.newParentObstacle(speed, "stillText_", 0, 0)
     obstacle.children = {util.newText(x, y, displayText, font, fontSize, color)}
