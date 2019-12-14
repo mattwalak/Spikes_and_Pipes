@@ -88,7 +88,9 @@ local function clearScreen()
             for i = 1, #thisNull.children, 1 do
                 if thisNull.children[i].type ~= "null" then
                     thisObject = thisNull.children[i]
-                    if not thisObject.image.collected then
+                    if thisObject.image.collected then
+                    	
+                    else
                         thisObject.image:removeSelf()
                         util.removeFromList(activeDisplayObjects, thisObject.image)
                         thisObject.image = nil
@@ -244,6 +246,7 @@ local function createDisplayObject(thisObject, ancestry)
         image = display.newSprite(A.sheet_coin, A.sequences_coin)
         obstacleGroup:insert(image)
         image:play()
+        image.collected = false
         imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
     elseif thisObject.type == "text" then
     	print("New text")
@@ -256,7 +259,7 @@ local function createDisplayObject(thisObject, ancestry)
     image.r_y = thisObject.y * CN.COL_WIDTH
     image.r_rot = thisObject.rotation
     image.ancestry = ancestry
-    image.object = thisObject -- Used to set both to nill when destroying
+    image.object = thisObject -- Used to set both to nil when destroying
     thisObject.image = image
 
     if thisObject.type ~= "text" then
@@ -449,7 +452,7 @@ local function onCollision(event)
             if(event.element2 == 2) then
                 return
             end
-
+            print("coin collision!")
             util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
             obj2.collected = true
@@ -457,7 +460,7 @@ local function onCollision(event)
             if(event.element1 == 2) then
                 return
             end
-
+            print("coin collision!")
             util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
             obj1.collected = true

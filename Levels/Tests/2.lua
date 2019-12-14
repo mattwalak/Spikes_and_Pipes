@@ -25,13 +25,16 @@ util.mergeObstacle(spikeSquare, coins)
 
 -- Define pairs
 local obstacles_list = {}
+obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
+obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
+--[[
 obstacles_list[1] = util.coinCircle_(speed, 2, 8)
 obstacles_list[8] = util.spikeLine_(speed, s1, e1, 3, 8000)
 obstacles_list[14] = util.spikeLine_(speed, e1, s1, 3, 8000)
 obstacles_list[20] = util.spikeLine_(speed, s1, e1, 4, 8000)
 obstacles_list[25] = util.spikeLine_(speed, e1, s1, 4, 8000)
 obstacles_list[30] = util.spikeLine_(speed, s1, e1, 4, 8000)
-obstacles_list[36] = spikeSquare
+obstacles_list[36] = spikeSquare]]--
 
 local level_2 =  {
     name = "Test level 2",

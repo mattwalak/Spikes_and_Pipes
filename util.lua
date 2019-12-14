@@ -238,6 +238,16 @@ function util.newSpike(x,y, isVertical)
     return {topSpike, block, bottomSpike}
 end
 
+function util.newObjectList(n, object_type)
+    local result = {}
+    for i = 1, n, 1 do
+        if(object_type == "spike") then
+
+        end
+    end
+    return result
+end
+
 function util.newSpikeList(n, isVertical)
 	local result = {}
 	for i = 1, n, 1 do
@@ -262,11 +272,11 @@ function util.wrapLoopPath(nullModel, objectList)
 	return result
 end
 
--- Simple spike line from x to y, loops endlessly
-function util.newLineModel(startPoint, endPoint, num_spikes, period)
+-- Simple line from x to y, loops endlessly
+function util.newLineModel(startPoint, endPoint, num_objects, period)
     local nullModel = {}
     nullModel.type = "null"
-    nullModel.name = "SpikeLineNull"
+    nullModel.name = "LineModel"
     nullModel.position_interpolation = easing.linear
     nullModel.rotation_interpolation = easing.linear
     nullModel.on_complete = "loop"
@@ -276,9 +286,9 @@ function util.newLineModel(startPoint, endPoint, num_spikes, period)
     local position_path = {}
     local rotation_path = {}
     local transition_time = {}
-    for i = 1, (num_spikes+1), 1 do
-        local dx = ((endPoint.x-startPoint.x)/num_spikes) * (i-1)
-        local dy = ((endPoint.y-startPoint.y)/num_spikes) * (i-1)
+    for i = 1, (num_objects+1), 1 do
+        local dx = ((endPoint.x-startPoint.x)/num_objects) * (i-1)
+        local dy = ((endPoint.y-startPoint.y)/num_objects) * (i-1)
         local x = dx + startPoint.x
         local y = dy + startPoint.y
         table.insert(position_path, util.newPoint(x, y))
@@ -286,7 +296,7 @@ function util.newLineModel(startPoint, endPoint, num_spikes, period)
         if i == 1 then
             table.insert(transition_time, 0)
         else
-            table.insert(transition_time, period/num_spikes)
+            table.insert(transition_time, period/num_objects)
         end
     end
     nullModel.position_path = position_path
@@ -374,7 +384,7 @@ function util.fillHorizontalLine_(speed, ignore_locations, object_type)
 end
 
 function util.stillText_(speed, x, y, displayText, font, fontSize, color)
-    local obstacle = util.newParentObstacle(speed, "stillText_", 0, 0)
+    local obstacle = util.newParentObstacle(speed, "stillText_", fontSize/2, fontSize/2)
     obstacle.children = {util.newText(x, y, displayText, font, fontSize, color)}
     return obstacle
 end
@@ -446,6 +456,22 @@ function util.coinCircle_(speed, radius, num_coins)
 	end
 	util.tableExtend(obstacle.children, coins)
 	return obstacle
+end
+
+
+-- Simple animated line of any type
+-- ignore -> if a number is contained in ignore, no spike will be added at that index
+function util.simpleLine_(speed, startPoint, endPoint, num_objects, period, ignore, object_type)
+    if not ignore then ignore = {} end
+    local obstacle = util.newParentObstacle(speed, "simpleLine_", _halfSpikeHeight+(startPoint.y), _halfSpikeHeight+(endPoint.y))
+    local lineModel = util.newLineModel(startPoint, endPoint, num_objects, period)
+    local wrapList = util.newSpikeList(num_objects, true)
+    for i = 1, #ignore, 1 do
+        wrapList[ignore[i]] = nil
+    end
+    local line = util.wrapLoopPath(lineModel, wrapList)
+    util.tableExtend(obstacle.children, line)
+    return obstacle
 end
 
 -- Simple animated spike line
