@@ -178,6 +178,9 @@ local function keyframeNull(thisNull)
     local next_y = thisNull.position_path[next_frame].y * CN.COL_WIDTH
     local next_rotation = thisNull.rotation_path[next_frame]
 
+    -- If transition time is negative, we stop everything
+    if transition_time < 0 then return end
+
     -- To ensure transitions start at the same time, only the position transition
     -- causes the next transition to be called
     transition.to(thisNull, {
