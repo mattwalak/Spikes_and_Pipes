@@ -72,9 +72,10 @@ HARD CORE CODING:
 12/14	2:05pm		1:30				Began writing new level building tools to build more complex levels
 12/14	8:05pm		1:00				Continued work on new level building tools
 12/15	12:30am		1:00				Finished helper methods and basic objects/patterns for level building tools
-12/15	12:20pm		
+12/15	12:20pm		1:40				Re-created line and foursquare with new level building tools
+12/15	3:10pm		
 ------------------------------------------------------------------------------------------------------------------------------
-					52:50 TOTAL
+					54:30 TOTAL
 
 
-THE GRAND TOTAL:	58:35
+THE GRAND TOTAL:	60:15

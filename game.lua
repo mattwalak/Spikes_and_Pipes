@@ -246,6 +246,7 @@ local function createDisplayObject(thisObject, ancestry)
 		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
         imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
     elseif thisObject.type == "coin" then
+        print("adding coin")
         image = display.newSprite(A.sheet_coin, A.sequences_coin)
         obstacleGroup:insert(image)
         image:play()
@@ -275,7 +276,7 @@ end
 
 local function createObstacle(thisObstacle, ancestry)
     if not thisObstacle then return end
-
+    print("type = "..thisObstacle.type)
     if thisObstacle.type == "null" then
         local thisNull = thisObstacle
         -- print("Inserting name = "..thisNull.name)

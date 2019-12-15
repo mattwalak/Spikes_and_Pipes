@@ -29,7 +29,7 @@ util.mergeObstacle(spikeSquare, coins)
 -- Define pairs
 local obstacles_list = {}
 
-obstacles_list[1] = lb.newSimpleFoursquare_(speed, c1, 4, 4000, nil, lb.doubleEdgeSpike(0,0,0), 3)
+obstacles_list[1] = lb.newCircle_(speed, c1, 2, 0, 6, nil, lb.basicObject(0,0,0,"coin"), .5)
 
 --obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
 --obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")

@@ -20,6 +20,23 @@ function mergeObstacle(ob1, ob2)
     util.tableExtend(ob1.children, ob2.children)
 end
 
+-- Wraps list of objects into a single stationary null centered at (x,y)
+local function wrapNull(x, y, object_list)
+	local centeredNull = {
+		type = "null",
+		name = "centered_null",
+        position_path = {util.newPoint(x, y), util.newPoint(x, y)},
+        rotation_path = {0,0},
+        transition_time = {1000, 1000},
+        position_interpolation = easing.linear,
+        rotation_interpolation = easing.linear,
+        on_complete = "stop",
+        first_frame = 2,
+        children = object_list
+	}
+	return centeredNull
+end
+
 -- Wraps list of objects into a single stationary null centered at (0,0)
 local function newCenteredNull(object_list)
 	local centeredNull = {
@@ -144,7 +161,17 @@ end
 
 -- Circle pattern of objects
 local function objectCircle(centerPoint, radius, deg_offset, num_objects, ignore, object)
-	
+	local rad_offset = math.rad(deg_offset)
+	local objects = newObjectList(num_objects, ignore, object)
+	local positioned_objects = {}
+	local angle = 2*math.pi/num_objects
+	for i = 1, num_objects, 1 do
+		if objects[i] then
+			local newNull = wrapNull(radius*math.cos(deg_offset+i*angle),radius*math.sin(deg_offset+i*angle), {objects[i]})
+			table.insert(positioned_objects, newNull)
+		end
+	end
+	return wrapNull(0,0,positioned_objects)
 end
 
 -- Rigid line of objects, where startPoint is the center and space_width is the distance between the center of each object
@@ -191,6 +218,7 @@ end
 
 -- Pingpong line (Objects reach end then play animation backwards to reach beginning)
 local function pingpongLineModel(startPoint, endPoint, num_objects, period, ease_pos, ease_rot) end
+
 
 -- 4 point square objects loop around
 local function foursquareModel(centerPoint, edge_length, period, ease_pos, ease_rot) 
@@ -270,7 +298,14 @@ function lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore
 	return obstacle
 end
 
-function lb.newCircle_(speed, centerPoint, radius, deg_offset, num_objects, ignore, object) end
+function lb.newCircle_(speed, centerPoint, radius, deg_offset, num_objects, ignore, object, object_height) 
+	local obstacle = newParent(speed, "circle", -centerPoint.y+radius+(object_height/2), centerPoint.y+radius+(object_height/2))
+	local circle = objectCircle(centerPoint, radius, deg_offset, num_objects, ignore, object)
+	mergeObstacle(obstacle, circle)
+	return obstacle
+end
+
+
 function lb.newStillText_(speed, x, y, displayText, font, fontSize, color) end
 function lb.fillAllColumns(speed, ignore_locations, object) end
 
