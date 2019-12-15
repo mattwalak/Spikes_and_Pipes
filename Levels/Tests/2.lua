@@ -1,4 +1,5 @@
 local CN = require("crazy_numbers")
+local lb = require("level_builder")
 local util = require("util")
 
 -- Helpful numbers
@@ -25,8 +26,14 @@ util.mergeObstacle(spikeSquare, coins)
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
-obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
+
+obstacles_list[1] = lb.literallyBlock(speed)
+
+--obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
+--obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
+
+
+
 --[[
 obstacles_list[1] = util.coinCircle_(speed, 2, 8)
 obstacles_list[8] = util.spikeLine_(speed, s1, e1, 3, 8000)
