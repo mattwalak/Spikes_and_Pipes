@@ -113,7 +113,7 @@ end
 --============ BASIC OBJECTS: Returns stationary patterns of objects (Nestled in single stationary null) =======================================================================
 
 -- On screen text
-local function text(x, y, displayText, font, fontSize, color)
+local function text(x, y, displayText, fontSize, font, color)
 	if not font then font = native.systemFont end
     if not color then color = {0,0,0} end
 
@@ -151,7 +151,7 @@ function lb.basicObject(x, y, rot, object_type)
 	return newCenteredNull({object})
 end
 
-function lb.doubleEdgeSpike(x, y, rot)
+function lb.spike2Edge(x, y, rot)
 	local rot_rad = math.rad(rot)
 	local newSpike = lb.basicObject(x, y, rot, "black_square")
 	mergeObstacle(newSpike, lb.basicObject(x+math.sin(rot_rad), y-math.cos(rot_rad), rot, "spike"))
@@ -216,10 +216,6 @@ local function lineModel(startPoint, endPoint, num_objects, period, ease_pos, ea
     return nullModel
 end
 
--- Pingpong line (Objects reach end then play animation backwards to reach beginning)
-local function pingpongLineModel(startPoint, endPoint, num_objects, period, ease_pos, ease_rot) end
-
-
 -- 4 point square objects loop around
 local function foursquareModel(centerPoint, edge_length, period, ease_pos, ease_rot) 
 	if not ease_rot then ease_rot = easing.linear end
@@ -272,7 +268,26 @@ local function simpleLine(startPoint, endPoint, num_objects, period, ignore, obj
 	return newCenteredNull(result)
 end
 
-local function pingpongLine(startPoint, endPoint, num_objects, period, ignore, object) end
+-- Creates a pingpong line with a single object completing a single revolution in 'period_1 + period_2' time
+local function pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
+	if not ease_pos then ease_pos = easing.linear end
+	if not ease_rot then ease_rot = ease_pos end
+
+	local line = {
+		type = "null",
+		name = "pingpongLine",
+        position_path = {startPoint, endPoint},
+        rotation_path = {start_rot,end_rot},
+        transition_time = {period_1, period_2},
+        position_interpolation = ease_pos,
+        rotation_interpolation = ease_rot,
+        on_complete = "loop",
+        first_frame = 1,
+        children = {util.deepcopy(object)}
+	}
+
+	return wrapNull(0,0,{line})
+end
 
 local function foursquare(centerPoint, edge_length, period, ignore, object, ease_pos, ease_rot) 
 	if not ignore then ignore = {} end
@@ -289,30 +304,35 @@ function lb.newSimpleLine_(speed, startPoint, endPoint, num_objects, period, ign
 	return obstacle
 end
 
-function lb.newPingpongLine_(speed, startPoint, endPoint, num_objects, period, ignore, object) end
+function lb.newPingpongLine_(speed, startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, object_height, ease_pos, ease_rot) 
+	local obstacle = newParent(speed, "simpleLine_", -startPoint.y+(object_height/2), endPoint.y+(object_height/2))
+	local line = pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
+	mergeObstacle(obstacle, line)
+	util.tprint(obstacle)
+	return obstacle
+end
 
 function lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height) 
-	local obstacle = newParent(speed, "simpleFoursqurae", -centerPoint.y+(edge_length/2)+(object_height/2), centerPoint.y+(edge_length/2)+(object_height/2))
+	local obstacle = newParent(speed, "newSimpleFoursquare_", -centerPoint.y+(edge_length/2)+(object_height/2), centerPoint.y+(edge_length/2)+(object_height/2))
 	local line = foursquare(centerPoint, edge_length, period, ignore, object)
 	mergeObstacle(obstacle, line)
 	return obstacle
 end
 
 function lb.newCircle_(speed, centerPoint, radius, deg_offset, num_objects, ignore, object, object_height) 
-	local obstacle = newParent(speed, "circle", -centerPoint.y+radius+(object_height/2), centerPoint.y+radius+(object_height/2))
+	local obstacle = newParent(speed, "newCircle_", -centerPoint.y+radius+(object_height/2), centerPoint.y+radius+(object_height/2))
 	local circle = objectCircle(centerPoint, radius, deg_offset, num_objects, ignore, object)
 	mergeObstacle(obstacle, circle)
 	return obstacle
 end
 
-
-function lb.newStillText_(speed, x, y, displayText, font, fontSize, color) end
-function lb.fillAllColumns(speed, ignore_locations, object) end
-
-function lb.literallyBlock(speed)
-	local parent = newParent(speed, "literallyBlock", 1.5, 1.5)
-	parent.children = {text(0, 0, "displayText", nil, 1, nil)}
+function lb.newStillText_(speed, x, y, displayText, fontSize, font, color) 
+	local parent = newParent(speed, "newStillText_", fontSize/2, fontSize/2)
+	parent.children = {text(x, y, displayText, fontSize, font, color)}
 	return parent
 end
+
+
+function lb.fillAllColumns(speed, ignore_locations, object) end
 
 return lb

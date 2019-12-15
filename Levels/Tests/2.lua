@@ -14,8 +14,8 @@ local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 local speed = 10000
 
 -- Define obstacles ------------------------------------------------------------
-local s1 = util.newPoint(_left-_halfSpikeWidth, -2)
-local e1 = util.newPoint(_right+_halfSpikeWidth, 2)
+local s1 = util.newPoint(-3, 0)
+local e1 = util.newPoint(3, 0)
 
 local c1 = util.newPoint(0,0)
 
@@ -29,7 +29,7 @@ util.mergeObstacle(spikeSquare, coins)
 -- Define pairs
 local obstacles_list = {}
 
-obstacles_list[1] = lb.newCircle_(speed, c1, 2, 0, 6, nil, lb.basicObject(0,0,0,"coin"), .5)
+obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 5, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
 
 --obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
 --obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")

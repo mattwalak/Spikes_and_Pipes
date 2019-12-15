@@ -73,9 +73,9 @@ HARD CORE CODING:
 12/14	8:05pm		1:00				Continued work on new level building tools
 12/15	12:30am		1:00				Finished helper methods and basic objects/patterns for level building tools
 12/15	12:20pm		1:40				Re-created line and foursquare with new level building tools
-12/15	3:10pm		
+12/15	3:10pm		1:35				Created pingpong line. Realized I have a big big rotation issue
 ------------------------------------------------------------------------------------------------------------------------------
-					54:30 TOTAL
+					56:05 TOTAL
 
 
-THE GRAND TOTAL:	60:15
+THE GRAND TOTAL:	61:50
