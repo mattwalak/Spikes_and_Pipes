@@ -70,6 +70,7 @@ HARD CORE CODING:
 12/13	9:15pm		1:45				Implemented text object. Added fillHorizontalLine_, stillText_, and stillLine_. Began building intro sequence
 12/14	11:35am		0:20				Tried to fix coin collecting error. Upon realizing this is actually a larger memory management error I gave up.
 12/14	2:05pm		1:30				Began writing new level building tools to build more complex levels
+12/14	8:05pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					50:50 TOTAL
 
