@@ -14,14 +14,13 @@ local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 local speed = 10000
 
 -- Define obstacles ------------------------------------------------------------
-local s1 = util.newPoint(-3, 0)
-local e1 = util.newPoint(3, 0)
+local s1 = util.newPoint(-7, 1)
+local e1 = util.newPoint(7, -1)
+
+local s2 = util.newPoint(-7-2-.5-3, 0)
+local e2 = util.newPoint(7+2+.5+3, 0)
 
 local c1 = util.newPoint(0,0)
-
-local coins = util.coinCircle_(speed, 2, 6)
-local spikeSquare = util.still4Square_(speed, 10, 8000)
-util.mergeObstacle(spikeSquare, coins)
 
 --------------------------------------------------------------------------------
 
@@ -29,11 +28,10 @@ util.mergeObstacle(spikeSquare, coins)
 -- Define pairs
 local obstacles_list = {}
 
--- obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 90, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
+obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 360, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
 -- obstacles_list[1] = lb.newSimpleLine_(speed, s1, e1, 3, 4000, nil, lb.spike2Edge(0,0,0), 1.5)
--- obstacles_list[1] = lb.newFillAllColumns_(speed, 0, {1, 14}, lb.spike2Edge(0,0,0), 3, 1)
-
-
+-- obstacles_list[1] = lb.newFillAllColumns_(speed, 1, {1, 14}, lb.spike2Edge(0,0,0), 3, 1)
+-- obstacles_list[1] = lb.newSquareLine_(speed, s2, e2, 2, 8000, nil, c1, 4, 4000, nil, lb.spike2Edge(0,0,0), 1.5)
 --obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
 --obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
 

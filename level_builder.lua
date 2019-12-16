@@ -298,28 +298,28 @@ end
 
 --============ FINISHED OBJECTS: Obstacles nestled within parent and ready for use in game (Nestled in parent null) ========================================================
 function lb.newSimpleLine_(speed, startPoint, endPoint, num_objects, period, ignore, object, object_height)
-	local obstacle = newParent(speed, "simpleLine_", -startPoint.y+(object_height/2), endPoint.y+(object_height/2))
+	local obstacle = newParent(speed, "newSimpleLine_", startPoint.y+(object_height/2), -endPoint.y+(object_height/2))
 	local line = simpleLine(startPoint, endPoint, num_objects, period, ignore, object)
 	mergeObstacle(obstacle, line)
 	return obstacle
 end
 
 function lb.newPingpongLine_(speed, startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, object_height, ease_pos, ease_rot) 
-	local obstacle = newParent(speed, "simpleLine_", -startPoint.y+(object_height/2), endPoint.y+(object_height/2))
+	local obstacle = newParent(speed, "newPingpongLine_", startPoint.y+(object_height/2), -endPoint.y+(object_height/2))
 	local line = pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
 	mergeObstacle(obstacle, line)
 	return obstacle
 end
 
 function lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height) 
-	local obstacle = newParent(speed, "newSimpleFoursquare_", -centerPoint.y+(edge_length/2)+(object_height/2), centerPoint.y+(edge_length/2)+(object_height/2))
+	local obstacle = newParent(speed, "newSimpleFoursquare_", centerPoint.y+(edge_length/2)+(object_height/2), -centerPoint.y+(edge_length/2)+(object_height/2))
 	local line = foursquare(centerPoint, edge_length, period, ignore, object)
 	mergeObstacle(obstacle, line)
 	return obstacle
 end
 
 function lb.newCircle_(speed, centerPoint, radius, deg_offset, num_objects, ignore, object, object_height) 
-	local obstacle = newParent(speed, "newCircle_", -centerPoint.y+radius+(object_height/2), centerPoint.y+radius+(object_height/2))
+	local obstacle = newParent(speed, "newCircle_", centerPoint.y+radius+(object_height/2), -centerPoint.y+radius+(object_height/2))
 	local circle = objectCircle(centerPoint, radius, deg_offset, num_objects, ignore, object)
 	mergeObstacle(obstacle, circle)
 	return obstacle
@@ -331,12 +331,19 @@ function lb.newStillText_(speed, x, y, displayText, fontSize, font, color)
 	return parent
 end
 
-
 function lb.newFillAllColumns_(speed, y, ignore, object, object_height, object_width) 
-	local obstacle = newParent(speed, "simpleLine_", -y+(object_height/2), y+(object_height/2))
+	local obstacle = newParent(speed, "newFillAllColumns_", y+(object_height/2), -y+(object_height/2))
 	local startPoint = util.newPoint(_left+(object_width/2), y)
 	local endPoint = util.newPoint(_right+(object_width/2), y)
 	local line = simpleLine(startPoint, endPoint, CN.COL_NUM, -1, ignore, object)
+	mergeObstacle(obstacle, line)
+	return obstacle
+end
+
+function lb.newSquareLine_(speed, line_start, line_end, line_numSquares, line_period, line_ignore, square_center, square_edgeLength, square_period, square_ignore, square_object, square_objectHeight)
+	local obstacle = newParent(speed, "newSquareLine_", line_start.y+(square_edgeLength/2)+(square_objectHeight/2), -line_start.y+(square_edgeLength/2)+(square_objectHeight/2))
+	local square = foursquare(square_center, square_edgeLength, square_period, square_ignore, square_object) 	
+	local line = simpleLine(line_start, line_end, line_numSquares, line_period, line_ignore, square)
 	mergeObstacle(obstacle, line)
 	return obstacle
 end
