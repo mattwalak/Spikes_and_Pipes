@@ -209,6 +209,7 @@ local function reposition(displayObject)
     local total_y = 0
     local last_rot = 0
     local total_rot = 0
+
     local ancestry = displayObject.ancestry
     for i = 1, #ancestry+1, 1 do
         local thisObject
@@ -221,8 +222,8 @@ local function reposition(displayObject)
             thisObject.r_rot = thisObject.rotation
         end
 
-        local r_x = thisObject.r_x*math.cos(math.rad(last_rot))-thisObject.r_y*math.sin(math.rad(last_rot))
-        local r_y = thisObject.r_y*math.cos(math.rad(last_rot))+thisObject.r_x*math.sin(math.rad(last_rot))
+        local r_x = thisObject.r_x*math.cos(math.rad(total_rot))-thisObject.r_y*math.sin(math.rad(total_rot))
+        local r_y = thisObject.r_y*math.cos(math.rad(total_rot))+thisObject.r_x*math.sin(math.rad(total_rot))
         total_x = total_x + r_x
         total_y = total_y + r_y
         total_rot = total_rot + thisObject.r_rot

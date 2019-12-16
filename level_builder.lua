@@ -308,7 +308,6 @@ function lb.newPingpongLine_(speed, startPoint, endPoint, start_rot, end_rot, pe
 	local obstacle = newParent(speed, "simpleLine_", -startPoint.y+(object_height/2), endPoint.y+(object_height/2))
 	local line = pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
 	mergeObstacle(obstacle, line)
-	util.tprint(obstacle)
 	return obstacle
 end
 
