@@ -29,13 +29,13 @@ util.mergeObstacle(spikeSquare, coins)
 -- Define pairs
 local obstacles_list = {}
 
-obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 90, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
+-- obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 90, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
 -- obstacles_list[1] = lb.newSimpleLine_(speed, s1, e1, 3, 4000, nil, lb.spike2Edge(0,0,0), 1.5)
+-- obstacles_list[1] = lb.newFillAllColumns_(speed, 0, {1, 14}, lb.spike2Edge(0,0,0), 3, 1)
+
 
 --obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
 --obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
-
-
 
 --[[
 obstacles_list[1] = util.coinCircle_(speed, 2, 8)

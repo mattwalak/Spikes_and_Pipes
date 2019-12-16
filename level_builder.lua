@@ -332,6 +332,13 @@ function lb.newStillText_(speed, x, y, displayText, fontSize, font, color)
 end
 
 
-function lb.fillAllColumns(speed, ignore_locations, object) end
+function lb.newFillAllColumns_(speed, y, ignore, object, object_height, object_width) 
+	local obstacle = newParent(speed, "simpleLine_", -y+(object_height/2), y+(object_height/2))
+	local startPoint = util.newPoint(_left+(object_width/2), y)
+	local endPoint = util.newPoint(_right+(object_width/2), y)
+	local line = simpleLine(startPoint, endPoint, CN.COL_NUM, -1, ignore, object)
+	mergeObstacle(obstacle, line)
+	return obstacle
+end
 
 return lb
