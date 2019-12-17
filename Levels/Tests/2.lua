@@ -9,18 +9,18 @@ local _top = (display.contentHeight/CN.COL_WIDTH)/2
 local _bottom = -(display.contentHeight/CN.COL_WIDTH)/2
 local _halfSpikeWidth = CN.SPIKE_WIDTH/2
 local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
+local _offLeft = util.newPoint(_left - _halfSpikeWidth, 0)
+local _offRight = util.newPoint(_right + _halfSpikeWidth, 0)
+local _center = util.newPoint(0,0)
+local _extraLeft = util.newPoint(-3*CN.COL_NUM/4, 0)
+local _extraRight = util.newPoint(3*CN.COL_NUM/4, 0)
 
 -- SPEED OF ALL OBSTACLES (Number of seconds from top to bottom)
 local speed = 10000
 
+
 -- Define obstacles ------------------------------------------------------------
-local s1 = util.newPoint(-7, 1)
-local e1 = util.newPoint(7, -1)
 
-local s2 = util.newPoint(-7-2-.5-3, 0)
-local e2 = util.newPoint(7+2+.5+3, 0)
-
-local c1 = util.newPoint(0,0)
 
 --------------------------------------------------------------------------------
 
@@ -28,27 +28,24 @@ local c1 = util.newPoint(0,0)
 -- Define pairs
 local obstacles_list = {}
 
-obstacles_list[1] = lb.newPingpongLine_(speed, s1, e1, 0, 360, 1000, 1000, lb.spike2Edge(0,0,0), 1.5, easing.inOutSine)
--- obstacles_list[1] = lb.newSimpleLine_(speed, s1, e1, 3, 4000, nil, lb.spike2Edge(0,0,0), 1.5)
--- obstacles_list[1] = lb.newFillAllColumns_(speed, 1, {1, 14}, lb.spike2Edge(0,0,0), 3, 1)
--- obstacles_list[1] = lb.newSquareLine_(speed, s2, e2, 2, 8000, nil, c1, 4, 4000, nil, lb.spike2Edge(0,0,0), 1.5)
---obstacles_list[1] = util.fillHorizontalLine_(speed, nil, "coin")
---obstacles_list[5] = util.fillHorizontalLine_(speed, nil, "spike")
+obstacles_list[1] = lb.newStillText_(speed, 0, 0, "Long tap for constant wind", 1, native.systemFont, {0,0,0})
+obstacles_list[2] = lb.newFillAllColumns_(speed, 0, {1, 2, 3, 4}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[6] = lb.newSimpleLine_(speed, _offLeft, _offRight, 2, -1, {1}, lb.basicObject(0,0,0,"coin"), .5)
+obstacles_list[10] = lb.newFillAllColumns_(speed, 0, {14, 13, 12, 11}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[14] = lb.newSimpleLine_(speed, _offLeft, _offRight, 2, -1, {1}, lb.basicObject(0,0,0,"coin"), .5)
+obstacles_list[18] = lb.newFillAllColumns_(speed, 0, {1,2,3,4}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[26] = lb.newStillText_(speed, 0, 0, "Tap far away for light wind", 1, native.systemFont, {0,0,0})
+obstacles_list[27] = lb.newFillAllColumns_(speed, 0, {6, 7, 8, 9}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[31] = lb.newFillAllColumns_(speed, 0, {4, 5, 6, 7}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[35] = lb.newFillAllColumns_(speed, 0, {8, 9, 10, 11}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[39] = lb.newPingpongFillColumns_(speed, -2, 2, 0, 1000, 1000, {6, 7, 8, 9}, lb.spike2Edge(0,0,0), 3, 1)
 
---[[
-obstacles_list[1] = util.coinCircle_(speed, 2, 8)
-obstacles_list[8] = util.spikeLine_(speed, s1, e1, 3, 8000)
-obstacles_list[14] = util.spikeLine_(speed, e1, s1, 3, 8000)
-obstacles_list[20] = util.spikeLine_(speed, s1, e1, 4, 8000)
-obstacles_list[25] = util.spikeLine_(speed, e1, s1, 4, 8000)
-obstacles_list[30] = util.spikeLine_(speed, s1, e1, 4, 8000)
-obstacles_list[36] = spikeSquare]]--
 
 local level_2 =  {
     name = "Test level 2",
-    speed = 50,
     victory = 60,
     obstacles = obstacles_list,
+    startScore = 38
 }
 
 return level_2

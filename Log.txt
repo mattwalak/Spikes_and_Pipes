@@ -75,8 +75,9 @@ HARD CORE CODING:
 12/15	12:20pm		1:40				Re-created line and foursquare with new level building tools
 12/15	3:10pm		1:35				Created pingpong line. Realized I have a big big rotation issue
 12/15	10:05pm		1:40				Wrote squareLine_, fillAllColumns_, rewrote intro level 
+12/16	10:15pm		1:00				Continued working on intro level. Began writing newPingpongFillColumns_()
 ------------------------------------------------------------------------------------------------------------------------------
-					57:45 TOTAL
+					58:45 TOTAL
 
 
-THE GRAND TOTAL:	63:30
+THE GRAND TOTAL:	64:30

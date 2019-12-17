@@ -29,7 +29,25 @@ end
 
 -- Sets up temporary level buttons for navigation durring preliminary stages
 local function setupTempButtons(sceneGroup)
+
     -- Creates temporary level buttons (With action listener to same method)
+    local folder = "Tests"
+    local num_levels = 10
+    for i = 1, num_levels, 1 do
+        local button1 = display.newRect(sceneGroup, display.contentWidth/2, i*display.contentHeight/(num_levels+1),
+        display.contentWidth/2,display.contentHeight/15)
+        button1:setFillColor(127,0,127)
+        button1.level = folder.."."..i
+        button1:addEventListener("tap", on_button_tap)
+
+        local text1 = display.newText(sceneGroup, folder.."."..i,
+            display.contentWidth/2, i*display.contentHeight/(num_levels+1),
+            native.systemFont)
+        text1:setFillColor(0,0,0)
+    end
+
+
+    --[[
     local button1 = display.newRect(sceneGroup, display.contentWidth/2, display.contentHeight/4,
     display.contentWidth/2,display.contentHeight/10)
     button1:setFillColor(127,0,127)
@@ -62,9 +80,10 @@ local function setupTempButtons(sceneGroup)
     local text3 = display.newText(sceneGroup, "Test Level 3",
         display.contentWidth/2, 3*display.contentHeight/4,
         native.systemFont)
-    text3:setFillColor(0,0,0)
+    text3:setFillColor(0,0,0)]]--
 
     -- Set wind gen method
+    --[[
     local button1 = display.newRect(sceneGroup, display.contentWidth/4, 7*display.contentHeight/8,
     display.contentWidth/6,display.contentHeight/10)
     button1:setFillColor(127,127,0)
@@ -98,6 +117,7 @@ local function setupTempButtons(sceneGroup)
         3*display.contentWidth/4, 7*display.contentHeight/8,
         native.systemFont)
     text3:setFillColor(0,0,0)
+    ]]--
 
 
 

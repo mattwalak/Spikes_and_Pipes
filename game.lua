@@ -563,7 +563,12 @@ function scene:show( event )
         level_data = require ("Levels."..level)
 
         print("Here we are, playing level ".. level_data.name)
-        score = 0
+        if level_data.startScore then
+            score = level_data.startScore
+        else
+            score = 0
+        end
+
         update_scoreText()
 
     elseif ( phase == "did" ) then
