@@ -348,6 +348,7 @@ function lb.newSquareLine_(speed, line_start, line_end, line_numSquares, line_pe
 	return obstacle
 end
 
+
 function lb.newPingpongFillColumns_(speed, start_x_offset, end_x_offset, y, period_1, period_2, ignore, object, object_height, object_width, ease_pos, ease_rot)
 	if not ignore then ignore = {} end
 	local obstacle = newParent(speed, "newPingpongFillColumns_", y+(object_height/2), -y+(object_height/2))
@@ -375,17 +376,19 @@ function lb.newPingpongFillColumns_(speed, start_x_offset, end_x_offset, y, peri
 		mostPositive_x = end_x_offset
 	end
 
-
 	local startPoint = util.newPoint(_left-mostPositive_x+(object_width/2), y)
 	local endPoint = util.newPoint(_right-mostNegative_x+(object_width/2), y)
+	local r_start = util.newPoint(start_x_offset, 0)
+	local r_end = util.newPoint(end_x_offset, 0)
+
 	for i = 1, #ignore, 1 do
 		-- Our ignore values are now off because of the padding we added
 		ignore[i] = ignore[i] + mostPositive_x
 	end
 
-	-- local function pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
 	local line = simpleLine(startPoint, endPoint, CN.COL_NUM+mostPositive_x-mostNegative_x, -1, ignore, object)
-	mergeObstacle(obstacle, line)
+	local animatedLine = pingpongLine(r_start, r_end, 0, 0, period_1, period_2, line, ease_pos, ease_rot)
+	mergeObstacle(obstacle, animatedLine)
 	return obstacle
 end
 

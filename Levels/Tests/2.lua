@@ -38,7 +38,7 @@ obstacles_list[26] = lb.newStillText_(speed, 0, 0, "Tap far away for light wind"
 obstacles_list[27] = lb.newFillAllColumns_(speed, 0, {6, 7, 8, 9}, lb.spike2Edge(0,0,0), 3, 1)
 obstacles_list[31] = lb.newFillAllColumns_(speed, 0, {4, 5, 6, 7}, lb.spike2Edge(0,0,0), 3, 1)
 obstacles_list[35] = lb.newFillAllColumns_(speed, 0, {8, 9, 10, 11}, lb.spike2Edge(0,0,0), 3, 1)
-obstacles_list[39] = lb.newPingpongFillColumns_(speed, -2, 2, 0, 1000, 1000, {6, 7, 8, 9}, lb.spike2Edge(0,0,0), 3, 1)
+obstacles_list[39] = lb.newPingpongFillColumns_(speed, -1, 1, 0, 2000, 2000, {6, 7, 8, 9}, lb.spike2Edge(0,0,0), 3, 1, easing.inOutSine, easing.inOutSine)
 
 
 local level_2 =  {
