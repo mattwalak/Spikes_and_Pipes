@@ -179,10 +179,21 @@ local function keyframeNull(thisNull)
     local next_rotation = thisNull.rotation_path[next_frame]
 
     -- If transition time is negative, we stop everything
-    if transition_time < 0 then return end
+    if transition_time < 0 then 
+        print("Canceling transition")
+        return 
+    end
 
     -- To ensure transitions start at the same time, only the position transition
     -- causes the next transition to be called
+
+    transition.to(thisNull, {
+        time = transition_time,
+        rotation = next_rotation,
+        tag = thisNull.name,
+        transition = thisNull.rotation_interpolation
+    })
+
     transition.to(thisNull, {
         time = transition_time,
         x = next_x,
@@ -192,13 +203,7 @@ local function keyframeNull(thisNull)
         onComplete = keyframeNull
     })
 
-    transition.to(thisNull, {
-        time = transition_time,
-        rotation = next_rotation,
-        tag = thisNull.name,
-        transition = thisNull.rotation_interpolation
-    })
-
+    
 end
 
 -- Repositions a display object based on its ancestry

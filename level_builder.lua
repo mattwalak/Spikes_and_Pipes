@@ -337,6 +337,37 @@ local function pingpongFillColumns(start_x_offset, end_x_offset, y, period_1, pe
 	return animatedLine
 end
 
+local function fan(centerPoint, clockwise, radius, deg_offset, period, num_objects, ignore, object, object_height)
+	local line = simpleLine(util.newPoint(-radius+.5, 0), util.newPoint(radius+.5, 0), num_objects, -1, ignore, object)
+	local zero = util.newPoint(0,0)
+	local off1 = 360
+	local off2 = 0
+	if clockwise then
+		off1 = 0
+		off2 = 360
+	end
+
+
+	local fan = {
+		type = "null",
+		name = "fan",
+        position_path = {zero, zero},
+        rotation_path = {deg_offset+off1, deg_offset+off2},
+        transition_time = {0, period},
+        position_interpolation = ease_pos,
+        rotation_interpolation = ease_rot,
+        on_complete = "loop",
+        first_frame = 1,
+        children = {line}
+	}
+
+	return wrapNull(centerPoint.x,centerPoint.y,{fan})
+end
+
+local function doubleThwomp(height)
+	local left = simpleLine(util.newPoint(_left, .5), util.newPoint(), num_objects, period, ignore, object, ease_pos, ease_rot) 
+end
+
 
 --============ FINISHED OBJECTS: Obstacles nestled within parent and ready for use in game (Nestled in parent null) ========================================================
 function lb.newSimpleLine_(speed, startPoint, endPoint, num_objects, period, ignore, object, object_height)
@@ -399,8 +430,18 @@ function lb.newPingpongFillColumns_(speed, start_x_offset, end_x_offset, y, peri
 end
 
 -- NOTE: object_height/2 method only works if deg_offset = 0
-function lb.newFan_(speed, centerPoint, radius, deg_offset, num_objects, ignore, object, object_height)
-	
+function lb.newFan_(speed, clockwise, centerPoint, radius, deg_offset, period, num_objects, ignore, object, object_height)
+	local obstacle = newParent(speed, "newFan_", centerPoint.y+radius+.5, -centerPoint.y+radius+.5)
+	local fan = fan(centerPoint, clockwise, radius, deg_offset, period, num_objects, ignore, object, object_height)
+	mergeObstacle(obstacle, fan)
+	return obstacle
+end
+
+function lb.newDoubleThwomp_(speed, height)
+	local obstacle = newParent(speed, "newDoubleThwomp_", height-.5, .5)
+	local thwomp = doubleThwomp(height)
+	mergeObstacle(obstacle, thwomp)
+	return obstacle
 end
 
 return lb
