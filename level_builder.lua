@@ -526,12 +526,12 @@ function lb.zigzag_(speed)
 end
 
 function lb.diagonalLatice1_(speed)
-	local period = 4000
+	local period = 6000
 	local obstacle_width = 1
 	local obstacle_height = 3
-	local extra_width = 2
-	local slope_height = 14
-	local line_dist = 7
+	local extra_width = 4
+	local slope_height = 12
+	local line_dist = 8
 	local left = -(CN.COL_NUM/2)-(obstacle_width/2)-extra_width
 	local right = (CN.COL_NUM/2)+(obstacle_width/2)+extra_width
 
@@ -539,10 +539,9 @@ function lb.diagonalLatice1_(speed)
 
 	-- simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
 	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
-	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
 	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-(line_dist/2)), util.newPoint(left, -(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
-	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-(line_dist/2)), util.newPoint(left, -line_dist-(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
-
+	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-(line_dist/2)), util.newPoint(left, -line_dist-(line_dist/2)), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
 
 	mergeObstacle(obstacle, left_line_1)
 	mergeObstacle(obstacle, left_line_2)
