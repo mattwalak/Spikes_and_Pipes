@@ -80,9 +80,9 @@ HARD CORE CODING:
 12/21				0:30				Wrote pingpongFillColumns_()
 12/22	12:00pm		0:50				Implemented fan_(). Began work on doubleThwomp_()
 12/23	5:05pm		0:30				Wrote some randomly ready obstacles
-12/24	10:30am 	
+12/24	10:30am 	0:50				Implemented zigzag_()
 ------------------------------------------------------------------------------------------------------------------------------
-					60:35 TOTAL
+					61:25 TOTAL
 
 
-THE GRAND TOTAL:	66:20
+THE GRAND TOTAL:	67:10

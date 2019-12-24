@@ -498,18 +498,56 @@ function lb.threeLineSquare_(speed)
 	return obstacle
 end
 
-function lb.diagonalLatice1_(speed)
+function lb.zigzag_(speed)
+	local period = 5000
 	local obstacle_width = 1
 	local obstacle_height = 3
-	local extra_width = 4
-	local slope_height = 4
+	local extra_width = 2
+	local slope_height = 5
 	local line_dist = 10
-	local left = -(CN.COL_NUM/2)-(obstacle_width/2)
-	local right = CN.COL_NUM + (obstacle_width/2)
+	local left = -(CN.COL_NUM/2)-(obstacle_width/2)-extra_width
+	local right = (CN.COL_NUM/2)+(obstacle_width/2)+extra_width
 
-	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, 8000, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local obstacle = newParent(speed, "diagonalLatice1_", obstacle_height/2, 2*line_dist+(obstacle_height/2))
+
+	-- simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
+	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-(line_dist/2)), util.newPoint(left, -(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-(line_dist/2)), util.newPoint(left, -line_dist-(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+
 
 	mergeObstacle(obstacle, left_line_1)
+	mergeObstacle(obstacle, left_line_2)
+	mergeObstacle(obstacle, right_line_1)
+	mergeObstacle(obstacle, right_line_2)
+
+	return obstacle
+end
+
+function lb.diagonalLatice1_(speed)
+	local period = 4000
+	local obstacle_width = 1
+	local obstacle_height = 3
+	local extra_width = 2
+	local slope_height = 14
+	local line_dist = 7
+	local left = -(CN.COL_NUM/2)-(obstacle_width/2)-extra_width
+	local right = (CN.COL_NUM/2)+(obstacle_width/2)+extra_width
+
+	local obstacle = newParent(speed, "diagonalLatice1_", obstacle_height/2, 2*line_dist+(obstacle_height/2))
+
+	-- simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
+	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-(line_dist/2)), util.newPoint(left, -(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-(line_dist/2)), util.newPoint(left, -line_dist-(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+
+
+	mergeObstacle(obstacle, left_line_1)
+	mergeObstacle(obstacle, left_line_2)
+	mergeObstacle(obstacle, right_line_1)
+	mergeObstacle(obstacle, right_line_2)
 
 	return obstacle
 end
