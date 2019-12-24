@@ -81,9 +81,9 @@ HARD CORE CODING:
 12/22	12:00pm		0:50				Implemented fan_(). Began work on doubleThwomp_()
 12/23	5:05pm		0:30				Wrote some randomly ready obstacles
 12/24	10:30am 	0:50				Implemented zigzag_()
-12/24	11:50am		
+12/24	11:50am		0:40				Implemented other diagonal latics obstacles and multiple1Square_ and singleSquare_
 ------------------------------------------------------------------------------------------------------------------------------
-					61:25 TOTAL
+					62:05 TOTAL
 
 
-THE GRAND TOTAL:	67:10
+THE GRAND TOTAL:	67:50

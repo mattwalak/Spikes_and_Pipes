@@ -532,21 +532,77 @@ function lb.diagonalLatice1_(speed)
 	local extra_width = 4
 	local slope_height = 12
 	local line_dist = 8
+	local start_offset = line_dist/2
 	local left = -(CN.COL_NUM/2)-(obstacle_width/2)-extra_width
 	local right = (CN.COL_NUM/2)+(obstacle_width/2)+extra_width
 
-	local obstacle = newParent(speed, "diagonalLatice1_", obstacle_height/2, 2*line_dist+(obstacle_height/2))
+	local obstacle = newParent(speed, "diagonalLatice1_", obstacle_height/2, start_offset+line_dist+slope_height+(obstacle_height/2))
 
 	-- simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
 	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
 	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
-	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-(line_dist/2)), util.newPoint(left, -(line_dist/2)), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
-	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-(line_dist/2)), util.newPoint(left, -line_dist-(line_dist/2)), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-start_offset), util.newPoint(left, -start_offset), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-start_offset), util.newPoint(left, -line_dist-start_offset), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
 
 	mergeObstacle(obstacle, left_line_1)
 	mergeObstacle(obstacle, left_line_2)
 	mergeObstacle(obstacle, right_line_1)
 	mergeObstacle(obstacle, right_line_2)
+
+	return obstacle
+end
+
+function lb.diagonalLatice2_(speed)
+	local period = 6000
+	local obstacle_width = 1
+	local obstacle_height = 3
+	local extra_width = 4
+	local slope_height = 8
+	local line_dist = 8
+	local start_offset = 0
+	local left = -(CN.COL_NUM/2)-(obstacle_width/2)-extra_width
+	local right = (CN.COL_NUM/2)+(obstacle_width/2)+extra_width
+
+	local obstacle = newParent(speed, "diagonalLatice1_", obstacle_height/2, start_offset+line_dist+slope_height+(obstacle_height/2))
+
+	-- simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
+	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local left_line_2 = simpleLine(util.newPoint(left, -slope_height-line_dist), util.newPoint(right, -line_dist), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_1 = simpleLine(util.newPoint(right, -slope_height-start_offset), util.newPoint(left, -start_offset), 2, period, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local right_line_2 = simpleLine(util.newPoint(right, -line_dist-slope_height-start_offset), util.newPoint(left, -line_dist-start_offset), 4, period, {1,3}, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+
+	mergeObstacle(obstacle, left_line_1)
+	mergeObstacle(obstacle, left_line_2)
+	mergeObstacle(obstacle, right_line_1)
+	mergeObstacle(obstacle, right_line_2)
+
+	return obstacle
+end
+
+function lb.singleSquare_(speed)
+	-- lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height)
+	return lb.newSimpleFoursquare_(speed, util.newPoint(0,0), 10, 8000, nil, lb.spike2Edge(0,0,0), 3) 
+end
+
+function lb.multiple1Square_(speed)
+	local period = 8000
+	local squareSize = 10
+	local square_dist = 5
+	local object_width = 1
+	local object_height = 3
+
+
+	-- lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height)
+	local obstacle = newParent(speed, "multiple2Square_",(squareSize/2)+(object_height/2),3*square_dist+(squareSize/2)+(object_height/2))
+	local square1 = lb.newSimpleFoursquare_(speed, util.newPoint(0,0), squareSize, period, {2, 3, 4}, lb.spike2Edge(0,0,0), 3)
+	local square2 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-square_dist), squareSize, period, {3, 4, 1}, lb.spike2Edge(0,0,0), 3)
+	local square3 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-2*square_dist), squareSize, period, {4, 1, 2}, lb.spike2Edge(0,0,0), 3)
+	local square4 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-3*square_dist), squareSize, period, {1, 2, 3}, lb.spike2Edge(0,0,0), 3)
+
+	mergeObstacle(obstacle, square1)
+	mergeObstacle(obstacle, square2)
+	mergeObstacle(obstacle, square3)
+	mergeObstacle(obstacle, square4)
 
 	return obstacle
 end

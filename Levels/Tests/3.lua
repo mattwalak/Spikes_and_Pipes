@@ -8,7 +8,7 @@ local speed = 10000
 
 -- Define pairs
 local obstacles_list = {}
-obstacles_list[1] = lb.diagonalLatice1_(speed)
+obstacles_list[1] = lb.multiple1Square_(speed)
 
 local level_3 =  {
     name = "Test level 3",
