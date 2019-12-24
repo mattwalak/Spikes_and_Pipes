@@ -12,6 +12,9 @@ local _top = (display.contentHeight/CN.COL_WIDTH)/2
 local _bottom = -(display.contentHeight/CN.COL_WIDTH)/2
 local _halfSpikeWidth = CN.SPIKE_WIDTH/2
 local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
+local _offLeft = util.newPoint(_left - _halfSpikeWidth, 0)
+local _offRight = util.newPoint(_right + _halfSpikeWidth, 0)
+local _center = util.newPoint(0,0)
 
 --============ HELPER FUNCTIONS: Performs various operations to assist obstacle creation ==============================================================================
 
@@ -442,6 +445,31 @@ function lb.newDoubleThwomp_(speed, height)
 	local thwomp = doubleThwomp(height)
 	mergeObstacle(obstacle, thwomp)
 	return obstacle
+end
+
+--============ FINISHED GROUPED OBSTACLES: Game ready collections of finished obstacles ========================================================
+-- Minimal parameters required
+
+
+function lb.threeLineSpike_(speed)
+	local obstacle = newParent(speed, "threeLineEasy_", 1.5, 16+1.5)
+	local left = -(3/4)*CN.COL_NUM
+	local right = (3/4)*CN.COL_NUM
+	local line1 = simpleLine(util.newPoint(left, 0), util.newPoint(right, 0), 2, 8000, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local line2 = simpleLine(util.newPoint(right, -8), util.newPoint(left, -8), 2, 8000, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+	local line2_coin = simpleLine(util.newPoint(right, -7), util.newPoint(left, -7), 4, 8000, {1,3}, lb.basicObject(0,0,0,"coin"), easing.linear, easing.linear) 
+	local line3 = simpleLine(util.newPoint(left, -16), util.newPoint(right, -16), 2, 8000, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+
+	mergeObstacle(obstacle, line1)
+	mergeObstacle(obstacle, line2)
+	mergeObstacle(obstacle, line2_coin)
+	mergeObstacle(obstacle, line3)
+
+	return obstacle
+end
+
+function lb.threeLineSquare_(speed)
+
 end
 
 return lb

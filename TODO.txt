@@ -8,8 +8,6 @@ PLZ CHECK:
 1. Check keyframe time interpolation numbers (Does looping back to first keyframe use last time value or first?)
 2. Coins issue "Not found in table" when calling util.removeFromList() when level 2 is launched a second time after game overing
 3. ^^^ Check everything (memory usage, .collected status) when a level is quit or restarted
-4. YOU'VE GOT A ROTATION PROBLEM!!! THINGS DONT ROTATE NORMALLY
-
 
 
 THING TO DO BEFORE RELEASE:
@@ -19,3 +17,7 @@ THING TO DO BEFORE RELEASE:
 
 IDEAS!!!
 1. Increase scrolling speed as number of bubbles goes down (Would require re-writing transition to to be clock based)
+Obstacle ideas:
+	1. Double edged thwomp thing
+	2. Sine wave tunnel
+	3. 

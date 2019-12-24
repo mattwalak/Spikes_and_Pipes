@@ -76,8 +76,10 @@ HARD CORE CODING:
 12/15	3:10pm		1:35				Created pingpong line. Realized I have a big big rotation issue
 12/15	10:05pm		1:40				Wrote squareLine_, fillAllColumns_, rewrote intro level 
 12/16	10:15pm		1:00				Continued working on intro level. Began writing newPingpongFillColumns_()
+--- Boat times are aproximate ---
 12/21				0:30				Wrote pingpongFillColumns_()
 12/22	12:00pm		0:50				Implemented fan_(). Began work on doubleThwomp_()
+12/23	5:05pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					60:05 TOTAL
 
