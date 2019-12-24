@@ -79,9 +79,10 @@ HARD CORE CODING:
 --- Boat times are aproximate ---
 12/21				0:30				Wrote pingpongFillColumns_()
 12/22	12:00pm		0:50				Implemented fan_(). Began work on doubleThwomp_()
-12/23	5:05pm		
+12/23	5:05pm		0:30				Wrote some randomly ready obstacles
+12/24	10:30am 	
 ------------------------------------------------------------------------------------------------------------------------------
-					60:05 TOTAL
+					60:35 TOTAL
 
 
-THE GRAND TOTAL:	65:50
+THE GRAND TOTAL:	66:20

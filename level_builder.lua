@@ -469,7 +469,49 @@ function lb.threeLineSpike_(speed)
 end
 
 function lb.threeLineSquare_(speed)
+	local smallSquareSize = 6
+	local largeSquareSize = 10
+	local obstacle_width = 1
+	local obstacle_height = 3
+	local extra_width = 4
+	local line_dist = 18
 
+	local obstacle = newParent(speed, "threeLineSquare_", (obstacle_height/2)+(smallSquareSize/2), (2*line_dist)+(obstacle_height/2)+(smallSquareSize/2))
+	local left = -(1/2)*CN.COL_NUM-(largeSquareSize/2)-(obstacle_width/2)-extra_width
+	local right = (1/2)*CN.COL_NUM+(largeSquareSize/2)+(obstacle_width/2)+extra_width
+	
+	local square_period = 8000
+
+	local smallSquare = foursquare(util.newPoint(0,0), smallSquareSize, square_period, nil, lb.spike2Edge(0,0,0)) 	
+	local largeSquare = foursquare(util.newPoint(0,0), largeSquareSize, square_period, nil, lb.spike2Edge(0,0,0)) 
+
+	local line1 = simpleLine(util.newPoint(left, 0), util.newPoint(right, 0), 2, 8000, nil, smallSquare, easing.linear, easing.linear) 
+	local line2 = simpleLine(util.newPoint(right, -line_dist), util.newPoint(left, -line_dist), 2, 8000, nil, largeSquare, easing.linear, easing.linear) 
+	local line2_coin = simpleLine(util.newPoint(right, -line_dist), util.newPoint(left, -line_dist), 2, 8000, nil, lb.basicObject(0,0,0,"coin"), easing.linear, easing.linear) 
+	local line3 = simpleLine(util.newPoint(left, -2*line_dist), util.newPoint(right, -2*line_dist), 2, 8000, nil, smallSquare, easing.linear, easing.linear) 
+
+	mergeObstacle(obstacle, line1)
+	mergeObstacle(obstacle, line2)
+	mergeObstacle(obstacle, line2_coin)
+	mergeObstacle(obstacle, line3)
+
+	return obstacle
+end
+
+function lb.diagonalLatice1_(speed)
+	local obstacle_width = 1
+	local obstacle_height = 3
+	local extra_width = 4
+	local slope_height = 4
+	local line_dist = 10
+	local left = -(CN.COL_NUM/2)-(obstacle_width/2)
+	local right = CN.COL_NUM + (obstacle_width/2)
+
+	local left_line_1 = simpleLine(util.newPoint(left, -slope_height), util.newPoint(right, 0), 2, 8000, nil, lb.spike2Edge(0,0,0), easing.linear, easing.linear) 
+
+	mergeObstacle(obstacle, left_line_1)
+
+	return obstacle
 end
 
 return lb
