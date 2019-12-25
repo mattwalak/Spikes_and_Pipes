@@ -82,8 +82,9 @@ HARD CORE CODING:
 12/23	5:05pm		0:30				Wrote some randomly ready obstacles
 12/24	10:30am 	0:50				Implemented zigzag_()
 12/24	11:50am		0:40				Implemented other diagonal latics obstacles and multiple1Square_ and singleSquare_
+12/24	6:40pm		1:10				Implemented fourSmall2Squares_ and threeFans_
 ------------------------------------------------------------------------------------------------------------------------------
-					62:05 TOTAL
+					63:15 TOTAL
 
 
-THE GRAND TOTAL:	67:50
+THE GRAND TOTAL:	69:00 YEEEEEAHAHAHAHAHAHAHAHAHAHAHAHAHAHAAHAA 69 lol

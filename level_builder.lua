@@ -340,6 +340,31 @@ local function pingpongFillColumns(start_x_offset, end_x_offset, y, period_1, pe
 	return animatedLine
 end
 
+local function spinObject(anchorPoint, clockwise, deg_offset, period, object)
+	local objects = wrapNull(-anchorPoint.x, -anchorPoint.y, {object})
+
+	local off1 = 360
+	local off2 = 0
+	if clockwise then
+		off1 = 0
+		off2 = 360
+	end
+	local spin = {
+		type = "null",
+		name = "spinObject",
+        position_path = {anchorPoint, anchorPoint},
+        rotation_path = {deg_offset+off1, deg_offset+off2},
+        transition_time = {0, period},
+        position_interpolation = ease_pos,
+        rotation_interpolation = ease_rot,
+        on_complete = "loop",
+        first_frame = 1,
+        children = {objects}
+	}
+
+	return wrapNull(0,0,{spin})
+end
+
 local function fan(centerPoint, clockwise, radius, deg_offset, period, num_objects, ignore, object, object_height)
 	local line = simpleLine(util.newPoint(-radius+.5, 0), util.newPoint(radius+.5, 0), num_objects, -1, ignore, object)
 	local zero = util.newPoint(0,0)
@@ -586,24 +611,73 @@ end
 
 function lb.multiple1Square_(speed)
 	local period = 8000
-	local squareSize = 10
-	local square_dist = 5
+	local squareSize = 12
+	local square_dist = 6
 	local object_width = 1
 	local object_height = 3
 
-
 	-- lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height)
 	local obstacle = newParent(speed, "multiple2Square_",(squareSize/2)+(object_height/2),3*square_dist+(squareSize/2)+(object_height/2))
-	local square1 = lb.newSimpleFoursquare_(speed, util.newPoint(0,0), squareSize, period, {2, 3, 4}, lb.spike2Edge(0,0,0), 3)
-	local square2 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-square_dist), squareSize, period, {3, 4, 1}, lb.spike2Edge(0,0,0), 3)
-	local square3 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-2*square_dist), squareSize, period, {4, 1, 2}, lb.spike2Edge(0,0,0), 3)
-	local square4 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-3*square_dist), squareSize, period, {1, 2, 3}, lb.spike2Edge(0,0,0), 3)
+	local square1 = lb.newSimpleFoursquare_(speed, util.newPoint(0,0), squareSize, period, {1, 2, 3}, lb.spike2Edge(0,0,0), 3)
+	local square2 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-square_dist), squareSize, period, {2, 3, 4}, lb.spike2Edge(0,0,0), 3)
+	local square3 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-2*square_dist), squareSize, period, {3, 4, 1}, lb.spike2Edge(0,0,0), 3)
+	local square4 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-3*square_dist), squareSize, period, {4, 1, 2}, lb.spike2Edge(0,0,0), 3)
+
+	local coin1 = lb.newSimpleFoursquare_(speed, util.newPoint(0,0), squareSize, period, {1, 3, 4}, lb.basicObject(0,0,0, "coin"), 1)
+	local coin2 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-square_dist), squareSize, period, {1, 2, 4}, lb.basicObject(0,0,0, "coin"), 1)
+	local coin3 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-2*square_dist), squareSize, period, {1, 2, 3}, lb.basicObject(0,0,0, "coin"), 1)
+	local coin4 = lb.newSimpleFoursquare_(speed, util.newPoint(0,-3*square_dist), squareSize, period, {2, 3, 4}, lb.basicObject(0,0,0, "coin"), 1)
 
 	mergeObstacle(obstacle, square1)
 	mergeObstacle(obstacle, square2)
 	mergeObstacle(obstacle, square3)
 	mergeObstacle(obstacle, square4)
+	mergeObstacle(obstacle, coin1)
+	mergeObstacle(obstacle, coin2)
+	mergeObstacle(obstacle, coin3)
+	mergeObstacle(obstacle, coin4)
 
+	return obstacle
+end
+
+function lb.fourSmall2Squares_(speed)
+	local smallSquareSize = 3
+	local smallSquarePeriod = 4000
+	local largeSquareSize = 12
+	local largeSquarePeriod = 10000
+	local object_height = 3
+
+	local obstacle = newParent(speed, "fourSmall2Squares_", (largeSquareSize/2)+(smallSquareSize/2)+(object_height/2), (largeSquareSize/2)+(smallSquareSize/2)+(object_height/2))
+
+	local smallSquare_1 = foursquare(util.newPoint(0,0), smallSquareSize, smallSquarePeriod, {1, 3}, lb.spike2Edge(0,0,0)) 	
+	local smallSquare_2 = foursquare(util.newPoint(0,0), smallSquareSize, smallSquarePeriod, {2, 4}, lb.spike2Edge(0,0,0)) 	
+	local largeSquare_1 = foursquare(util.newPoint(0,0), largeSquareSize, largeSquarePeriod, {2, 4}, smallSquare_1) 	
+	local largeSquare_2 = foursquare(util.newPoint(0,0), largeSquareSize, largeSquarePeriod, {1, 3}, smallSquare_2) 
+	local centerCoin = {lb.basicObject(0,0,0,"coin")}
+	mergeObstacle(obstacle, largeSquare_1)
+	mergeObstacle(obstacle, largeSquare_2)
+	util.tableExtend(obstacle.children, centerCoin)
+	return obstacle
+end
+
+function lb.threeFans_(speed)
+	local period = 8000
+	local fan_length = CN.COL_NUM/2
+	local fan_space = CN.COL_NUM
+
+	local obstacle = newParent(speed, "threeFans_", fan_length/2, 2*fan_space+fan_length/2)
+	local object_width = 1
+
+	local startPoint = util.newPoint(_left+(object_width/2), 0)
+	local endPoint = util.newPoint(_right+(object_width/2), 0)
+	local fan_line = simpleLine(startPoint, endPoint, CN.COL_NUM, -1, nil, lb.spike2Edge(0,0,0))
+	local spinThings_1 = spinObject(util.newPoint(0,0), true, 0, period, fan_line)
+	local spinThings_2 = spinObject(util.newPoint(0,-fan_space), false, 0, period, wrapNull(0, -fan_space, {fan_line}))
+	local spinThings_3 = spinObject(util.newPoint(0,-2*fan_space), true, 0, period, wrapNull(0, -2*fan_space, {fan_line}))
+
+	mergeObstacle(obstacle, spinThings_1)
+	mergeObstacle(obstacle, spinThings_2)
+	mergeObstacle(obstacle, spinThings_3)
 	return obstacle
 end
 
