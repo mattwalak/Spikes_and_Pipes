@@ -180,7 +180,7 @@ local function keyframeNull(thisNull)
 
     -- If transition time is negative, we stop everything
     if transition_time < 0 then 
-        print("Canceling transition")
+        --print("Canceling transition")
         return 
     end
 
@@ -282,7 +282,7 @@ end
 
 local function createObstacle(thisObstacle, ancestry)
     if not thisObstacle then return end
-    print("type = "..thisObstacle.type)
+    -- print("type = "..thisObstacle.type)
     if thisObstacle.type == "null" then
         local thisNull = thisObstacle
         -- print("Inserting name = "..thisNull.name)

@@ -14,6 +14,8 @@ local _halfSpikeWidth = CN.SPIKE_WIDTH/2
 local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 local _offLeft = util.newPoint(_left - _halfSpikeWidth, 0)
 local _offRight = util.newPoint(_right + _halfSpikeWidth, 0)
+local _inLeft = util.newPoint(_left + _halfSpikeWidth, 0)
+local _inRight = util.newPoint(_right - _halfSpikeWidth, 0)
 local _center = util.newPoint(0,0)
 
 --============ HELPER FUNCTIONS: Performs various operations to assist obstacle creation ==============================================================================
@@ -679,6 +681,121 @@ function lb.threeFans_(speed)
 	mergeObstacle(obstacle, spinThings_2)
 	mergeObstacle(obstacle, spinThings_3)
 	return obstacle
+end
+
+function lb.threePingpongLines_(speed)
+	local period_1 = 1500
+	local period_2 = 1500
+	local line_dist = 9
+	local object_height = 3
+
+	local left = _offLeft.x
+	local right = _offRight.x
+	local obstacle = newParent(speed, "threePingpongLines_", object_height/2, 2*line_dist+(object_height/2)) 
+
+	-- pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
+	local line_1 = pingpongLine(util.newPoint(left, 0), util.newPoint(right, 0), 0, 0, period_1, period_2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_2 = pingpongLine(util.newPoint(right, -line_dist), util.newPoint(left, -line_dist), 0, 0, period_1, period_2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_3 = pingpongLine(util.newPoint(left, -2*line_dist), util.newPoint(right, -2*line_dist), 0, 0, period_1, period_2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	
+	mergeObstacle(obstacle, line_1)
+	mergeObstacle(obstacle, line_2)
+	mergeObstacle(obstacle, line_3)
+
+	return obstacle
+end
+
+function lb.fourOffsyncPingpongLines_(speed)
+	local period_A1 = 1500
+	local period_A2 = 1500
+	local period_B1 = 3000
+	local period_B2 = 3000
+	local period_C1 = 4500
+	local period_C2 = 4500
+	local period_D1 = 6000
+	local period_D2 = 6000
+	local line_dist = 3
+	local object_height = 3
+
+	local left = _inLeft.x
+	local right = _inRight.x
+	local obstacle = newParent(speed, "threePingpongLines_", object_height/2, 3*line_dist+(object_height/2)) 
+
+	-- pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
+	local line_1 = pingpongLine(util.newPoint(left, 0), util.newPoint(right, 0), 0, 0, period_A1, period_A2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_2 = pingpongLine(util.newPoint(left, -line_dist), util.newPoint(right, -line_dist), 0, 0, period_B1, period_B2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_3 = pingpongLine(util.newPoint(left, -2*line_dist), util.newPoint(right, -2*line_dist), 0, 0, period_C1, period_C2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_4 = pingpongLine(util.newPoint(left, -3*line_dist), util.newPoint(right, -3*line_dist), 0, 0, period_D1, period_D2, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	
+	mergeObstacle(obstacle, line_1)
+	mergeObstacle(obstacle, line_2)
+	mergeObstacle(obstacle, line_3)
+	mergeObstacle(obstacle, line_4)
+
+	return obstacle
+end
+
+function lb.pingpongThreeGrid_(speed)
+	local left = _inLeft.x
+	local right = _inRight.x
+	local height = 14
+	local object_height = 3
+	local period = 3000
+
+	local obstacle = newParent(speed, "pingpongThreeGrid_", object_height/2, height+(object_height/2))
+
+	local line_1 = pingpongLine(util.newPoint(left, -height), util.newPoint(left, 0), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_2 = pingpongLine(util.newPoint(0, 0), util.newPoint(0, -height), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_3 = pingpongLine(util.newPoint(right, -height), util.newPoint(right, 0), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	
+	local line_4 = pingpongLine(util.newPoint(left, 0), util.newPoint(right, 0), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_5 = pingpongLine(util.newPoint(right, -height/2), util.newPoint(left, -height/2), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+	local line_6 = pingpongLine(util.newPoint(left, -height), util.newPoint(right, -height), 0, 0, period, period, lb.spike2Edge(0,0,0), easing.inOutSine, easing.inOutSine)
+
+
+	mergeObstacle(obstacle, line_1)
+	mergeObstacle(obstacle, line_2)
+	mergeObstacle(obstacle, line_3)
+	mergeObstacle(obstacle, line_4)
+	mergeObstacle(obstacle, line_5)
+	mergeObstacle(obstacle, line_6)
+
+	return obstacle
+end
+
+function lb.pingpongPath_(speed)
+	local height = 30
+	local width = 8
+	local object_width = 1
+	local object_height = 3
+	local move_dist = 3
+	local period_1 = 2000
+	local period_2 = 2000
+	local left = _left+(object_width/2)
+	local right = _right+(object_width/2)
+
+	-- pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, period_2, object, ease_pos, ease_rot)
+	local obstacle = newParent(speed, "pingpongPath_", object_height/2, height+(object_height/2))
+
+	local start_line = simpleLine(util.newPoint(left, 0), util.newPoint(right, 0), CN.COL_NUM, -1, {5, 6, 7, 8, 9, 10}, lb.spike2Edge(0,0,0))
+
+	local left_side_bar = simpleLine(util.newPoint(-width/2, -2), util.newPoint(-width/2, -height+1), height-3, -1, nil, lb.spike2Edge(0,0,90))
+	local left_side = pingpongLine(util.newPoint(-move_dist/2, 0), util.newPoint(move_dist/2, 0), 0, 0, period_1, period_2, left_side_bar, easing.inOutSine, easing.inOutSine)
+	local right_side_bar = simpleLine(util.newPoint(width/2, -2), util.newPoint(width/2, -height+1), height-3, -1, nil, lb.spike2Edge(0,0,90))
+	local right_side = pingpongLine(util.newPoint(-move_dist/2, 0), util.newPoint(move_dist/2, 0), 0, 0, period_1, period_2, right_side_bar, easing.inOutSine, easing.inOutSine)
+
+	local end_line = simpleLine(util.newPoint(left, -height), util.newPoint(right, -height), CN.COL_NUM, -1, {5, 6, 7, 8, 9, 10}, lb.spike2Edge(0,0,0))
+
+	mergeObstacle(obstacle, start_line)
+	mergeObstacle(obstacle, end_line)
+	mergeObstacle(obstacle, left_side)
+	mergeObstacle(obstacle, right_side)
+
+	return obstacle
+end
+
+function lb.sinePath_(speed)
+	
 end
 
 return lb
