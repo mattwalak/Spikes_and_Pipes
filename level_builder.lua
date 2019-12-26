@@ -795,7 +795,45 @@ function lb.pingpongPath_(speed)
 end
 
 function lb.sinePath_(speed)
-	
+
+end
+
+--============ THE ULTIMATE FUNCTION: returns an obstacle based on index ==============================================================================
+-- Returns obstacle, height
+function lb.obstacle(speed, i)
+	if i == 1 then
+		return lb.threeLineSpike_(speed), 0
+	elseif i == 2 then
+		return lb.threeLineSquare_(speed), 0
+	elseif i == 3 then
+		return lb.zigzag_(speed), 0
+	elseif i == 4 then
+		return lb.diagonalLatice1_(speed)
+	elseif i == 5 then
+		return lb.diagonalLatice2_(speed)
+	elseif i == 6 then
+		return lb.singleSquare_(speed)
+	elseif i == 7 then
+		return lb.multiple1Square_(speed)
+	elseif i == 8 then
+		return lb.fourSmall2Squares_(speed)
+	elseif i == 9 then
+		return lb.threeFans_(speed)
+	elseif i == 10 then
+		return lb.threePingpongLines_(speed)
+	elseif i == 11 then
+		return lb.fourOffsyncPingpongLines_(speed)
+	elseif i == 12 then
+		return lb.pingpongThreeGrid_(speed)
+	elseif i == 13 then
+		return lb.pingpongPath_(speed)
+	elseif i == 14 then
+
+	elseif i == 15 then
+
+	elseif i == 16 then
+
+	end
 end
 
 return lb
