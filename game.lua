@@ -32,14 +32,15 @@ local backgroundGroup
 local uiGroup
 local padGroup -- In front of everything
 
--- Define game loop
-local slow_gameLoopTimer
-local fast_gameLoopTimer
-
 -- Define important gameplay variables
-local score -- Same as height within the level
+local score -- Total normalized seconds offset by height of heighest bubble
+local total_norm_sec -- Total normalized seconds
 local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
 local activeNullObjects = {} -- All active Null objects
+local activeTransitions = {} -- One transition for each null object
+local last_frame_time -- Time in ms of the last frame render
+local time_scale -- Value of each ms in game time
+
 local gameStarted = false
 
 -- Define variable for level data
@@ -118,6 +119,11 @@ local function stopTransitions()
             end
         end
     end
+end
+
+-- Updates all transition objects and corresponding null objects
+local function updateTransitions(dt)
+
 end
 
 -- Stops all transitions and destroys a null object and its children (And grandchildren)
@@ -241,7 +247,7 @@ local function reposition(displayObject)
     displayObject.rotation = total_rot
 end
 
--- Creates a new Corona recognized display object from its data
+-- OBSTACLE OPTION 1: Creates a new Corona recognized display object from its data
 local function createDisplayObject(thisObject, ancestry)
 	local image
     local imageOutline
@@ -277,6 +283,11 @@ local function createDisplayObject(thisObject, ancestry)
     end
 
 	return image
+end
+
+-- OBSTACLE OPTION 2: Creates a new null object with corresponding transition object
+local function createNullObject(thisObstacle)
+	
 end
 
 
@@ -341,24 +352,7 @@ local function on_victory_tapped(event)
     composer.gotoScene("level_select")
 end
 
-local function victory()
-    timer.pause(slow_gameLoopTimer)
-
-    -- Creates temporary victory button with event listener
-    local button = display.newRect(uiGroup, _width/2, _height/2,
-    _width/2,_height/8)
-    button:setFillColor(0,127,127)
-    button:addEventListener("tap", on_victory_tapped)
-
-    -- Adds text
-    button.text = display.newText(uiGroup, "Back to level select",
-        _width/2, _height/2,
-        native.systemFont)
-    button.text:setFillColor(0,0,0)
-end
-
 local function gameOver()
-    timer.pause(slow_gameLoopTimer)
     stopTransitions()
 
     -- Creates temporary victory button with event listener
@@ -376,50 +370,23 @@ local function gameOver()
 end
 
 local function onEnterFrame()
-	updateDisplayObjects()
-    bubble.applyForce()
-    if gameStarted and (bubble.numBubbles() == 0) then
-        gameStarted = false
-        gameOver()
+	if gameStarted then
+		local t = system.getTimer()
+		local dt = t - last_frame_time
+		last_frame_time = t
+
+		total_norm_sec = total_norm_sec + (time_scale*dt)
+		updateTransitions(dt) -- TODO
+		updateDisplayObjects()
+	    bubble.applyForce()
+	    if gameStarted and (bubble.numBubbles() == 0) then
+	        gameStarted = false
+	        gameOver()
+	    end
+
+	    score = total_norm_sec
+	    update_scoreText()
     end
-    --bubble.updateNumText()
-end
-
--- Updates obstacles and background (Updates twice a second)
-local function gameLoop_slow()
-    score = score + 1
-    -- Print Active nulls and display objects
-    
-    --[[
-    print("Active objects")
-    print("\tNulls:")
-    for i = 1, #activeNullObjects, 1 do
-        print("\t\t"..i..") "..activeNullObjects[i].name)
-    end
-    print("\tDisplayObjects:")
-    for i = 1, #activeDisplayObjects, 1 do
-        print("\t\t"..i..") "..activeDisplayObjects[i].type..", "..activeDisplayObjects[i].x)
-    end]]--
-
-
-    -- Check for VICTORY
-    if (score == level_data.victory) then
-        victory()
-    end
-
-    -- Check if we put on another object (The slot in the array is not null)
-    if level_data.obstacles[score] then
-        -- print("adding object "..score)
-        local toAdd = util.deepcopy(level_data.obstacles[score])
-        createObstacle(toAdd, {})
-
-        -- Check for VICTORY
-        if (score == level_data.victory) then
-            victory()
-        end
-    end
-
-    update_scoreText()
 end
 
 -- Does all the pagentry showing bubbles escaping the pipe etc...
@@ -432,7 +399,6 @@ end
 -- Starts the game!
 local function start_game()
     print("starting game")
-    slow_gameLoopTimer = timer.performWithDelay(1000, gameLoop_slow, 0)
     Runtime:addEventListener("enterFrame",onEnterFrame)
     gameStarted = true
 end
@@ -562,6 +528,7 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         util.printMemUsage()
+        last_frame_time = system.getTimer()
 
         -- Initialize level data
         local level = composer.getVariable("level")

@@ -84,9 +84,9 @@ HARD CORE CODING:
 12/24	11:50am		0:40				Implemented other diagonal latics obstacles and multiple1Square_ and singleSquare_
 12/24	6:40pm		1:10				Implemented fourSmall2Squares_ and threeFans_
 12/26	5:00pm		1:00				Implemented threePingpongLines_, fourOffsyncPingpongLines_, pingpongThreeGrid_, and pingpongPath_
-12/26	7:10pm		+15
+12/26	7:10pm		1:20				Began implementing time synced transitions
 ------------------------------------------------------------------------------------------------------------------------------
-					64:15 TOTAL
+					65:35 TOTAL
 
 
-THE GRAND TOTAL:	70:00
+THE GRAND TOTAL:	71:20
