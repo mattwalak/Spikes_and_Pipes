@@ -123,6 +123,39 @@ end
 
 -- Updates all transition objects and corresponding null objects
 local function updateTransitions(dt)
+	local scaled_time = dt*time_scale
+	for i = 1, #activeTransitioners, 1 do
+		local t = activeTransitioners[i]
+		t.internal_time = t.internal_time + scaled_time
+		
+		if t.internal_time/t.total_time > 0 then
+			if t.on_complete == "destroy" then
+				-- DESTROY!
+			elseif t.on_complete == "stop" then
+				-- STOP!
+			else
+		end
+
+		local time = t.internal_time%t.total_time
+
+		-- Find the most recent frame
+		local last_frame = 1
+		local time_sum = 0
+		for i = 2, #t.transition_time+1, 1 do
+			local frameOfInterest = ((i-1)%#t.transition_time)+1
+			time_sum = time_sum + t.transition_time[frameOfInterest]
+			if time < time_sum then
+				last_frame = i-1
+				break
+			end
+		end
+
+		local time_into = time - time_sum -- Time into transition
+		local frame_start = t.transition_time[((last_frame-1)%#t.transition_time)+1]
+		local frame_end = t.transition_time[((last_frame-1)%#t.transition_time)+1]-1
+
+
+	end
 
 end
 
@@ -300,6 +333,13 @@ local function newTransitioner(obstacleData, linkedObstacle)
     	internal_time = internal_time + obstacleData.transition_time[obstacleData.first_frame-1]
     end
     t.internal_time = internal_time
+
+    -- Calculate and set total time
+    local total_time = 0
+    for i = 1, #t.transition_time, 1 do
+    	total_time = total_time + t.transition_time[i]
+    end
+    t.total_time = total_time
 
     -- Set animation data
     t.position_path = obstacleData.position_path

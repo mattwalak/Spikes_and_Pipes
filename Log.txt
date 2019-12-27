@@ -85,9 +85,9 @@ HARD CORE CODING:
 12/24	6:40pm		1:10				Implemented fourSmall2Squares_ and threeFans_
 12/26	5:00pm		1:00				Implemented threePingpongLines_, fourOffsyncPingpongLines_, pingpongThreeGrid_, and pingpongPath_
 12/26	7:10pm		1:20				Began implementing time synced transitions
-12/17	11:30am		
+12/17	11:30am		1:30				Continued implementing time synced transitions (Transitioner implementation)
 ------------------------------------------------------------------------------------------------------------------------------
-					65:35 TOTAL
+					67:05 TOTAL
 
 
-THE GRAND TOTAL:	71:20
+THE GRAND TOTAL:	72:50
