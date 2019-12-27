@@ -12,6 +12,13 @@ local _halfSpikeWidth = CN.SPIKE_WIDTH/2
 local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 
 
+-- Scales a percent [0-1] to another percent with a given easing
+function util.scale(percent, ease)
+    if ease == "linear" then
+        return percent
+    end
+end
+
 -- Table clone method (Put this somewhere else when you are done plz)
 -- Credit: http://lua-users.org/wiki/CopyTable
 function util.deepcopy(orig)

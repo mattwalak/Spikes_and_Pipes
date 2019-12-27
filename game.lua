@@ -37,7 +37,11 @@ local score -- Total normalized seconds offset by height of heighest bubble
 local total_norm_sec -- Total normalized seconds
 local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
 local activeNullObjects = {} -- All active Null objects
+
+local activeObstacles = {} -- List of pointers to parent null for all active obstacles (1 for each obstacle)
 local activeTransitioners = {} -- One transition for each null object
+
+
 local last_frame_time -- Time in ms of the last frame render
 local time_scale -- Value of each ms in game time
 
@@ -127,36 +131,51 @@ local function updateTransitions(dt)
 	for i = 1, #activeTransitioners, 1 do
 		local t = activeTransitioners[i]
 		t.internal_time = t.internal_time + scaled_time
+		if t.name == "diagonalLatice1__transitioner" then
+			-- print(t.internal_time)
+		end
 		
-		if t.internal_time/t.total_time > 0 then
+		if t.internal_time/t.total_time >= 1 then
 			if t.on_complete == "destroy" then
-				-- DESTROY!
+				-- DESTROY
 			elseif t.on_complete == "stop" then
 				-- STOP!
-			else
+			end
 		end
 
 		local time = t.internal_time%t.total_time
 
-		-- Find the most recent frame
+		-- Find the most recent frame percent
 		local last_frame = 1
 		local time_sum = 0
-		for i = 2, #t.transition_time+1, 1 do
-			local frameOfInterest = ((i-1)%#t.transition_time)+1
-			time_sum = time_sum + t.transition_time[frameOfInterest]
+		for i = 1, #t.transition_time, 1 do
+			--local frameOfInterest = ((i-1)%#t.transition_time)+1
+			time_sum = time_sum + t.transition_time[i]
 			if time < time_sum then
-				last_frame = i-1
+				last_frame = i
 				break
 			end
 		end
+		local next_frame = (last_frame%#t.transition_time)+1
 
-		local time_into = time - time_sum -- Time into transition
-		local frame_start = t.transition_time[((last_frame-1)%#t.transition_time)+1]
-		local frame_end = t.transition_time[((last_frame-1)%#t.transition_time)+1]-1
+		local time_into_frame = time - time_sum -- Time into transition
+		local total_frame_time = t.transition_time[next_frame]
+		local percent = time_into_frame/total_frame_time
+		percent = util.scale(percent, "linear")
 
+		-- Calculate new position
+		local ori_pos = t.position_path[last_frame]
+		local ori_rot = t.rotation_path[last_frame]
+		local new_pos = t.position_path[next_frame]
+		local new_rot = t.rotation_path[next_frame]
+		local new_x = ori_pos.x+((new_pos.x-ori_pos.x)*percent)
+		local new_y = ori_pos.y+((new_pos.y-ori_pos.y)*percent)
+		local new_rot = ori_rot+((new_rot-ori_rot)*percent)
 
+		t.linkedNull.x = new_x
+		t.linkedNull.y = new_y
+		t.linkedNull.rotation = new_rot
 	end
-
 end
 
 -- Stops all transitions and destroys a null object and its children (And grandchildren)
@@ -319,10 +338,11 @@ local function createDisplayObject(thisObject, ancestry)
 end
 
 -- Returns a new transitioner object linked to the active obstacle
-local function newTransitioner(obstacleData, linkedObstacle)
+local function newTransitioner(obstacleData, linkedNull)
 	-- We know obstacleData represents a null object
 	local t = {} -- This transitioner
 	t.name = obstacleData.name.."_transitioner"
+	t.linkedNull = linkedNull
 
 	-- Set internal time
     local internal_time = 0
@@ -336,8 +356,8 @@ local function newTransitioner(obstacleData, linkedObstacle)
 
     -- Calculate and set total time
     local total_time = 0
-    for i = 1, #t.transition_time, 1 do
-    	total_time = total_time + t.transition_time[i]
+    for i = 1, #obstacleData.transition_time, 1 do
+    	total_time = total_time + obstacleData.transition_time[i]
     end
     t.total_time = total_time
 
@@ -551,6 +571,11 @@ local function onTouch(event)
 end
 
 
+local function addObstacle_tapped(event)
+	local obstacle = newObstacle(level_data.obstacles[1])
+	table.insert(activeObstacles, obstacle)
+end
+
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -610,8 +635,24 @@ function scene:create( event )
     bg:setFillColor(1,1,1) -- This isn't the only white thing... I don't know why
     backgroundGroup:insert(bg)
 
+
+    -- Creates temporary play button with event listener
+ 	local button = display.newRect(uiGroup, display.contentWidth/2, display.contentHeight/2,
+ 	display.contentWidth/2,display.contentHeight/8)
+ 	button:setFillColor(0,127,0)
+ 	button:addEventListener("tap", addObstacle_tapped)
+
+ 	-- Adds text (so we know where we are)
+ 	local text = display.newText(uiGroup, "add obstacle", 
+ 		display.contentWidth/2, display.contentHeight/2,
+ 		native.systemFont)
+ 	text:setFillColor(0,0,0)
+
+
     -- Initialize ui
     score = 0
+    time_scale = 1
+    total_norm_sec = 0
     scoreText = display.newText(uiGroup, score, _width/2, _height/8, native.systemFont, 36)
     scoreText:setFillColor(0,0,0)
 
