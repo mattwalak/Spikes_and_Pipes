@@ -37,7 +37,7 @@ local score -- Total normalized seconds offset by height of heighest bubble
 local total_norm_sec -- Total normalized seconds
 local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
 local activeNullObjects = {} -- All active Null objects
-local activeTransitions = {} -- One transition for each null object
+local activeTransitioners = {} -- One transition for each null object
 local last_frame_time -- Time in ms of the last frame render
 local time_scale -- Value of each ms in game time
 
@@ -285,16 +285,75 @@ local function createDisplayObject(thisObject, ancestry)
 	return image
 end
 
--- OBSTACLE OPTION 2: Creates a new null object with corresponding transition object
-local function createNullObject(thisObstacle)
-	
-end
+-- Returns a new transitioner object linked to the active obstacle
+local function newTransitioner(obstacleData, linkedObstacle)
+	-- We know obstacleData represents a null object
+	local t = {} -- This transitioner
+	t.name = obstacleData.name.."_transitioner"
+
+	-- Set internal time
+    local internal_time = 0
+    if obstacleData.time_offset then
+    	internal_time = internal_time + time_offset
+    end
+    if obstacleData.first_frame ~= 1 then
+    	internal_time = internal_time + obstacleData.transition_time[obstacleData.first_frame-1]
+    end
+    t.internal_time = internal_time
+
+    -- Set animation data
+    t.position_path = obstacleData.position_path
+    t.rotation_path = obstacleData.rotation_path
+    t.transition_time = obstacleData.transition_time
+    t.position_interpolation = obstacleData.position_interpolation
+    t.rotation_interpolation = obstacleData.rotation_interpolation
+    t.on_complete = obstacleData.on_complete
+
+    return t
+end	
+
+-- Returns a nestled obstacle. Creates all neccesary transitions for nulls in between
+local function newObstacle(obstacleData)
+    if not obstacleData then return {} end
+    local thisObject = {}
+
+    if obstacleData.type == "null" then
+    	thisObject.type = "null"
+    	thisObject.name = obstacleData.name
+    	thisObject.x = 0 -- Will be updated later
+    	thisObject.y = 0
+    	thisObject.rotation = 0
+
+    	-- Create transitioner
+    	local transitioner = newTransitioner(obstacleData, thisObject)
+    	table.insert(activeTransitioners, transitioner)
+
+    	-- Get children
+    	thisObject.children = {}
+    	if obstacleData.children then
+    		for i = 1, #obstacleData.children, 1 do
+    			local newChild = newObstacle(obstacleData.children[i])
+    			table.insert(thisObject.children, newChild)
+    		end
+    	end
+    else
+    	thisObject.type = obstacleData.type -- Some display object
+    	thisObject.x = obstacleData.x
+    	thisObject.y = obstacleData.y
+    	thisObject.rotation = obstacleData.rotation
+    	thisObject.image = nil -- To avoid having the object flash momentarally at (0,0) we will ad the image once its position is calculated
+    end
+
+    return thisObject
 
 
-local function createObstacle(thisObstacle, ancestry)
-    if not thisObstacle then return end
+
+    --[[
     -- print("type = "..thisObstacle.type)
     if thisObstacle.type == "null" then
+    	createNullObject(thisObstacle)
+
+    	
         local thisNull = thisObstacle
         -- print("Inserting name = "..thisNull.name)
         table.insert(activeNullObjects, thisNull)
@@ -323,6 +382,7 @@ local function createObstacle(thisObstacle, ancestry)
         table.insert(activeDisplayObjects, newDisplayObject)
         reposition(newDisplayObject)
     end
+    ]]--
 end
 
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
