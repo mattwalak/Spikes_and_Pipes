@@ -277,9 +277,14 @@ local function keyframeNull(thisNull)
 end
 
 -- Repositions a display object based on its ancestry
--- Depth indicates how deep we are
--- Returns -1 if we remove an element, 0 otherwise <-- THIS IS BAD AND TEMPORARY
-local function reposition(displayObject)
+local function reposition(displayObject, ancestry)
+	print("#ancestry = "..#ancestry)
+	for i = 1, #ancestry, 1 do
+		print("[[["..i.."]]]")
+		util.tprint(ancestry[i])
+	end
+
+	--[[
     local total_x = 0
     local total_y = 0
     local last_rot = 0
@@ -308,8 +313,30 @@ local function reposition(displayObject)
     -- Place this object (rotated) at this point
     displayObject.x = total_x
     displayObject.y = total_y
-    displayObject.rotation = total_rot
+    displayObject.rotation = total_rot]]--
 end
+
+local function updateObstacle(obstacle, ancestry)
+	if not obstacle then return end
+	if not ancestry then ancestry = {} end
+
+	if obstacle.type == "null" then
+		print("updateObstacle null")
+		if obstacle.children then
+			for i = 1, #obstacle.children, 1 do
+				local new_ancestry = util.shallowcopy(ancestry)
+				print("new ancestry # = "..#new_ancestry)
+				new_ancestry = table.insert(new_ancestry, obstacle)
+				print("new ancestry # = "..#new_ancestry)
+				updateObstacle(obstacle.children[i], new_ancestry)
+			end
+		end
+	else
+		print("updateObstacle "..obstacle.type)
+		reposition(obstacle, ancestry)
+	end
+end
+
 
 -- OBSTACLE OPTION 1: Creates a new Corona recognized display object from its data
 local function createDisplayObject(thisObject, ancestry)
@@ -459,9 +486,7 @@ end
 
 -- Updates all displayObjects (Spikes, squares, powerups, etc...)
 local function updateDisplayObjects()
-    for i = 1, #activeDisplayObjects, 1 do
-        reposition(activeDisplayObjects[i])
-    end
+    
 end
 
 
@@ -508,8 +533,8 @@ local function onEnterFrame()
 		last_frame_time = t
 
 		total_norm_sec = total_norm_sec + (time_scale*dt)
-		--updateTransitions(dt) -- TODO
-		updateDisplayObjects()
+		-- updateTransitions(dt) -- TODO
+		-- updateDisplayObjects()
 	    bubble.applyForce()
 	    if gameStarted and (bubble.numBubbles() == 0) then
 	        gameStarted = false
@@ -585,13 +610,16 @@ end
 
 local function addObstacle_tapped(event)
 	print("addObstacle_tapped")
-	local obstacle = newObstacle(lb.obstacle(10000, 1))
+	local obstacle = newObstacle(lb.testObject())
 	table.insert(activeObstacles, obstacle)
 end
 
 local function addTime_tapped(event)
 	print("addTime_tapped")
 	updateTransitions(1000)
+	for i = 1, #activeObstacles, 1 do
+		updateObstacle(activeObstacles[i])
+	end
 end
 
 
@@ -730,7 +758,7 @@ function scene:show( event )
 
         -- Run the intro, then start the game!
         run_intro()
-        timer.performWithDelay(1000, start_game)
+        timer.performWithDelay(100, start_game)
     end
 end
 
