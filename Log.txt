@@ -88,8 +88,9 @@ HARD CORE CODING:
 12/27	11:30am		1:30				Continued implementing time synced transitions (Transitioner implementation)
 12/27	5:55pm		0:50				Continued work on transitioner implementation
 12/28	6:40pm		1:40				Continued work on transitioner implementation. Debugged updateTransitions, began writing updateObstacle
+12/29	3:00pm		1:30				Continued work on transitioner implementation. Debugged updateObstacle. Worked on destroyObject
 ------------------------------------------------------------------------------------------------------------------------------
-					68:45 TOTAL
+					70:15 TOTAL
 
 
-THE GRAND TOTAL:	74:30
+THE GRAND TOTAL:	76:00

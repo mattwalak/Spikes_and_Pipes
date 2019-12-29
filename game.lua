@@ -126,98 +126,112 @@ local function stopTransitions()
     end
 end
 
+-- Sets object to nil, remove all children, remove all transitioners. If contained in activeObstacles, will be removed too
+local function destroyObject(thisObject)
+	if not thisObject then return end
+    if thisObject.type == "null" then
+    	if thisObject.children then
+    		for i = 1, #thisObject.children, 1 do
+    			destroyObject(thisObject.children[i])
+    		end
+    	end
+
+    	util.removeFromList(activeTransitioners, thisObject.linkedTransitioner)
+    	thisObject.linkedTransitioner = nil
+
+	    if util.tableContains(activeObstacles, thisObject) then
+	    	util.removeFromList(activeObstacles, thisObject)
+	    end
+
+	    if thisObject.parent then
+	    	util.removeFromList(thisObject.parent.children, thisObject)
+	    end
+    else
+    	if thisObject.image then
+    		thisObject.image:removeSelf()
+    		thisObject.image = nil
+    	end
+    end
+
+    thisObject = nil
+end
+
 -- Updates all transition objects and corresponding null objects
 local function updateTransitions(dt)
 	local scaled_time = dt*time_scale
-	for i = 1, #activeTransitioners, 1 do
+	local i = 1
+	while i <= #activeTransitioners do
+		print("i = "..i..", activeTransitioners = "..#activeTransitioners)
 		local t = activeTransitioners[i]
 		t.internal_time = t.internal_time + scaled_time
 		--print("["..i.."] "..t.name)
-		--print("\tInternal time = "..t.internal_time)
-		
-		if t.internal_time/t.total_time >= 1 then
+		print("\tInternal time = "..t.internal_time)
+		print("\tTotal time = "..t.total_time)
+		print("\tOncomplete = "..t.on_complete)
+
+		local continue = true
+		if (t.internal_time/t.total_time) >= 1 then
 			if t.on_complete == "destroy" then
-				-- DESTROY
+				print("DESTROY!!!")
+				print("#transitioners before = "..#activeTransitioners)
+				destroyObject(t.linkedNull)
+				print("#transitioners after = "..#activeTransitioners)
+				i = 0
+				continue = false
 			elseif t.on_complete == "stop" then
-				-- STOP!
+				continue = false
 			end
 		end
 
-		local time = t.internal_time%t.total_time
-		--print("\ttime = "..time)
+		if continue then
+			local time = t.internal_time%t.total_time
+			--print("\ttime = "..time)
 
-		-- Find the most recent frame percent
-		local last_frame = -1
-		local time_sum = 0
-		--print("\ttransition_time:")
-		--[[
-		for i = 1, #t.transition_time, 1 do
-			time_sum = time_sum + t.transition_time[i]
-			--print("\t\t["..i.."] = "..t.transition_time[i].."; time_sum = "..time_sum)
-		end]]--
-		time_sum = 0
-		for i = 1, #t.transition_time, 1 do
-			time_sum = time_sum + t.transition_time[i]
-			if time < time_sum then
-				last_frame = i
-				break
+			-- Find the most recent frame percent
+			local last_frame = -1
+			local time_sum = 0
+			--print("\ttransition_time:")
+			--[[
+			for i = 1, #t.transition_time, 1 do
+				time_sum = time_sum + t.transition_time[i]
+				--print("\t\t["..i.."] = "..t.transition_time[i].."; time_sum = "..time_sum)
+			end]]--
+			time_sum = 0
+			for i = 1, #t.transition_time, 1 do
+				time_sum = time_sum + t.transition_time[i]
+				if time < time_sum then
+					last_frame = i
+					break
+				end
 			end
+			local next_frame = (last_frame%(#t.transition_time))+1
+			--print("\tlast_frame = "..last_frame.."; next_frame = "..next_frame)
+
+			local time_into_frame = time - (time_sum - t.transition_time[last_frame])-- Time into transition
+			--print("\ttime_into_frame = "..time_into_frame)
+			local total_frame_time = t.transition_time[last_frame]
+			--print("\ttotal_frame_time = "..total_frame_time)
+			local percent = time_into_frame/total_frame_time
+			percent = util.scale(percent, "linear")
+			--print("\tpercent = "..percent)
+
+			-- Calculate new position
+			local ori_pos = t.position_path[last_frame]
+			local ori_rot = t.rotation_path[last_frame]
+			local new_pos = t.position_path[next_frame]
+			local new_rot = t.rotation_path[next_frame]
+			local new_x = ori_pos.x+((new_pos.x-ori_pos.x)*percent)
+			local new_y = ori_pos.y+((new_pos.y-ori_pos.y)*percent)
+			local new_rot = ori_rot+((new_rot-ori_rot)*percent)
+			--print("\tnew_x = "..new_x..", new_y = "..new_y..", new_rot = "..new_rot)
+
+			t.linkedNull.x = new_x
+			t.linkedNull.y = new_y
+			t.linkedNull.rotation = new_rot
 		end
-		local next_frame = (last_frame%(#t.transition_time))+1
-		--print("\tlast_frame = "..last_frame.."; next_frame = "..next_frame)
-
-		local time_into_frame = time - (time_sum - t.transition_time[last_frame])-- Time into transition
-		--print("\ttime_into_frame = "..time_into_frame)
-		local total_frame_time = t.transition_time[last_frame]
-		--print("\ttotal_frame_time = "..total_frame_time)
-		local percent = time_into_frame/total_frame_time
-		percent = util.scale(percent, "linear")
-		--print("\tpercent = "..percent)
-
-		-- Calculate new position
-		local ori_pos = t.position_path[last_frame]
-		local ori_rot = t.rotation_path[last_frame]
-		local new_pos = t.position_path[next_frame]
-		local new_rot = t.rotation_path[next_frame]
-		local new_x = ori_pos.x+((new_pos.x-ori_pos.x)*percent)
-		local new_y = ori_pos.y+((new_pos.y-ori_pos.y)*percent)
-		local new_rot = ori_rot+((new_rot-ori_rot)*percent)
-		--print("\tnew_x = "..new_x..", new_y = "..new_y..", new_rot = "..new_rot)
-
-		t.linkedNull.x = new_x
-		t.linkedNull.y = new_y
-		t.linkedNull.rotation = new_rot
+		i = i + 1
 	end
 end
-
--- Stops all transitions and destroys a null object and its children (And grandchildren)
-local function destroyObject(thisObject)
-    -- Test if destroyed before
-	if not thisObject then return end
-
-    if thisObject.type == "null" then
-        transition.cancel(thisObject) -- Just changed this from deleting by tag/name... Check to see if you can/should eliminate tagging transitions
-        if thisObject.children then
-        	for i = 0, #thisObject.children, 1 do
-        		destroyObject(thisObject.children[i])
-        	end
-        end
-        util.removeFromList(activeNullObjects, thisObject)
-        thisObject = nil  -- DisplayObjects know if one of their parents is nill (They will delete themselves)
-    else
-        -- Test if object already removed (ie coin collected)
-        if thisObject.image.collected then 
-            thisObject.image = nil
-            thisObject = nil
-        else
-            util.removeFromList(activeDisplayObjects, thisObject.image)
-            thisObject.image:removeSelf()
-            thisObject.image = nil
-            thisObject = nil
-        end
-    end
-end
-
 
 -- Transitions a null object from current_frame to current_frame + 1
 local function keyframeNull(thisNull)
@@ -276,44 +290,65 @@ local function keyframeNull(thisNull)
     
 end
 
--- Repositions a display object based on its ancestry
-local function reposition(displayObject, ancestry)
-	print("#ancestry = "..#ancestry)
-	for i = 1, #ancestry, 1 do
-		print("[[["..i.."]]]")
-		util.tprint(ancestry[i])
-	end
+-- Creates the required corona object for a displayObject. Also adds object to physics engine
+local function getImage(displayObject)
+	local image
+	if displayObject.type == "black_square" then
+		image = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
+        imageOutline = graphics.newOutline(2, "Game/Obstacle/black_square.png")
+    elseif displayObject.type == "spike" then
+		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
+        imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
+    elseif displayObject.type == "coin" then
+        image = display.newSprite(A.sheet_coin, A.sequences_coin)
+        obstacleGroup:insert(image)
+        image:play()
+        image.collected = false
+        imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
+    elseif displayObject.type == "text" then
+    	image = display.newText(obstacleGroup, thisObject.text, thisObject.x, thisObject.y, thisObject.font, thisObject.fontSize)
+    	image:setFillColor( thisObject.color[1], thisObject.color[2], thisObject.color[3] )
+    	imageOutline = nil
+    end
 
-	--[[
+    if displayObject.type ~= "text" then
+    	physics.addBody(image, "static", {outline=imageOutline})
+    end
+
+	return image
+end
+
+-- Repositions a display object based on its ancestry
+local function reposition(displayObject, ancestry)	
     local total_x = 0
     local total_y = 0
     local last_rot = 0
     local total_rot = 0
 
-    local ancestry = displayObject.ancestry
     for i = 1, #ancestry+1, 1 do
         local thisObject
         if i > #ancestry then
             thisObject = displayObject
         else
             thisObject = ancestry[i]
-            thisObject.r_x = thisObject.x
-            thisObject.r_y = thisObject.y
-            thisObject.r_rot = thisObject.rotation
         end
 
-        local r_x = thisObject.r_x*math.cos(math.rad(total_rot))-thisObject.r_y*math.sin(math.rad(total_rot))
-        local r_y = thisObject.r_y*math.cos(math.rad(total_rot))+thisObject.r_x*math.sin(math.rad(total_rot))
+        local r_x = thisObject.x*math.cos(math.rad(total_rot))-thisObject.y*math.sin(math.rad(total_rot))
+        local r_y = thisObject.y*math.cos(math.rad(total_rot))+thisObject.x*math.sin(math.rad(total_rot))
         total_x = total_x + r_x
         total_y = total_y + r_y
-        total_rot = total_rot + thisObject.r_rot
-        last_rot = thisObject.r_rot
+        total_rot = total_rot + thisObject.rotation
+        last_rot = thisObject.rotation
     end
 
     -- Place this object (rotated) at this point
-    displayObject.x = total_x
-    displayObject.y = total_y
-    displayObject.rotation = total_rot]]--
+    if not displayObject.image then
+    	displayObject.image = getImage(displayObject)
+    end 
+
+    displayObject.image.x = total_x * CN.COL_WIDTH
+    displayObject.image.y = total_y * CN.COL_WIDTH
+    displayObject.image.rotation = total_rot
 end
 
 local function updateObstacle(obstacle, ancestry)
@@ -321,18 +356,14 @@ local function updateObstacle(obstacle, ancestry)
 	if not ancestry then ancestry = {} end
 
 	if obstacle.type == "null" then
-		print("updateObstacle null")
 		if obstacle.children then
 			for i = 1, #obstacle.children, 1 do
 				local new_ancestry = util.shallowcopy(ancestry)
-				print("new ancestry # = "..#new_ancestry)
-				new_ancestry = table.insert(new_ancestry, obstacle)
-				print("new ancestry # = "..#new_ancestry)
+				new_ancestry[#new_ancestry+1] = obstacle
 				updateObstacle(obstacle.children[i], new_ancestry)
 			end
 		end
 	else
-		print("updateObstacle "..obstacle.type)
 		reposition(obstacle, ancestry)
 	end
 end
@@ -412,11 +443,12 @@ local function newTransitioner(obstacleData, linkedNull)
 end	
 
 -- Returns a nestled obstacle. Creates all neccesary transitions for nulls in between
-local function newObstacle(obstacleData)
+local function newObstacle(obstacleData, parent)
     if not obstacleData then return {} end
     local thisObject = {}
 
     if obstacleData.type == "null" then
+    	thisObject.parent = parent
     	thisObject.type = "null"
     	thisObject.name = obstacleData.name
     	thisObject.x = 0 -- Will be updated later
@@ -425,13 +457,14 @@ local function newObstacle(obstacleData)
 
     	-- Create transitioner
     	local transitioner = newTransitioner(obstacleData, thisObject)
+    	thisObject.linkedTransitioner = transitioner
     	table.insert(activeTransitioners, transitioner)
 
     	-- Get children
     	thisObject.children = {}
     	if obstacleData.children then
     		for i = 1, #obstacleData.children, 1 do
-    			local newChild = newObstacle(obstacleData.children[i])
+    			local newChild = newObstacle(obstacleData.children[i], thisObject)
     			table.insert(thisObject.children, newChild)
     		end
     	end
@@ -610,13 +643,13 @@ end
 
 local function addObstacle_tapped(event)
 	print("addObstacle_tapped")
-	local obstacle = newObstacle(lb.testObject())
+	local obstacle = newObstacle(lb.obstacle(5000, 3))
 	table.insert(activeObstacles, obstacle)
 end
 
 local function addTime_tapped(event)
 	print("addTime_tapped")
-	updateTransitions(1000)
+	updateTransitions(500)
 	for i = 1, #activeObstacles, 1 do
 		updateObstacle(activeObstacles[i])
 	end

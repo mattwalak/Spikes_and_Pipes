@@ -184,23 +184,22 @@ end
 
 -- Just so I can call this from game.lua -> delete later?
 function lb.testObject()
-	local object = {
-		type = "black_square",
-		x = 0,
-		y = 0,
-		rotation = 0
-	}
+	local object = lb.spike2Edge(0,0,0)
 
+	local bottomExtend = 0
+	local topExtend = 0
+	local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
+    local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
     local parent = {
         type = "null",
         name = "testObject",
-        position_path = {util.newPoint(0,0), util.newPoint(1,1), util.newPoint(2,2)},
-        rotation_path = {0,1,2},
-        transition_time = {3000, 2000, 5000},
+        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y+bottomExtend), util.newPoint(MIDDLE_X, 0-topExtend)},
+        rotation_path = {0,180},
+        transition_time = {5000, 5000},
         position_interpolation = easing.linear,
         rotation_interpolation = easing.linear,
-        on_complete = "loop",
-        first_frame = 1,
+        on_complete = "destroy",
+        first_frame = 2,
         children = {object}
     }
     return parent
@@ -233,7 +232,7 @@ local function lineModel(startPoint, endPoint, num_objects, period, ease_pos, ea
         local y = dy + startPoint.y
         table.insert(position_path, util.newPoint(x, y))
         table.insert(rotation_path, 0)
-        if i == 1 then
+        if i == (num_objects+1) then
             table.insert(transition_time, 0)
         else
             table.insert(transition_time, period/num_objects)
