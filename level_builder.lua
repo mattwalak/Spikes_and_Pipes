@@ -85,6 +85,23 @@ local function newParent(speed, name, topExtend, bottomExtend)
     return parent
 end
 
+-- Just so I can call this from game.lua -> delete later?
+function lb.testObject()
+    local parent = {
+        type = "null",
+        name = "testObject",
+        position_path = {util.newPoint(0,0), util.newPoint(1,1), util.newPoint(2,2)},
+        rotation_path = {0,1,2},
+        transition_time = {3000, 2000, 5000},
+        position_interpolation = easing.linear,
+        rotation_interpolation = easing.linear,
+        on_complete = "loop",
+        first_frame = 1,
+        children = {}
+    }
+    return parent
+end
+
 -- Duplicates object (with deep copy) and creates of list of length num_objects, leaving indicies specified in ignore as nil
 local function newObjectList(num_objects, ignore, object)
 	if not ignore then ignore = {} end

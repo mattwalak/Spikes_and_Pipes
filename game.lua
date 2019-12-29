@@ -7,6 +7,7 @@ local levels = require("levels")
 local util = require("util")
 local CN = require ("crazy_numbers")
 local A = require ("animation")
+local lb = require ("level_builder")
 local composer = require( "composer" )
 local bubble = require("bubble")
 local scene = composer.newScene()
@@ -131,9 +132,8 @@ local function updateTransitions(dt)
 	for i = 1, #activeTransitioners, 1 do
 		local t = activeTransitioners[i]
 		t.internal_time = t.internal_time + scaled_time
-		if t.name == "diagonalLatice1__transitioner" then
-			-- print(t.internal_time)
-		end
+		--print("["..i.."] "..t.name)
+		--print("\tInternal time = "..t.internal_time)
 		
 		if t.internal_time/t.total_time >= 1 then
 			if t.on_complete == "destroy" then
@@ -144,24 +144,35 @@ local function updateTransitions(dt)
 		end
 
 		local time = t.internal_time%t.total_time
+		--print("\ttime = "..time)
 
 		-- Find the most recent frame percent
-		local last_frame = 1
+		local last_frame = -1
 		local time_sum = 0
+		--print("\ttransition_time:")
+		--[[
 		for i = 1, #t.transition_time, 1 do
-			--local frameOfInterest = ((i-1)%#t.transition_time)+1
+			time_sum = time_sum + t.transition_time[i]
+			--print("\t\t["..i.."] = "..t.transition_time[i].."; time_sum = "..time_sum)
+		end]]--
+		time_sum = 0
+		for i = 1, #t.transition_time, 1 do
 			time_sum = time_sum + t.transition_time[i]
 			if time < time_sum then
 				last_frame = i
 				break
 			end
 		end
-		local next_frame = (last_frame%#t.transition_time)+1
+		local next_frame = (last_frame%(#t.transition_time))+1
+		--print("\tlast_frame = "..last_frame.."; next_frame = "..next_frame)
 
-		local time_into_frame = time - time_sum -- Time into transition
-		local total_frame_time = t.transition_time[next_frame]
+		local time_into_frame = time - (time_sum - t.transition_time[last_frame])-- Time into transition
+		--print("\ttime_into_frame = "..time_into_frame)
+		local total_frame_time = t.transition_time[last_frame]
+		--print("\ttotal_frame_time = "..total_frame_time)
 		local percent = time_into_frame/total_frame_time
 		percent = util.scale(percent, "linear")
+		--print("\tpercent = "..percent)
 
 		-- Calculate new position
 		local ori_pos = t.position_path[last_frame]
@@ -171,6 +182,7 @@ local function updateTransitions(dt)
 		local new_x = ori_pos.x+((new_pos.x-ori_pos.x)*percent)
 		local new_y = ori_pos.y+((new_pos.y-ori_pos.y)*percent)
 		local new_rot = ori_rot+((new_rot-ori_rot)*percent)
+		--print("\tnew_x = "..new_x..", new_y = "..new_y..", new_rot = "..new_rot)
 
 		t.linkedNull.x = new_x
 		t.linkedNull.y = new_y
@@ -496,7 +508,7 @@ local function onEnterFrame()
 		last_frame_time = t
 
 		total_norm_sec = total_norm_sec + (time_scale*dt)
-		updateTransitions(dt) -- TODO
+		--updateTransitions(dt) -- TODO
 		updateDisplayObjects()
 	    bubble.applyForce()
 	    if gameStarted and (bubble.numBubbles() == 0) then
@@ -572,8 +584,14 @@ end
 
 
 local function addObstacle_tapped(event)
-	local obstacle = newObstacle(level_data.obstacles[1])
+	print("addObstacle_tapped")
+	local obstacle = newObstacle(lb.obstacle(10000, 1))
 	table.insert(activeObstacles, obstacle)
+end
+
+local function addTime_tapped(event)
+	print("addTime_tapped")
+	updateTransitions(1000)
 end
 
 
@@ -636,15 +654,24 @@ function scene:create( event )
     backgroundGroup:insert(bg)
 
 
-    -- Creates temporary play button with event listener
- 	local button = display.newRect(uiGroup, display.contentWidth/2, display.contentHeight/2,
+
+    -- Add obstacle button
+ 	local button = display.newRect(uiGroup, 3*display.contentWidth/4, 3*display.contentHeight/4,
  	display.contentWidth/2,display.contentHeight/8)
  	button:setFillColor(0,127,0)
  	button:addEventListener("tap", addObstacle_tapped)
-
- 	-- Adds text (so we know where we are)
  	local text = display.newText(uiGroup, "add obstacle", 
- 		display.contentWidth/2, display.contentHeight/2,
+ 		3*display.contentWidth/4, 3*display.contentHeight/4,
+ 		native.systemFont)
+ 	text:setFillColor(0,0,0)
+
+ 	-- Increase time button
+ 	local button = display.newRect(uiGroup, display.contentWidth/4, 3*display.contentHeight/4,
+ 	display.contentWidth/2,display.contentHeight/8)
+ 	button:setFillColor(127,0,0)
+ 	button:addEventListener("tap", addTime_tapped)
+ 	local text = display.newText(uiGroup, "add 1000", 
+ 		display.contentWidth/4, 3*display.contentHeight/4,
  		native.systemFont)
  	text:setFillColor(0,0,0)
 
