@@ -129,10 +129,11 @@ end
 -- Sets object to nil, remove all children, remove all transitioners. If contained in activeObstacles, will be removed too
 local function destroyObject(thisObject)
 	if not thisObject then return end
+	print("destoying object = "..thisObject.name)
     if thisObject.type == "null" then
     	if thisObject.children then
-    		for i = 1, #thisObject.children, 1 do
-    			destroyObject(thisObject.children[i])
+    		while #thisObject.children > 0 do -- Children will remove themselves from the parent
+    			destroyObject(thisObject.children[1])
     		end
     	end
 
@@ -151,6 +152,8 @@ local function destroyObject(thisObject)
     		thisObject.image:removeSelf()
     		thisObject.image = nil
     	end
+
+    	util.removeFromList(thisObject.parent.children, thisObject)
     end
 
     thisObject = nil
@@ -161,24 +164,28 @@ local function updateTransitions(dt)
 	local scaled_time = dt*time_scale
 	local i = 1
 	while i <= #activeTransitioners do
-		print("i = "..i..", activeTransitioners = "..#activeTransitioners)
+		-- print("i = "..i..", activeTransitioners = "..#activeTransitioners)
 		local t = activeTransitioners[i]
 		t.internal_time = t.internal_time + scaled_time
 		--print("["..i.."] "..t.name)
-		print("\tInternal time = "..t.internal_time)
-		print("\tTotal time = "..t.total_time)
-		print("\tOncomplete = "..t.on_complete)
+		-- print("\tInternal time = "..t.internal_time)
+		-- print("\tTotal time = "..t.total_time)
+		-- print("\tOncomplete = "..t.on_complete)
 
 		local continue = true
 		if (t.internal_time/t.total_time) >= 1 then
 			if t.on_complete == "destroy" then
 				print("DESTROY!!!")
-				print("#transitioners before = "..#activeTransitioners)
+				print("#transitioners before = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
 				destroyObject(t.linkedNull)
-				print("#transitioners after = "..#activeTransitioners)
-				i = 0
+				print("#transitioners after = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
+				i = 0 -- Probably a better way to do this, but we just go through all transitioners again
 				continue = false
 			elseif t.on_complete == "stop" then
+				continue = false
+			end
+
+			if t.transition_time[1] < 0 then
 				continue = false
 			end
 		end
@@ -228,6 +235,7 @@ local function updateTransitions(dt)
 			t.linkedNull.x = new_x
 			t.linkedNull.y = new_y
 			t.linkedNull.rotation = new_rot
+
 		end
 		i = i + 1
 	end
@@ -446,9 +454,9 @@ end
 local function newObstacle(obstacleData, parent)
     if not obstacleData then return {} end
     local thisObject = {}
+    thisObject.parent = parent
 
     if obstacleData.type == "null" then
-    	thisObject.parent = parent
     	thisObject.type = "null"
     	thisObject.name = obstacleData.name
     	thisObject.x = 0 -- Will be updated later
@@ -470,6 +478,7 @@ local function newObstacle(obstacleData, parent)
     	end
     else
     	thisObject.type = obstacleData.type -- Some display object
+    	thisObject.name = obstacleData.type.."_display"
     	thisObject.x = obstacleData.x
     	thisObject.y = obstacleData.y
     	thisObject.rotation = obstacleData.rotation
@@ -566,8 +575,11 @@ local function onEnterFrame()
 		last_frame_time = t
 
 		total_norm_sec = total_norm_sec + (time_scale*dt)
-		-- updateTransitions(dt) -- TODO
-		-- updateDisplayObjects()
+		updateTransitions(dt) -- TODO
+		for i = 1, #activeObstacles, 1 do
+			updateObstacle(activeObstacles[i])
+		end
+
 	    bubble.applyForce()
 	    if gameStarted and (bubble.numBubbles() == 0) then
 	        gameStarted = false
@@ -643,13 +655,13 @@ end
 
 local function addObstacle_tapped(event)
 	print("addObstacle_tapped")
-	local obstacle = newObstacle(lb.obstacle(5000, 3))
+	local obstacle = newObstacle(lb.testObject(), nil)
 	table.insert(activeObstacles, obstacle)
 end
 
 local function addTime_tapped(event)
 	print("addTime_tapped")
-	updateTransitions(500)
+	updateTransitions(2000)
 	for i = 1, #activeObstacles, 1 do
 		updateObstacle(activeObstacles[i])
 	end

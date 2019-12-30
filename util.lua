@@ -11,6 +11,34 @@ local _bottom = -(display.contentHeight/CN.COL_WIDTH)/2
 local _halfSpikeWidth = CN.SPIKE_WIDTH/2
 local _halfSpikeHeight = CN.SPIKE_HEIGHT/2
 
+-- Prints an obstacle without going into an infinite loop
+function util.printObstacle(obstacle, indent)
+    if not indent then indent = 0 end
+    local format = string.rep("\t", indent)
+    io.write(format.."ref = ")
+    print(obstacle)
+    print(format.."name = "..obstacle.name)
+    print(format.."type = "..obstacle.type)
+    print(format.."x = "..obstacle.x)
+    print(format.."y = "..obstacle.y)
+    print(format.."rotation = "..obstacle.y)
+
+    io.write(format.."image = ")
+    print(obstacle.image)
+
+    io.write(format.."parent_ref = ")
+    print(obstacle.parent)
+
+    if obstacle.children then
+        print(format.."children: ")
+        for i = 1, #obstacle.children, 1 do
+            print(format.."["..i.."]")
+            util.printObstacle(obstacle.children[i], indent+1)
+        end
+    else
+        print(format.."children = nil")
+    end
+end
 
 -- Scales a percent [0-1] to another percent with a given easing
 function util.scale(percent, ease)

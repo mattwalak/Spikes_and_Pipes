@@ -182,29 +182,6 @@ end
 -- Rigid line of objects, where startPoint is the center and space_width is the distance between the center of each object
 -- local function fillLine(centerPoint, space_width, num_objects, ignore, object) -- Also don't know if I need this if I you can make a still line from simpleLine
 
--- Just so I can call this from game.lua -> delete later?
-function lb.testObject()
-	local object = lb.spike2Edge(0,0,0)
-
-	local bottomExtend = 0
-	local topExtend = 0
-	local BOTTOM_Y = (display.contentHeight/CN.COL_WIDTH)
-    local MIDDLE_X = (display.contentWidth/CN.COL_WIDTH)/2
-    local parent = {
-        type = "null",
-        name = "testObject",
-        position_path = {util.newPoint(MIDDLE_X, BOTTOM_Y+bottomExtend), util.newPoint(MIDDLE_X, 0-topExtend)},
-        rotation_path = {0,180},
-        transition_time = {5000, 5000},
-        position_interpolation = easing.linear,
-        rotation_interpolation = easing.linear,
-        on_complete = "destroy",
-        first_frame = 2,
-        children = {object}
-    }
-    return parent
-end
-
 
 --============ MODEL OBJECTS: Returns nulls with animated paths for use as models (single null object) =================================================================
 
@@ -858,6 +835,17 @@ function lb.obstacle(speed, i)
 	elseif i == 16 then
 
 	end
+end
+
+-- Just so I can call this from game.lua -> delete later?
+function lb.testObject()
+	-- local function simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
+	local obstacle = newParent(10000, "testObject", 0,0)
+	local line = simpleLine(util.newPoint(-5,0), util.newPoint(5,0), 30, 8000, nil, lb.basicObject(0,0,0,"coin"), nil, nil) 
+
+	mergeObstacle(obstacle, line)
+
+	return obstacle
 end
 
 return lb
