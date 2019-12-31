@@ -129,7 +129,6 @@ end
 -- Sets object to nil, remove all children, remove all transitioners. If contained in activeObstacles, will be removed too
 local function destroyObject(thisObject)
 	if not thisObject then return end
-	print("destoying object = "..thisObject.name)
     if thisObject.type == "null" then
     	if thisObject.children then
     		while #thisObject.children > 0 do -- Children will remove themselves from the parent
@@ -148,10 +147,10 @@ local function destroyObject(thisObject)
 	    	util.removeFromList(thisObject.parent.children, thisObject)
 	    end
     else
-    	if thisObject.image then
-    		thisObject.image:removeSelf()
-    		thisObject.image = nil
+    	if not thisObject.collected then
+			thisObject.image:removeSelf()
     	end
+    	thisObject.image = nil
 
     	util.removeFromList(thisObject.parent.children, thisObject)
     end
@@ -175,10 +174,10 @@ local function updateTransitions(dt)
 		local continue = true
 		if (t.internal_time/t.total_time) >= 1 then
 			if t.on_complete == "destroy" then
-				print("DESTROY!!!")
-				print("#transitioners before = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
+				-- print("DESTROY!!!")
+				-- print("#transitioners before = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
 				destroyObject(t.linkedNull)
-				print("#transitioners after = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
+				-- print("#transitioners after = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
 				i = 0 -- Probably a better way to do this, but we just go through all transitioners again
 				continue = false
 			elseif t.on_complete == "stop" then
@@ -352,6 +351,7 @@ local function reposition(displayObject, ancestry)
     -- Place this object (rotated) at this point
     if not displayObject.image then
     	displayObject.image = getImage(displayObject)
+    	displayObject.image.type = displayObject.type
     end 
 
     displayObject.image.x = total_x * CN.COL_WIDTH
@@ -428,7 +428,11 @@ local function newTransitioner(obstacleData, linkedNull)
     	internal_time = internal_time + time_offset
     end
     if obstacleData.first_frame ~= 1 then
-    	internal_time = internal_time + obstacleData.transition_time[obstacleData.first_frame-1]
+    	local sum_time = 0
+    	for i = 2, obstacleData.first_frame, 1 do
+    		sum_time = sum_time + obstacleData.transition_time[i]
+    	end
+    	internal_time = internal_time + sum_time
     end
     t.internal_time = internal_time
 
@@ -568,14 +572,36 @@ local function gameOver()
 
 end
 
+-- Gets new time scale from bubble_num (Maybe do a non-linear thing?)
+local function getTimeScale(num_bubbles)
+	local diff = CN.START_CLUMP_SIZE-num_bubbles
+	local frac = diff/CN.START_CLUMP_SIZE
+	local add = frac*1
+	local goal = 1+add
+
+	if time_scale < goal then
+		print("increase time scale")
+		return time_scale + .01
+	elseif time_scale > goal then
+		print("decrease time scale")
+		return time_scale - .01
+	else
+		return time_scale
+	end
+end
+
+
 local function onEnterFrame()
 	if gameStarted then
+		time_scale = getTimeScale(bubble.numBubbles())
+
+
 		local t = system.getTimer()
 		local dt = t - last_frame_time
 		last_frame_time = t
 
 		total_norm_sec = total_norm_sec + (time_scale*dt)
-		updateTransitions(dt) -- TODO
+		updateTransitions(dt)
 		for i = 1, #activeObstacles, 1 do
 			updateObstacle(activeObstacles[i])
 		end
@@ -601,6 +627,7 @@ end
 -- Starts the game!
 local function start_game()
     print("starting game")
+    time_scale = 1
     Runtime:addEventListener("enterFrame",onEnterFrame)
     gameStarted = true
 end
@@ -630,18 +657,18 @@ local function onCollision(event)
             if(event.element2 == 2) then
                 return
             end
-            print("coin collision!")
+            --[[print("coin collision!")
             util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
-            obj2.collected = true
+            obj2.collected = true]]--
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
-            print("coin collision!")
+            --[[print("coin collision!")
             util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
-            obj1.collected = true
+            obj1.collected = true]]--
         end
 	end
 end
@@ -655,7 +682,7 @@ end
 
 local function addObstacle_tapped(event)
 	print("addObstacle_tapped")
-	local obstacle = newObstacle(lb.testObject(), nil)
+	local obstacle = newObstacle(lb.obstacle(10000, 8), nil)
 	table.insert(activeObstacles, obstacle)
 end
 

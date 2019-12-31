@@ -841,8 +841,7 @@ end
 function lb.testObject()
 	-- local function simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
 	local obstacle = newParent(10000, "testObject", 0,0)
-	local line = simpleLine(util.newPoint(-5,0), util.newPoint(5,0), 30, 8000, nil, lb.basicObject(0,0,0,"coin"), nil, nil) 
-
+	local line = simpleLine(util.newPoint(-5, 0), util.newPoint(5, 0), 5, 8000, nil, lb.spike2Edge(0,0,0), nil, nil) 
 	mergeObstacle(obstacle, line)
 
 	return obstacle
