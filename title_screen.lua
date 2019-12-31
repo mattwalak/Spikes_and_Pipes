@@ -21,7 +21,7 @@ end
 
 
 
-
+print(display.contentHeight/CN.COL_WIDTH)
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions

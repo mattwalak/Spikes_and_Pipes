@@ -32,6 +32,9 @@ local INTRO_DELAY = 80
 local INTRO_FORCE = -.7
 local INTRO_RANDOM_WIDTH = .25
 
+-- Game
+local BASE_OBSTACLE_TIME = 10000
+
 
 local crazy_numbers = {
 	-- Display
@@ -63,6 +66,9 @@ local crazy_numbers = {
 	INTRO_DELAY = INTRO_DELAY,
 	INTRO_FORCE = INTRO_FORCE,
 	INTRO_RANDOM_WIDTH = INTRO_RANDOM_WIDTH,
+
+	-- Game
+	BASE_OBSTACLE_TIME = BASE_OBSTACLE_TIME,
 
 	-- Debug
 	DBG_TOUCH_TYPE = "1",

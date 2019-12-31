@@ -45,6 +45,7 @@ local activeTransitioners = {} -- One transition for each null object
 
 local last_frame_time -- Time in ms of the last frame render
 local time_scale -- Value of each ms in game time
+local next_obstacle_time -- Time when next obstacle is added
 
 local gameStarted = false
 
@@ -181,10 +182,6 @@ local function updateTransitions(dt)
 				i = 0 -- Probably a better way to do this, but we just go through all transitioners again
 				continue = false
 			elseif t.on_complete == "stop" then
-				continue = false
-			end
-
-			if t.transition_time[1] < 0 then
 				continue = false
 			end
 		end
@@ -580,10 +577,10 @@ local function getTimeScale(num_bubbles)
 	local goal = 1+add
 
 	if time_scale < goal then
-		print("increase time scale")
+		-- print("increase time scale")
 		return time_scale + .01
 	elseif time_scale > goal then
-		print("decrease time scale")
+		-- print("decrease time scale")
 		return time_scale - .01
 	else
 		return time_scale
@@ -593,26 +590,35 @@ end
 
 local function onEnterFrame()
 	if gameStarted then
-		time_scale = getTimeScale(bubble.numBubbles())
+		time_scale = getTimeScale(bubble.numBubbles())                -- Update time scale
 
-
-		local t = system.getTimer()
+		local t = system.getTimer()                                   -- Get change in time
 		local dt = t - last_frame_time
 		last_frame_time = t
-
 		total_norm_sec = total_norm_sec + (time_scale*dt)
-		updateTransitions(dt)
+
+        if total_norm_sec > next_obstacle_time then                   -- Add next obstacle (If applicable)
+            local obstacle_num = math.random(10)
+            local obstacle
+            local wait_time
+            obstacle, wait_time = lb.obstacle(CN.BASE_OBSTACLE_TIME, 1)
+            obstacle = newObstacle(obstacle, nil)
+            table.insert(activeObstacles, obstacle)
+            next_obstacle_time = total_norm_sec + wait_time
+        end
+
+		updateTransitions(dt)                                         -- Update transitioners and obstacles
 		for i = 1, #activeObstacles, 1 do
 			updateObstacle(activeObstacles[i])
 		end
 
-	    bubble.applyForce()
+	    bubble.applyForce()                                            -- Apply bubble force
 	    if gameStarted and (bubble.numBubbles() == 0) then
 	        gameStarted = false
 	        gameOver()
 	    end
 
-	    score = total_norm_sec
+	    score = total_norm_sec                                         -- Update score and score text
 	    update_scoreText()
     end
 end
@@ -627,8 +633,13 @@ end
 -- Starts the game!
 local function start_game()
     print("starting game")
-    time_scale = 1
     Runtime:addEventListener("enterFrame",onEnterFrame)
+    
+    time_scale = 1
+    next_obstacle_time = 0
+    total_norm_sec = 0
+    last_frame_time = system.getTimer()
+
     gameStarted = true
 end
 
@@ -644,13 +655,13 @@ local function onCollision(event)
 			if(event.element2 == 2) then
 				return
 			end
-            bubble.popBubble(obj1)
+            --bubble.popBubble(obj1)
 
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
-			bubble.popBubble(obj2)
+			--bubble.popBubble(obj2)
 
         -- COIN COLLISION
 		elseif(obj1.type == "bubble" and obj2.type == "coin") then
@@ -682,7 +693,7 @@ end
 
 local function addObstacle_tapped(event)
 	print("addObstacle_tapped")
-	local obstacle = newObstacle(lb.obstacle(10000, 8), nil)
+	local obstacle = newObstacle(lb.testObject(), nil)
 	table.insert(activeObstacles, obstacle)
 end
 

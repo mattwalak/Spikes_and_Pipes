@@ -26,12 +26,12 @@ function mergeObstacle(ob1, ob2)
 end
 
 -- Wraps list of objects into a single stationary null centered at (x,y)
-local function wrapNull(x, y, object_list)
+local function wrapNull(x, y, rot_deg, object_list)
 	local centeredNull = {
 		type = "null",
 		name = "centered_null",
         position_path = {util.newPoint(x, y), util.newPoint(x, y)},
-        rotation_path = {0,0},
+        rotation_path = {rot_deg, rot_deg},
         transition_time = {1000, 1000},
         position_interpolation = easing.linear,
         rotation_interpolation = easing.linear,
@@ -42,21 +42,11 @@ local function wrapNull(x, y, object_list)
 	return centeredNull
 end
 
--- Wraps list of objects into a single stationary null centered at (0,0)
-local function newCenteredNull(object_list)
-	local centeredNull = {
-		type = "null",
-		name = "centered_null",
-        position_path = {util.newPoint(0, 0), util.newPoint(0, 0)},
-        rotation_path = {0,0},
-        transition_time = {1000, 1000},
-        position_interpolation = easing.linear,
-        rotation_interpolation = easing.linear,
-        on_complete = "stop",
-        first_frame = 2,
-        children = object_list
-	}
-	return centeredNull
+-- Calculates wait time between obstacles based on height of obstacle
+local function getWaitTime(addHeight)
+	local height = display.contentHeight/CN.COL_WIDTH
+	local v = height/CN.BASE_OBSTACLE_TIME
+	return (addHeight+(height/2))/v
 end
 
 -- Wrapper parent object, controls top to bottom screen movement
@@ -131,7 +121,7 @@ local function text(x, y, displayText, fontSize, font, color)
     text.y = y
     text.text = displayText
     text.rotation = 0
-    return newCenteredNull({text})
+    return wrapNull(0,0,0,{text})
 end
 
  -- Basic "atomic" objects, including coin, spike, black_square, black_circle, all powerups, and others
@@ -153,7 +143,7 @@ function lb.basicObject(x, y, rot, object_type)
 		object.y = y
 		object.rotation = rot
 	end
-	return newCenteredNull({object})
+	return wrapNull(0,0,0,{object})
 end
 
 function lb.spike2Edge(x, y, rot)
@@ -172,11 +162,11 @@ local function objectCircle(centerPoint, radius, deg_offset, num_objects, ignore
 	local angle = 2*math.pi/num_objects
 	for i = 1, num_objects, 1 do
 		if objects[i] then
-			local newNull = wrapNull(radius*math.cos(deg_offset+i*angle),radius*math.sin(deg_offset+i*angle), {objects[i]})
+			local newNull = wrapNull(radius*math.cos(deg_offset+i*angle),radius*math.sin(deg_offset+i*angle), 0, {objects[i]})
 			table.insert(positioned_objects, newNull)
 		end
 	end
-	return wrapNull(0,0,positioned_objects)
+	return wrapNull(0,0,0,positioned_objects)
 end
 
 -- Rigid line of objects, where startPoint is the center and space_width is the distance between the center of each object
@@ -271,7 +261,7 @@ local function simpleLine(startPoint, endPoint, num_objects, period, ignore, obj
 	local lineModel = lineModel(startPoint, endPoint, num_objects, period, ease_pos, ease_rot)
 	table.insert(ignore, num_objects+1) -- We don't want to double add the last object
 	local result = wrapLoopPath(lineModel, ignore, object)
-	return newCenteredNull(result)
+	return wrapNull(0,0,0,result)
 end
 
 -- Creates a pingpong line with a single object completing a single revolution in 'period_1 + period_2' time
@@ -292,14 +282,14 @@ local function pingpongLine(startPoint, endPoint, start_rot, end_rot, period_1, 
         children = {util.deepcopy(object)}
 	}
 
-	return wrapNull(0,0,{line})
+	return wrapNull(0,0,0,{line})
 end
 
 local function foursquare(centerPoint, edge_length, period, ignore, object, ease_pos, ease_rot) 
 	if not ignore then ignore = {} end
 	local squareModel = foursquareModel(centerPoint, edge_length, period, ease_pos, ease_rot)
 	local result = wrapLoopPath(squareModel, ignore, object)
-	return newCenteredNull(result)
+	return wrapNull(0,0,0,result)
 end
 
 local function pingpongFillColumns(start_x_offset, end_x_offset, y, period_1, period_2, ignore, object, object_height, object_width, ease_pos, ease_rot)
@@ -344,7 +334,7 @@ local function pingpongFillColumns(start_x_offset, end_x_offset, y, period_1, pe
 end
 
 local function spinObject(anchorPoint, clockwise, deg_offset, period, object)
-	local objects = wrapNull(-anchorPoint.x, -anchorPoint.y, {object})
+	local objects = wrapNull(-anchorPoint.x, -anchorPoint.y, 0, {object})
 
 	local off1 = 360
 	local off2 = 0
@@ -365,35 +355,19 @@ local function spinObject(anchorPoint, clockwise, deg_offset, period, object)
         children = {objects}
 	}
 
-	return wrapNull(0,0,{spin})
+	return wrapNull(0,0,0,{spin})
 end
 
-local function fan(centerPoint, clockwise, radius, deg_offset, period, num_objects, ignore, object, object_height)
-	local line = simpleLine(util.newPoint(-radius+.5, 0), util.newPoint(radius+.5, 0), num_objects, -1, ignore, object)
-	local zero = util.newPoint(0,0)
-	local off1 = 360
-	local off2 = 0
-	if clockwise then
-		off1 = 0
-		off2 = 360
+-- Spike wall with left most spike centered at 0,0
+-- length >= 1
+local function stillSpikeWall(length)
+	local wall = lb.spike2Edge(0,0,0)
+	for i = 1, length-1, 1 do
+		mergeObstacle(wall, lb.spike2Edge(i,0,0))
 	end
-
-
-	local fan = {
-		type = "null",
-		name = "fan",
-        position_path = {zero, zero},
-        rotation_path = {deg_offset+off1, deg_offset+off2},
-        transition_time = {0, period},
-        position_interpolation = ease_pos,
-        rotation_interpolation = ease_rot,
-        on_complete = "loop",
-        first_frame = 1,
-        children = {line}
-	}
-
-	return wrapNull(centerPoint.x,centerPoint.y,{fan})
+	return wall
 end
+
 
 local function doubleThwomp(height)
 	local left = simpleLine(util.newPoint(_left, .5), util.newPoint(), num_objects, period, ignore, object, ease_pos, ease_rot) 
@@ -460,14 +434,6 @@ function lb.newPingpongFillColumns_(speed, start_x_offset, end_x_offset, y, peri
 	return obstacle
 end
 
--- NOTE: object_height/2 method only works if deg_offset = 0
-function lb.newFan_(speed, clockwise, centerPoint, radius, deg_offset, period, num_objects, ignore, object, object_height)
-	local obstacle = newParent(speed, "newFan_", centerPoint.y+radius+.5, -centerPoint.y+radius+.5)
-	local fan = fan(centerPoint, clockwise, radius, deg_offset, period, num_objects, ignore, object, object_height)
-	mergeObstacle(obstacle, fan)
-	return obstacle
-end
-
 function lb.newDoubleThwomp_(speed, height)
 	local obstacle = newParent(speed, "newDoubleThwomp_", height-.5, .5)
 	local thwomp = doubleThwomp(height)
@@ -493,7 +459,8 @@ function lb.threeLineSpike_(speed)
 	mergeObstacle(obstacle, line2_coin)
 	mergeObstacle(obstacle, line3)
 
-	return obstacle
+	local waitTime = getWaitTime(16+1.5)
+	return obstacle, waitTime
 end
 
 function lb.threeLineSquare_(speed)
@@ -675,8 +642,8 @@ function lb.threeFans_(speed)
 	local endPoint = util.newPoint(_right+(object_width/2), 0)
 	local fan_line = simpleLine(startPoint, endPoint, CN.COL_NUM, -1, nil, lb.spike2Edge(0,0,0))
 	local spinThings_1 = spinObject(util.newPoint(0,0), true, 0, period, fan_line)
-	local spinThings_2 = spinObject(util.newPoint(0,-fan_space), false, 0, period, wrapNull(0, -fan_space, {fan_line}))
-	local spinThings_3 = spinObject(util.newPoint(0,-2*fan_space), true, 0, period, wrapNull(0, -2*fan_space, {fan_line}))
+	local spinThings_2 = spinObject(util.newPoint(0,-fan_space), false, 0, period, wrapNull(0, -fan_space, 0, {fan_line}))
+	local spinThings_3 = spinObject(util.newPoint(0,-2*fan_space), true, 0, period, wrapNull(0, -2*fan_space, 0, {fan_line}))
 
 	mergeObstacle(obstacle, spinThings_1)
 	mergeObstacle(obstacle, spinThings_2)
@@ -803,11 +770,11 @@ end
 -- Returns obstacle, height
 function lb.obstacle(speed, i)
 	if i == 1 then
-		return lb.threeLineSpike_(speed), 0
+		return lb.threeLineSpike_(speed)
 	elseif i == 2 then
-		return lb.threeLineSquare_(speed), 0
+		return lb.threeLineSquare_(speed)
 	elseif i == 3 then
-		return lb.zigzag_(speed), 0
+		return lb.zigzag_(speed)
 	elseif i == 4 then
 		return lb.diagonalLatice1_(speed)
 	elseif i == 5 then
@@ -819,30 +786,31 @@ function lb.obstacle(speed, i)
 	elseif i == 8 then
 		return lb.fourSmall2Squares_(speed)
 	elseif i == 9 then
-		return lb.threeFans_(speed)
-	elseif i == 10 then
 		return lb.threePingpongLines_(speed)
-	elseif i == 11 then
+	elseif i == 10 then
 		return lb.fourOffsyncPingpongLines_(speed)
-	elseif i == 12 then
+	elseif i == 10 then
 		return lb.pingpongThreeGrid_(speed)
+	elseif i == 12 then
+		return lb.pingpongPath_(speed) -- BROKEN! (Can't use -1 time anymore)
 	elseif i == 13 then
-		return lb.pingpongPath_(speed)
+		return lb.threeFans_(speed) -- BROKEN! (Can't use -1 time anymore)
 	elseif i == 14 then
 
 	elseif i == 15 then
-
-	elseif i == 16 then
 
 	end
 end
 
 -- Just so I can call this from game.lua -> delete later?
 function lb.testObject()
-	-- local function simpleLine(startPoint, endPoint, num_objects, period, ignore, object, ease_pos, ease_rot) 
-	local obstacle = newParent(10000, "testObject", 0,0)
-	local line = simpleLine(util.newPoint(-5, 0), util.newPoint(5, 0), 5, 8000, nil, lb.spike2Edge(0,0,0), nil, nil) 
-	mergeObstacle(obstacle, line)
+	local obstacle = newParent(10000, "threeFans_", 0, 0)
+
+	local wall = wrapNull(-1,0,0,{stillSpikeWall(3)})
+	wall = wrapNull(0,0,90,{wall})
+	wall = wrapNull(0,0,0,{wall})
+
+	mergeObstacle(obstacle, wall)
 
 	return obstacle
 end

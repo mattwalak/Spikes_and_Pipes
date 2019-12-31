@@ -94,8 +94,9 @@ HARD CORE CODING:
 12/30	3:20pm		1:30				Finished destroyObject. Debugging some pre-written level obstacles
 12/30	10:00pm		0:30				Fixed bug with first_frame not setting correctly
 12/30	10:45pm		0:25				Implemented speed changes with bubble pops
+12/31	1:45pm		0:55				Identified problem with -1 transition values. Implemented wait_time
 ------------------------------------------------------------------------------------------------------------------------------
-					73:10 TOTAL
+					74:05 TOTAL
 
 
-THE GRAND TOTAL:	78:55
+THE GRAND TOTAL:	79:50
