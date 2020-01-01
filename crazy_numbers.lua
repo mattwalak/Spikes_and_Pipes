@@ -34,6 +34,7 @@ local INTRO_RANDOM_WIDTH = .25
 
 -- Game
 local BASE_OBSTACLE_TIME = 10000
+local OBSTACLE_BUFFER = 3
 
 
 local crazy_numbers = {
@@ -69,6 +70,7 @@ local crazy_numbers = {
 
 	-- Game
 	BASE_OBSTACLE_TIME = BASE_OBSTACLE_TIME,
+	OBSTACLE_BUFFER = OBSTACLE_BUFFER,
 
 	-- Debug
 	DBG_TOUCH_TYPE = "1",

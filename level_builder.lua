@@ -459,7 +459,7 @@ function lb.threeLineSpike_(speed)
 	mergeObstacle(obstacle, line2_coin)
 	mergeObstacle(obstacle, line3)
 
-	local waitTime = getWaitTime(16+1.5)
+	local waitTime = getWaitTime(16+1.5+CN.OBSTACLE_BUFFER)
 	return obstacle, waitTime
 end
 
@@ -490,7 +490,7 @@ function lb.threeLineSquare_(speed)
 	mergeObstacle(obstacle, line2_coin)
 	mergeObstacle(obstacle, line3)
 
-	return obstacle
+	return obstacle, getWaitTime((2*line_dist)+(obstacle_height/2)+(smallSquareSize/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.zigzag_(speed)
@@ -517,7 +517,7 @@ function lb.zigzag_(speed)
 	mergeObstacle(obstacle, right_line_1)
 	mergeObstacle(obstacle, right_line_2)
 
-	return obstacle
+	return obstacle, getWaitTime(2*line_dist+(obstacle_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.diagonalLatice1_(speed)
@@ -544,7 +544,7 @@ function lb.diagonalLatice1_(speed)
 	mergeObstacle(obstacle, right_line_1)
 	mergeObstacle(obstacle, right_line_2)
 
-	return obstacle
+	return obstacle, getWaitTime(start_offset+line_dist+slope_height+(obstacle_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.diagonalLatice2_(speed)
@@ -571,12 +571,12 @@ function lb.diagonalLatice2_(speed)
 	mergeObstacle(obstacle, right_line_1)
 	mergeObstacle(obstacle, right_line_2)
 
-	return obstacle
+	return obstacle, getWaitTime(start_offset+line_dist+slope_height+(obstacle_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.singleSquare_(speed)
 	-- lb.newSimpleFoursquare_(speed, centerPoint, edge_length, period, ignore, object, object_height)
-	return lb.newSimpleFoursquare_(speed, util.newPoint(0,0), 10, 8000, nil, lb.spike2Edge(0,0,0), 3) 
+	return lb.newSimpleFoursquare_(speed, util.newPoint(0,0), 10, 8000, nil, lb.spike2Edge(0,0,0), 3), getWaitTime(5+1.5+CN.OBSTACLE_BUFFER) 
 end
 
 function lb.multiple1Square_(speed)
@@ -607,7 +607,7 @@ function lb.multiple1Square_(speed)
 	mergeObstacle(obstacle, coin3)
 	mergeObstacle(obstacle, coin4)
 
-	return obstacle
+	return obstacle, getWaitTime(3*square_dist+(squareSize/2)+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.fourSmall2Squares_(speed)
@@ -627,7 +627,7 @@ function lb.fourSmall2Squares_(speed)
 	mergeObstacle(obstacle, largeSquare_1)
 	mergeObstacle(obstacle, largeSquare_2)
 	util.tableExtend(obstacle.children, centerCoin)
-	return obstacle
+	return obstacle, getWaitTime((largeSquareSize/2)+(smallSquareSize/2)+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.threeFans_(speed)
@@ -648,7 +648,7 @@ function lb.threeFans_(speed)
 	mergeObstacle(obstacle, spinThings_1)
 	mergeObstacle(obstacle, spinThings_2)
 	mergeObstacle(obstacle, spinThings_3)
-	return obstacle
+	return obstacle, getWaitTime(2*fan_space+(fan_length/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.threePingpongLines_(speed)
@@ -670,7 +670,7 @@ function lb.threePingpongLines_(speed)
 	mergeObstacle(obstacle, line_2)
 	mergeObstacle(obstacle, line_3)
 
-	return obstacle
+	return obstacle, getWaitTime(2*line_dist+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.fourOffsyncPingpongLines_(speed)
@@ -700,7 +700,7 @@ function lb.fourOffsyncPingpongLines_(speed)
 	mergeObstacle(obstacle, line_3)
 	mergeObstacle(obstacle, line_4)
 
-	return obstacle
+	return obstacle, getWaitTime(3*line_dist+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.pingpongThreeGrid_(speed)
@@ -728,7 +728,7 @@ function lb.pingpongThreeGrid_(speed)
 	mergeObstacle(obstacle, line_5)
 	mergeObstacle(obstacle, line_6)
 
-	return obstacle
+	return obstacle, getWaitTime(height+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.pingpongPath_(speed)
@@ -759,7 +759,7 @@ function lb.pingpongPath_(speed)
 	mergeObstacle(obstacle, left_side)
 	mergeObstacle(obstacle, right_side)
 
-	return obstacle
+	return obstacle, getWaitTime(height+(object_height/2)+CN.OBSTACLE_BUFFER)
 end
 
 function lb.sinePath_(speed)

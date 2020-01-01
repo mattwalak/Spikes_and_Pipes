@@ -85,32 +85,6 @@ local function drawCheckerboard()
 end
 
 
--- Clears everything from the screen
--- Does so by traversing every null, ultimately reaching every display object
-local function clearScreen()
-    while activeNullObjects[1] do
-        local thisNull = activeNullObjects[1]
-        if thisNull.children and (type(thisNull.children) == "table") then
-            -- Stop transitions for any displayObjects underneath
-            for i = 1, #thisNull.children, 1 do
-                if thisNull.children[i].type ~= "null" then
-                    thisObject = thisNull.children[i]
-                    if thisObject.image.collected then
-                    	
-                    else
-                        thisObject.image:removeSelf()
-                        util.removeFromList(activeDisplayObjects, thisObject.image)
-                        thisObject.image = nil
-                    end
-                    thisObject = nil
-                end
-            end
-        end
-        util.removeFromList(activeNullObjects, thisNull)
-        thisNull = nil
-    end
-end
-
 -- Stops all object transitions and sets them to nil
 local function stopTransitions()
     for i = 1, #activeNullObjects, 1 do
@@ -148,15 +122,43 @@ local function destroyObject(thisObject)
 	    	util.removeFromList(thisObject.parent.children, thisObject)
 	    end
     else
-    	if not thisObject.collected then
-			thisObject.image:removeSelf()
-    	end
-    	thisObject.image = nil
+        print("Destroying object: "..thisObject.type)
+
+        if thisObject.collected ~= nil then
+            print("\t.collected = something")
+            if thisObject.collected == true then
+                print("\t\t.collected == true")
+            else
+                print("\t\t.collected == false")
+            end
+            if thisObject.collected == false then
+                thisObject.image:removeSelf()
+            end
+        else
+            print("\t.collected = nil")
+            if thisObject.collected == true then
+                print("\t\t.collected == true")
+            else
+                print("\t\t.collected == false")
+            end
+
+            thisObject.image:removeSelf()
+        end
+        thisObject.image = nil
+
+
 
     	util.removeFromList(thisObject.parent.children, thisObject)
     end
 
     thisObject = nil
+end
+
+-- Clears everything from the screen
+local function clearScreen()
+    while activeObstacles[1] do
+        destroyObject(activeObstacles[1])
+    end
 end
 
 -- Updates all transition objects and corresponding null objects
@@ -553,8 +555,6 @@ local function on_victory_tapped(event)
 end
 
 local function gameOver()
-    stopTransitions()
-
     -- Creates temporary victory button with event listener
     local button = display.newRect(uiGroup, _width/2, _height/2,
     _width/2,_height/8)
@@ -566,7 +566,6 @@ local function gameOver()
         _width/2, _height/2,
         native.systemFont)
     button.text:setFillColor(0,0,0)
-
 end
 
 -- Gets new time scale from bubble_num (Maybe do a non-linear thing?)
@@ -655,31 +654,27 @@ local function onCollision(event)
 			if(event.element2 == 2) then
 				return
 			end
-            --bubble.popBubble(obj1)
+            bubble.popBubble(obj1)
 
 		elseif(obj1.type == "spike" and obj2.type == "bubble") then
 			if(event.element1 == 2) then
 				return
 			end
-			--bubble.popBubble(obj2)
+			bubble.popBubble(obj2)
 
         -- COIN COLLISION
 		elseif(obj1.type == "bubble" and obj2.type == "coin") then
             if(event.element2 == 2) then
                 return
             end
-            --[[print("coin collision!")
-            util.removeFromList(activeDisplayObjects, obj2)
             obj2:removeSelf()
-            obj2.collected = true]]--
+            obj2.collected = true
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
-            --[[print("coin collision!")
-            util.removeFromList(activeDisplayObjects, obj1)
             obj1:removeSelf()
-            obj1.collected = true]]--
+            obj1.collected = true
         end
 	end
 end
@@ -765,7 +760,7 @@ function scene:create( event )
     backgroundGroup:insert(bg)
 
 
-
+    --[[
     -- Add obstacle button
  	local button = display.newRect(uiGroup, 3*display.contentWidth/4, 3*display.contentHeight/4,
  	display.contentWidth/2,display.contentHeight/8)
@@ -785,7 +780,7 @@ function scene:create( event )
  		display.contentWidth/4, 3*display.contentHeight/4,
  		native.systemFont)
  	text:setFillColor(0,0,0)
-
+    ]]--
 
     -- Initialize ui
     score = 0
