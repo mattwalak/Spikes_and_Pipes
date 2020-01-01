@@ -124,29 +124,10 @@ local function destroyObject(thisObject)
     else
         print("Destroying object: "..thisObject.type)
 
-        if thisObject.collected ~= nil then
-            print("\t.collected = something")
-            if thisObject.collected == true then
-                print("\t\t.collected == true")
-            else
-                print("\t\t.collected == false")
-            end
-            if thisObject.collected == false then
-                thisObject.image:removeSelf()
-            end
-        else
-            print("\t.collected = nil")
-            if thisObject.collected == true then
-                print("\t\t.collected == true")
-            else
-                print("\t\t.collected == false")
-            end
-
+        if thisObject.image then
             thisObject.image:removeSelf()
+            thisObject.image = nil
         end
-        thisObject.image = nil
-
-
 
     	util.removeFromList(thisObject.parent.children, thisObject)
     end
@@ -321,6 +302,7 @@ local function getImage(displayObject)
     	physics.addBody(image, "static", {outline=imageOutline})
     end
 
+    image.type = displayObject.type
 	return image
 end
 
@@ -346,12 +328,6 @@ local function reposition(displayObject, ancestry)
         total_rot = total_rot + thisObject.rotation
         last_rot = thisObject.rotation
     end
-
-    -- Place this object (rotated) at this point
-    if not displayObject.image then
-    	displayObject.image = getImage(displayObject)
-    	displayObject.image.type = displayObject.type
-    end 
 
     displayObject.image.x = total_x * CN.COL_WIDTH
     displayObject.image.y = total_y * CN.COL_WIDTH
@@ -485,7 +461,7 @@ local function newObstacle(obstacleData, parent)
     	thisObject.x = obstacleData.x
     	thisObject.y = obstacleData.y
     	thisObject.rotation = obstacleData.rotation
-    	thisObject.image = nil -- To avoid having the object flash momentarally at (0,0) we will ad the image once its position is calculated
+    	thisObject.image = getImage(obstacleData)
     end
 
     return thisObject
@@ -668,13 +644,13 @@ local function onCollision(event)
                 return
             end
             obj2:removeSelf()
-            obj2.collected = true
+            obj2 = nil
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
             obj1:removeSelf()
-            obj1.collected = true
+            obj1 = nil
         end
 	end
 end

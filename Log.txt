@@ -96,6 +96,7 @@ HARD CORE CODING:
 12/30	10:45pm		0:25				Implemented speed changes with bubble pops
 12/31	1:45pm		0:55				Identified problem with -1 transition values. Implemented wait_time
 1/1		11:05am		0:40				Cleanup work to prepare for build. Worked on .collected bug
+1/1		4:05pm		
 ------------------------------------------------------------------------------------------------------------------------------
 					74:45 TOTAL
 
