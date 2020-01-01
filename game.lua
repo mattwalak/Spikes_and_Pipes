@@ -101,13 +101,8 @@ local function destroyObject(thisObject)
 	    	util.removeFromList(thisObject.parent.children, thisObject)
 	    end
     else
-        print("Destroying object: "..thisObject.type)
-
-        if thisObject.image then
-            thisObject.image:removeSelf()
-            thisObject.image = nil
-        end
-
+        thisObject.image:removeSelf()
+        thisObject.image = nil
     	util.removeFromList(thisObject.parent.children, thisObject)
     end
 
@@ -248,7 +243,13 @@ local function updateObstacle(obstacle, ancestry)
 			end
 		end
 	else
-		reposition(obstacle, ancestry)
+        if obstacle.image.needsRemoval == true then
+            print("removing physics object")
+            physics.removeBody(obstacle.image)
+            obstacle.image.needsRemoval = false
+        else
+            reposition(obstacle, ancestry)
+        end
 	end
 end
 
@@ -461,14 +462,16 @@ local function onCollision(event)
             if(event.element2 == 2) then
                 return
             end
-            obj2:removeSelf()
-            obj2 = nil
+            obj2.isVisible = false
+            obj2.needsRemoval = true
+
         elseif(obj1.type == "coin" and obj2.type == "bubble") then
             if(event.element1 == 2) then
                 return
             end
-            obj1:removeSelf()
-            obj1 = nil
+            obj1.isVisible = false
+            obj1.needsRemoval = true
+
         end
 	end
 end
