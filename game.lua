@@ -36,12 +36,8 @@ local padGroup -- In front of everything
 -- Define important gameplay variables
 local score -- Total normalized seconds offset by height of heighest bubble
 local total_norm_sec -- Total normalized seconds
-local activeDisplayObjects = {} -- All visible blocks, spikes, and powerups
-local activeNullObjects = {} -- All active Null objects
-
 local activeObstacles = {} -- List of pointers to parent null for all active obstacles (1 for each obstacle)
 local activeTransitioners = {} -- One transition for each null object
-
 
 local last_frame_time -- Time in ms of the last frame render
 local time_scale -- Value of each ms in game time
@@ -79,23 +75,6 @@ local function drawCheckerboard()
                 rect:setFillColor(.5, .5, .5)
             else
                 rect:setFillColor(1,1,1)
-            end
-        end
-    end
-end
-
-
--- Stops all object transitions and sets them to nil
-local function stopTransitions()
-    for i = 1, #activeNullObjects, 1 do
-        thisNull = activeNullObjects[i]
-        transition.cancel(thisNull)
-        if thisNull.children and (type(thisNull.children) == "table") then
-            -- Stop transitions for any displayObjects underneath
-            for i = 1, #thisNull.children, 1 do
-                if thisNull.children[i].type ~= "null" then
-                    transition.cancel(thisNull.children[i])
-                end
             end
         end
     end
@@ -147,22 +126,14 @@ local function updateTransitions(dt)
 	local scaled_time = dt*time_scale
 	local i = 1
 	while i <= #activeTransitioners do
-		-- print("i = "..i..", activeTransitioners = "..#activeTransitioners)
 		local t = activeTransitioners[i]
 		t.internal_time = t.internal_time + scaled_time
-		--print("["..i.."] "..t.name)
-		-- print("\tInternal time = "..t.internal_time)
-		-- print("\tTotal time = "..t.total_time)
-		-- print("\tOncomplete = "..t.on_complete)
 
 		local continue = true
 		if (t.internal_time/t.total_time) >= 1 then
 			if t.on_complete == "destroy" then
-				-- print("DESTROY!!!")
-				-- print("#transitioners before = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
 				destroyObject(t.linkedNull)
-				-- print("#transitioners after = "..#activeTransitioners..", #activeObstacles = "..#activeObstacles)
-				i = 0 -- Probably a better way to do this, but we just go through all transitioners again
+				i = 0 -- Just go through all transitioners again (Probably a better way to do this)
 				continue = false
 			elseif t.on_complete == "stop" then
 				continue = false
@@ -171,17 +142,10 @@ local function updateTransitions(dt)
 
 		if continue then
 			local time = t.internal_time%t.total_time
-			--print("\ttime = "..time)
 
 			-- Find the most recent frame percent
 			local last_frame = -1
 			local time_sum = 0
-			--print("\ttransition_time:")
-			--[[
-			for i = 1, #t.transition_time, 1 do
-				time_sum = time_sum + t.transition_time[i]
-				--print("\t\t["..i.."] = "..t.transition_time[i].."; time_sum = "..time_sum)
-			end]]--
 			time_sum = 0
 			for i = 1, #t.transition_time, 1 do
 				time_sum = time_sum + t.transition_time[i]
@@ -191,15 +155,10 @@ local function updateTransitions(dt)
 				end
 			end
 			local next_frame = (last_frame%(#t.transition_time))+1
-			--print("\tlast_frame = "..last_frame.."; next_frame = "..next_frame)
-
-			local time_into_frame = time - (time_sum - t.transition_time[last_frame])-- Time into transition
-			--print("\ttime_into_frame = "..time_into_frame)
+			local time_into_frame = time - (time_sum - t.transition_time[last_frame]) -- Time into transition
 			local total_frame_time = t.transition_time[last_frame]
-			--print("\ttotal_frame_time = "..total_frame_time)
 			local percent = time_into_frame/total_frame_time
 			percent = util.scale(percent, "linear")
-			--print("\tpercent = "..percent)
 
 			-- Calculate new position
 			local ori_pos = t.position_path[last_frame]
@@ -209,7 +168,6 @@ local function updateTransitions(dt)
 			local new_x = ori_pos.x+((new_pos.x-ori_pos.x)*percent)
 			local new_y = ori_pos.y+((new_pos.y-ori_pos.y)*percent)
 			local new_rot = ori_rot+((new_rot-ori_rot)*percent)
-			--print("\tnew_x = "..new_x..", new_y = "..new_y..", new_rot = "..new_rot)
 
 			t.linkedNull.x = new_x
 			t.linkedNull.y = new_y
@@ -218,63 +176,6 @@ local function updateTransitions(dt)
 		end
 		i = i + 1
 	end
-end
-
--- Transitions a null object from current_frame to current_frame + 1
-local function keyframeNull(thisNull)
-    local num_frames = #thisNull.position_path
-
-    -- Calculate current frame accounting for overflow
-    local current_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
-
-    -- Number of times we have completed the full animation
-    -- (If > 1, we are currently at first frame ie. cycle is already complete)
-    local revolutions = thisNull.frame_counter/num_frames
-    if(revolutions > 0) then
-        if(thisNull.on_complete == "destroy") then
-        	destroyObject(thisNull)
-            return
-        elseif(thisNull.on_complete == "stop") then
-            return -- Do not start on the next transition
-        elseif(thisNull.on_complete == "loop") then
-            -- Do nothing
-        end
-    end
-
-    -- Update frame count (Accounting for overflow) and perform transitions
-    local next_frame = (current_frame % num_frames) + 1
-    thisNull.frame_counter = thisNull.frame_counter + 1
-    local transition_time = thisNull.transition_time[next_frame]
-    local next_x = thisNull.position_path[next_frame].x * CN.COL_WIDTH
-    local next_y = thisNull.position_path[next_frame].y * CN.COL_WIDTH
-    local next_rotation = thisNull.rotation_path[next_frame]
-
-    -- If transition time is negative, we stop everything
-    if transition_time < 0 then 
-        --print("Canceling transition")
-        return 
-    end
-
-    -- To ensure transitions start at the same time, only the position transition
-    -- causes the next transition to be called
-
-    transition.to(thisNull, {
-        time = transition_time,
-        rotation = next_rotation,
-        tag = thisNull.name,
-        transition = thisNull.rotation_interpolation
-    })
-
-    transition.to(thisNull, {
-        time = transition_time,
-        x = next_x,
-        y = next_y,
-        transition = thisNull.position_interpolation,
-        tag = thisNull.name,
-        onComplete = keyframeNull
-    })
-
-    
 end
 
 -- Creates the required corona object for a displayObject. Also adds object to physics engine
@@ -349,45 +250,6 @@ local function updateObstacle(obstacle, ancestry)
 	else
 		reposition(obstacle, ancestry)
 	end
-end
-
-
--- OBSTACLE OPTION 1: Creates a new Corona recognized display object from its data
-local function createDisplayObject(thisObject, ancestry)
-	local image
-    local imageOutline
-	if thisObject.type == "black_square" then
-		image = display.newImageRect(obstacleGroup, "Game/Obstacle/black_square.png", CN.COL_WIDTH, CN.COL_WIDTH)
-        imageOutline = graphics.newOutline(2, "Game/Obstacle/black_square.png")
-    elseif thisObject.type == "spike" then
-		image = display.newImageRect(obstacleGroup, "Game/Obstacle/spike.png", CN.COL_WIDTH, CN.COL_WIDTH)
-        imageOutline = graphics.newOutline(2, "Game/Obstacle/spike.png")
-    elseif thisObject.type == "coin" then
-        print("adding coin")
-        image = display.newSprite(A.sheet_coin, A.sequences_coin)
-        obstacleGroup:insert(image)
-        image:play()
-        image.collected = false
-        imageOutline = graphics.newOutline(2, "Game/Item/coin_2d.png")
-    elseif thisObject.type == "text" then
-    	print("New text")
-    	image = display.newText(obstacleGroup, thisObject.text, thisObject.x, thisObject.y, thisObject.font, thisObject.fontSize)
-    	image:setFillColor( thisObject.color[1], thisObject.color[2], thisObject.color[3] )
-    	imageOutline = nil
-    end
-    image.type = thisObject.type
-    image.r_x = thisObject.x * CN.COL_WIDTH
-    image.r_y = thisObject.y * CN.COL_WIDTH
-    image.r_rot = thisObject.rotation
-    image.ancestry = ancestry
-    image.object = thisObject -- Used to set both to nil when destroying
-    thisObject.image = image
-
-    if thisObject.type ~= "text" then
-    	physics.addBody(image, "static", {outline=imageOutline})
-    end
-
-	return image
 end
 
 -- Returns a new transitioner object linked to the active obstacle
@@ -465,51 +327,7 @@ local function newObstacle(obstacleData, parent)
     end
 
     return thisObject
-
-
-
-    --[[
-    -- print("type = "..thisObstacle.type)
-    if thisObstacle.type == "null" then
-    	createNullObject(thisObstacle)
-
-    	
-        local thisNull = thisObstacle
-        -- print("Inserting name = "..thisNull.name)
-        table.insert(activeNullObjects, thisNull)
-
-        -- Set the state values of our null object
-        thisNull.frame_counter = 0
-        local num_frames = #thisNull.position_path
-        local this_frame = ( ((thisNull.first_frame - 1) + thisNull.frame_counter) % num_frames ) + 1
-        thisNull.x = thisNull.position_path[this_frame].x * CN.COL_WIDTH
-        thisNull.y = thisNull.position_path[this_frame].y * CN.COL_WIDTH
-        -- print("name = "..thisNull.name..", initial_x = "..thisNull.x..", initial_y = "..thisNull.y)
-        thisNull.rotation = thisNull.rotation_path[this_frame]
-
-        -- Set the null objects on their way! (Start transitions)
-        keyframeNull(thisNull)
-
-        if not thisObstacle.children then return end
-        for i = 1, #thisObstacle.children, 1 do
-            local newAncestry = {}
-            newAncestry = util.shallowcopy(ancestry)
-            table.insert(newAncestry, thisObstacle)
-            createObstacle(thisObstacle.children[i], newAncestry)
-        end
-    else
-        local newDisplayObject = createDisplayObject(thisObstacle, ancestry)
-        table.insert(activeDisplayObjects, newDisplayObject)
-        reposition(newDisplayObject)
-    end
-    ]]--
 end
-
--- Updates all displayObjects (Spikes, squares, powerups, etc...)
-local function updateDisplayObjects()
-    
-end
-
 
 -- Update score element
 local function update_scoreText()
